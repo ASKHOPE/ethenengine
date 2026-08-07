@@ -1,0 +1,46 @@
+{
+  "name": "ethenengine-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant Business Platform Architecture v1 (Phase 1) powered by Bun & Hono",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "tsc",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "bun run test/platform.test.ts",
+    "benchmark": "bun test/benchmark.ts",
+    "benchmark:subsystem": "bun test/subsystem-benchmark.ts"
+  },
+  "dependencies": {
+    "@types/pg": "^8.20.4",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.13.1",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.28.0",
+    "pg": "^8.22.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.12.7",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "bun-types": "latest",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "solid-js": "^1.9.14",
+    "svelte": "^5.56.8",
+    "typescript": "^5.4.5"
+  }
+}

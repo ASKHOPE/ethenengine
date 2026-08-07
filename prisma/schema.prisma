@@ -1,0 +1,103 @@
+// Prisma Schema for PostgreSQL / SQLite Database Ownership (ADR-009)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Organization {
+  id               String   @id @default(uuid())
+  name             String
+  billingEmail     String
+  subscriptionPlan String   @default("free")
+  createdAt        DateTime @default(now())
+  tenants          Tenant[]
+}
+
+model Tenant {
+  id        String       @id @default(uuid())
+  orgId     String
+  name      String
+  slug      String       @unique
+  domain    String       @unique
+  status    String       @default("active")
+  createdAt DateTime     @default(now())
+  org       Organization @relation(fields: [orgId], references: [id])
+  workspaces Workspace[]
+}
+
+model Workspace {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  environment String   @default("production")
+  createdAt   DateTime @default(now())
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  type      String   // PLATFORM_USER | TENANT_USER | PUBLIC_USER
+  email     String   @unique
+  name      String
+  tenantId  String?
+  orgId     String?
+  roles     String   // Comma-separated roles
+  createdAt DateTime @default(now())
+}
+
+model WebsitePage {
+  id          String   @id @default(uuid())
+  tenantId    String
+  title       String
+  slug        String
+  blocksJson  String   // JSON payload of blocks
+  isPublished Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model CmsEntry {
+  id            String   @id @default(uuid())
+  tenantId      String
+  contentTypeId String
+  slug          String
+  dataJson      String   // JSON payload of content
+  status        String   @default("published")
+  updatedAt     DateTime @updatedAt
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  sku         String
+  price       Float
+  currency    String   @default("USD")
+  stock       Int      @default(0)
+  description String
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  tenantId    String
+  userId      String
+  itemsJson   String   // JSON payload of order items
+  totalAmount Float
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+}
+
+model AuditRecord {
+  id          String   @id @default(uuid())
+  tenantId    String
+  workspaceId String?
+  actorId     String
+  action      String
+  resource    String
+  detailsJson String
+  timestamp   DateTime @default(now())
+}

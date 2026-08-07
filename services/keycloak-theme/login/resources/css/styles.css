@@ -1,0 +1,180 @@
+/* Modern Responsive Glassmorphism Theme for Keycloak 24+ */
+
+/* Reset & Root Setup */
+html, body {
+  min-height: 100vh !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 50%, #020617 100%) !important;
+  background-attachment: fixed !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  color: #f8fafc !important;
+  box-sizing: border-box !important;
+}
+
+body {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+}
+
+/* Hide Default Headers, Footers, and Unwanted Elements */
+#kc-header, .login-pf-header, header, footer, .pf-v5-c-login__header, .pf-c-login__header, .pf-v5-c-login__footer, .pf-c-login__footer {
+  display: none !important;
+}
+
+/* Main Outer Containers - Responsive Grid Centering */
+#kc-container-wrapper, .login-pf-page, .pf-v5-c-login, .pf-c-login, div[class*="login-container"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  margin: 0 auto !important;
+  padding: 1.5rem 1rem !important;
+  box-sizing: border-box !important;
+}
+
+/* Card Outer Box - Centered Glass Panel */
+.pf-v5-c-login__main, .pf-c-login__main, #kc-content, .card-pf, #kc-form-card, div[class*="card"] {
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: auto !important;
+  background: rgba(15, 23, 42, 0.82) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 30px rgba(99, 102, 241, 0.2) !important;
+  padding: 2.5rem 2rem !important;
+  box-sizing: border-box !important;
+  float: none !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* Page Header & Title */
+#kc-page-title, .pf-v5-c-title, .pf-c-title, h1#kc-page-title, h1 {
+  color: #ffffff !important;
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  margin: 0 0 1.75rem 0 !important;
+  letter-spacing: -0.5px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Form Groups & Margins */
+.pf-v5-c-form__group, .pf-c-form__group, .form-group {
+  margin-bottom: 1.25rem !important;
+}
+
+/* Form Labels */
+.pf-v5-c-form__label, .pf-c-form__label, label, .form-group label {
+  color: #94a3b8 !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.4rem !important;
+  display: block !important;
+}
+
+/* Input Fields & Text Boxes */
+.pf-v5-c-form-control, .pf-c-form-control, input.form-control, input[type="text"], input[type="password"], input[type="email"] {
+  width: 100% !important;
+  background: rgba(2, 6, 23, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 0.6rem !important;
+  color: #ffffff !important;
+  padding: 0.8rem 1rem !important;
+  font-size: 0.95rem !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input.form-control:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, .pf-v5-c-form-control:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3) !important;
+  outline: none !important;
+}
+
+/* Password Eye Button Alignment */
+.pf-v5-c-form-control__group, .pf-c-form-control__group, .input-group, .pf-v5-c-input-group, .pf-c-input-group {
+  display: flex !important;
+  border-radius: 0.6rem !important;
+  overflow: hidden !important;
+}
+
+.pf-v5-c-button.pf-m-control, .pf-c-button.pf-m-control, button.pf-m-control {
+  background: rgba(2, 6, 23, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-left: none !important;
+  color: #94a3b8 !important;
+  padding: 0 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+.pf-v5-c-button.pf-m-control:hover, .pf-c-button.pf-m-control:hover {
+  color: #ffffff !important;
+  background: rgba(15, 23, 42, 0.9) !important;
+}
+
+/* Primary Action Button (Sign In) */
+#kc-login, input[type="submit"], button[type="submit"], .pf-v5-c-button.pf-m-primary, .pf-c-button.pf-m-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  border: none !important;
+  border-radius: 0.6rem !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  padding: 0.85rem 1.25rem !important;
+  width: 100% !important;
+  margin-top: 0.75rem !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4) !important;
+  transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+}
+
+#kc-login:hover, input[type="submit"]:hover, button[type="submit"]:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.55) !important;
+}
+
+#kc-login:active, input[type="submit"]:active, button[type="submit"]:active {
+  transform: translateY(0) !important;
+}
+
+/* Alert Boxes & Errors */
+.pf-v5-c-alert, .pf-c-alert, .alert-error, .alert {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+  border-radius: 0.6rem !important;
+  padding: 0.85rem !important;
+  margin-bottom: 1.25rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Viewport Adjustments for Mobile / Tablet */
+@media (max-width: 576px) {
+  body {
+    padding: 0.5rem !important;
+  }
+  
+  .pf-v5-c-login__main, .pf-c-login__main, #kc-content, .card-pf, #kc-form-card {
+    padding: 1.75rem 1.25rem !important;
+    border-radius: 1rem !important;
+  }
+
+  #kc-page-title, .pf-v5-c-title {
+    font-size: 1.35rem !important;
+  }
+}

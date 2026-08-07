@@ -1,0 +1,30 @@
+services:
+  # 1. ETHENENGINE Bun & Hono Web Service
+  - type: web
+    name: ethenengine-core
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ethenengine-db
+          property: connectionString
+      - key: SMTP_HOST
+        value: smtp.sendgrid.net
+      - key: SMTP_PORT
+        value: 587
+    healthCheckPath: /api/openapi.json
+
+# 2. Managed Render PostgreSQL Database
+databases:
+  - name: ethenengine-db
+    plan: free
+    region: oregon
+    databaseName: ethenenginedb
+    user: platform

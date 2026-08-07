@@ -1,0 +1,161 @@
+{
+  "tenants": [
+    {
+      "id": "tenant_default",
+      "orgId": "org_default",
+      "name": "ETHENENGINE Core Tenant",
+      "slug": "default",
+      "domain": "localhost",
+      "status": "active",
+      "createdAt": "2026-08-07T18:01:41.529Z"
+    },
+    {
+      "id": "tenant_lioramedia",
+      "orgId": "org_lioramedia",
+      "name": "LIORAMEDIA Studios Inc",
+      "slug": "lioramedia",
+      "domain": "lioramedia.localhost",
+      "status": "active",
+      "createdAt": "2026-08-07T18:01:41.530Z"
+    }
+  ],
+  "pages": [
+    {
+      "id": "page_liora_home",
+      "tenantId": "tenant_lioramedia",
+      "title": "LIORAMEDIA Studios - Next-Gen Motion & AI Video Production",
+      "slug": "home",
+      "isPublished": true,
+      "seo": {
+        "title": "LIORAMEDIA Studios - 3D Motion & AI Commercial Production",
+        "description": "World-class virtual production, 3D motion design, and AI commercial pipelines."
+      },
+      "blocks": [
+        {
+          "id": "blk_liora_hero",
+          "type": "hero",
+          "settings": {
+            "title": "LIORAMEDIA Studios",
+            "subtitle": "High-Impact 3D Motion Design, Virtual Production & AI Video Pipelines for Global Brands.",
+            "ctaText": "Explore Media Portfolio",
+            "ctaUrl": "/lioramedia/portfolio"
+          }
+        },
+        {
+          "id": "blk_liora_features",
+          "type": "features",
+          "settings": {
+            "title": "LIORAMEDIA Production Capabilities",
+            "items": [
+              {
+                "name": "8K Virtual LED Stages",
+                "desc": "Real-time camera tracking and Unreal Engine 5 stage rendering."
+              },
+              {
+                "name": "Generative AI Pipelines",
+                "desc": "Custom trained Diffusion & Video AI models for instant ad variations."
+              },
+              {
+                "name": "3D VFX & Motion Graphics",
+                "desc": "Procedural Houdini VFX and Cinema 4D commercial animation."
+              },
+              {
+                "name": "Global Asset Store",
+                "desc": "Instant licensing of procedural shaders and 3D motion templates."
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk_liora_cms",
+          "type": "cms_feed",
+          "settings": {
+            "title": "Featured Case Studies & Media Releases",
+            "contentTypeSlug": "case-study",
+            "limit": 3
+          }
+        },
+        {
+          "id": "blk_liora_cta",
+          "type": "cta",
+          "settings": {
+            "headline": "Ready to produce your next global ad campaign with LIORAMEDIA?",
+            "buttonText": "Book Studio Consultation"
+          }
+        }
+      ]
+    },
+    {
+      "id": "page_liora_portfolio",
+      "tenantId": "tenant_lioramedia",
+      "title": "Media Portfolio & Case Studies",
+      "slug": "portfolio",
+      "isPublished": true,
+      "seo": {
+        "title": "LIORAMEDIA Portfolio - Global Campaigns",
+        "description": "Explore high-profile 3D motion and virtual production projects for Nike, Warner Bros, and Red Bull."
+      },
+      "blocks": [
+        {
+          "id": "blk_port_hero",
+          "type": "hero",
+          "settings": {
+            "title": "LIORAMEDIA Global Portfolio",
+            "subtitle": "Award-winning commercial campaigns, 3D billboards, and AI video innovations.",
+            "ctaText": "View Commercial Services",
+            "ctaUrl": "/lioramedia/home"
+          }
+        },
+        {
+          "id": "blk_port_feed",
+          "type": "cms_feed",
+          "settings": {
+            "title": "Selected Campaign Showcases",
+            "contentTypeSlug": "case-study",
+            "limit": 6
+          }
+        }
+      ]
+    }
+  ],
+  "cms_entries": [
+    {
+      "tenantId": "tenant_lioramedia",
+      "contentTypeId": "ct_1786125701638",
+      "slug": "ai-commercial-pipeline",
+      "data": {
+        "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
+        "content": "Generated 500 localized 4K commercial variations in 2 hours using custom trained Flux video diffusion models.",
+        "author": "AI Tech Lead",
+        "client": "Porsche Digital"
+      },
+      "status": "published",
+      "id": "entry_1786125701638",
+      "updatedAt": "2026-08-07T18:01:41.638Z"
+    }
+  ],
+  "products": [
+    {
+      "tenantId": "tenant_lioramedia",
+      "name": "Monthly AI Commercial Ad Retainer",
+      "sku": "LIO-AI-RETAINER",
+      "price": 4500,
+      "currency": "USD",
+      "stock": 50,
+      "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
+      "id": "prod_1786125701638"
+    }
+  ],
+  "leads": [
+    {
+      "tenantId": "tenant_lioramedia",
+      "contactName": "Felix Baum",
+      "email": "fbaum@redbull.com",
+      "company": "Red Bull Media House",
+      "dealValue": 45000,
+      "stage": "contacted",
+      "id": "lead_1786125701639",
+      "createdAt": "2026-08-07T18:01:41.639Z"
+    }
+  ]
+}
