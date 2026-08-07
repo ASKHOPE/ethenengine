@@ -78,7 +78,7 @@ export class CorePlatformManager {
       orgId: org.id,
       name: 'ETHENENGINE Core Tenant',
       slug: 'default',
-      domain: 'ethenengine.com',
+      domain: process.env.PLATFORM_DOMAIN || 'app.ethenengine.com',
       status: 'active',
       createdAt: new Date().toISOString(),
     };

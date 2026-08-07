@@ -6,6 +6,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
+    # Custom domain: app.ethenengine.com (CNAME → ethenengine-core.onrender.com)
     envVars:
       - key: PORT
         value: 10000
@@ -15,11 +16,19 @@ services:
         fromDatabase:
           name: ethenengine-db
           property: connectionString
+      - key: JWT_SECRET
+        sync: false   # Set manually in Render Dashboard → Environment
+      - key: ENCRYPTION_KEY
+        sync: false   # Set manually in Render Dashboard → Environment
+      - key: PLATFORM_DOMAIN
+        value: app.ethenengine.com
       - key: SMTP_HOST
         value: smtp.sendgrid.net
       - key: SMTP_PORT
         value: 587
-    healthCheckPath: /api/openapi.json
+      - key: SMTP_FROM
+        value: noreply@ethenengine.com
+    healthCheckPath: /api/sync/status
 
 # 2. Managed Render PostgreSQL Database
 databases:
