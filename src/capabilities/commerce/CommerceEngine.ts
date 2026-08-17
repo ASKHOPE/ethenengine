@@ -30,6 +30,9 @@ export interface Order {
   tenantId: string;
   userId: string;
   items: CartItem[];
+  subtotal: number;
+  discountAmount: number;
+  promoCode?: string;
   totalAmount: number;
   status: 'pending' | 'paid' | 'fulfilled' | 'cancelled';
   createdAt: string;
@@ -104,18 +107,49 @@ export class CommerceEngine {
     return cart;
   }
 
-  // Order Placement
-  public createOrder(tenantId: string, userId: string): Order {
+  public updateCartItemQuantity(tenantId: string, userId: string | undefined, productId: string, quantity: number): Cart {
+    const cart = this.getCart(tenantId, userId);
+    if (quantity <= 0) {
+      cart.items = cart.items.filter(item => item.productId !== productId);
+    } else {
+      const item = cart.items.find(i => i.productId === productId);
+      if (item) item.quantity = quantity;
+    }
+    return cart;
+  }
+
+  public clearCart(tenantId: string, userId?: string): Cart {
+    const cart = this.getCart(tenantId, userId);
+    cart.items = [];
+    return cart;
+  }
+
+  // Order Placement with Promo Code / Discount Support
+  public createOrder(tenantId: string, userId: string, promoCode?: string): Order {
     const cart = this.getCart(tenantId, userId);
     if (cart.items.length === 0) throw new Error('Cannot checkout empty cart');
 
-    const totalAmount = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    const subtotal = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    
+    // Promo calculation (e.g. BLACKFRIDAY20 = 20% off, SPECIAL10 = 10% off)
+    let discountAmount = 0;
+    const cleanPromo = (promoCode || '').trim().toUpperCase();
+    if (cleanPromo === 'BLACKFRIDAY20' || cleanPromo === 'SALE20') {
+      discountAmount = Math.round(subtotal * 0.2);
+    } else if (cleanPromo === 'SPECIAL10' || cleanPromo === 'WELCOME10') {
+      discountAmount = Math.round(subtotal * 0.1);
+    }
+
+    const totalAmount = Math.max(0, subtotal - discountAmount);
 
     const order: Order = {
       id: `ord_${Date.now()}`,
       tenantId,
       userId,
       items: [...cart.items],
+      subtotal,
+      discountAmount,
+      promoCode: discountAmount > 0 ? cleanPromo : undefined,
       totalAmount,
       status: 'pending',
       createdAt: new Date().toISOString(),

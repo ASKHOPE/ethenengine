@@ -73,3 +73,10 @@ export class CapabilityRegistry {
     return Array.from(this.blueprints.values());
   }
 }
+
+export const FutureCapabilitiesMap: Record<string, any> = {
+  ai_copilot: { name: 'AI Studio Copilot', status: 'ready', category: 'experience' },
+  i18n_multi_currency: { name: 'i18n & Multi-Currency Engine', status: 'ready', category: 'business' },
+  aiven_postgres_sync: { name: 'Aiven Cloud PostgreSQL Sync', status: 'active', category: 'core' },
+};
+

@@ -4,7 +4,7 @@ import { EventBus } from '../../foundation/EventBus.js';
 
 export interface PageBlock {
   id: string;
-  type: 'hero' | 'features' | 'cms_feed' | 'cta' | 'footer' | 'custom_html';
+  type: 'hero' | 'features' | 'cms_feed' | 'cta' | 'footer' | 'custom_html' | 'pricing' | 'testimonials' | 'stats' | 'gallery';
   settings: Record<string, any>;
 }
 
@@ -275,6 +275,11 @@ export class WebsiteBuilder {
   public listPages(tenantId: string): WebsitePage[] {
     const cleanId = tenantId.replace('tenant_', '');
     return Array.from(this.pages.values()).filter((p) => p.tenantId === tenantId || p.tenantId === cleanId || p.tenantId === `tenant_${cleanId}`);
+  }
+
+  public renderPage(page: WebsitePage, context?: any): string {
+    const registry = (require('./BlockRegistry.js') as any).BlockRegistry.getInstance();
+    return page.blocks.map(b => registry.renderBlock(b.type, b.settings, context)).join('\n');
   }
 
   public getPageBySlug(tenantId: string, slug: string): WebsitePage | undefined {
