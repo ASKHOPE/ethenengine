@@ -72,8 +72,17 @@ app.use('*', SecurityGuard.securityMiddleware());
 app.use('*', watchdogMiddleware());
 app.use('*', LoadGovernor.middleware());
 app.use('/public/*', serveStatic({ root: './' }));
-app.use('/*.css', serveStatic({ root: './public' }));
-app.use('/*.js', serveStatic({ root: './public' }));
+// Direct CSS/JS asset serving — serveStatic root resolution fix for Bun
+const servePublicFile = (filename: string, contentType: string) => async (c: any) => {
+  const file = Bun.file(`./public/${filename}`);
+  const content = await file.text();
+  return c.text(content, 200, { 'Content-Type': contentType });
+};
+app.get('/styles.css', servePublicFile('styles.css', 'text/css'));
+app.get('/editor.css', servePublicFile('editor.css', 'text/css'));
+app.get('/blocks.css', servePublicFile('blocks.css', 'text/css'));
+app.get('/animations.css', servePublicFile('animations.css', 'text/css'));
+
 
 // OpenAPI Spec & Swagger UI
 app.get('/api/openapi.json', (c) => c.json(OpenAPIGenerator.generateSpec()));
