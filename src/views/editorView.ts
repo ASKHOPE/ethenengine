@@ -278,7 +278,7 @@ export function renderEditorView(options: EditorViewOptions): string {
 
       <!-- BLOCKS TAB -->
       <div class="drawer-content" id="drawerBlocksTab">
-        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:0.75rem;">Navigation & Announcement</h4>
+        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:0.75rem;">Navigation & Header</h4>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'navbar')" onclick="addBlock('navbar')">
           <div class="block-card-icon">🧭</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Navigation Bar</div><div style="font-size:0.72rem; color:#94a3b8;">Brand logo, menu links & CTA</div></div>
@@ -287,12 +287,26 @@ export function renderEditorView(options: EditorViewOptions): string {
           <div class="block-card-icon">📢</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Announcement Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Top sale announcement ticker</div></div>
         </div>
-
-        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:1.25rem 0 0.75rem;">Core Sections</h4>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'hero')" onclick="addBlock('hero')">
           <div class="block-card-icon">⚡</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Hero Banner</div><div style="font-size:0.72rem; color:#94a3b8;">High-impact headline & CTA</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Hero Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Headline, CTAs & visual mockup</div></div>
         </div>
+
+        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:1.25rem 0 0.75rem;">Rich Media & Visuals</h4>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'image_showcase')" onclick="addBlock('image_showcase')">
+          <div class="block-card-icon">🖼️</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Image Banner & Showcase</div><div style="font-size:0.72rem; color:#94a3b8;">Single image, caption & destination link</div></div>
+        </div>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'video_player')" onclick="addBlock('video_player')">
+          <div class="block-card-icon">🎬</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Video Player & Embed</div><div style="font-size:0.72rem; color:#94a3b8;">YouTube, Vimeo & MP4 video player</div></div>
+        </div>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'gallery')" onclick="addBlock('gallery')">
+          <div class="block-card-icon">📸</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Media Gallery Grid</div><div style="font-size:0.72rem; color:#94a3b8;">Multi-image showcase grid with links</div></div>
+        </div>
+
+        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:1.25rem 0 0.75rem;">Content & Social Proof</h4>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'stats')" onclick="addBlock('stats')">
           <div class="block-card-icon">📊</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Key Metrics / Stats</div><div style="font-size:0.72rem; color:#94a3b8;">Multi-column metrics & proof</div></div>
@@ -313,13 +327,15 @@ export function renderEditorView(options: EditorViewOptions): string {
           <div class="block-card-icon">❓</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">FAQ Accordion</div><div style="font-size:0.72rem; color:#94a3b8;">Expandable Q&A accordion cards</div></div>
         </div>
-        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'product_grid')" onclick="addBlock('product_grid')">
-          <div class="block-card-icon">🛍️</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Store Showcase</div><div style="font-size:0.72rem; color:#94a3b8;">Product merchandise catalog</div></div>
-        </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'cms_feed')" onclick="addBlock('cms_feed')">
           <div class="block-card-icon">📝</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Headless CMS Feed</div><div style="font-size:0.72rem; color:#94a3b8;">Dynamic articles & releases</div></div>
+        </div>
+
+        <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:1.25rem 0 0.75rem;">Conversion & Actions</h4>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'product_grid')" onclick="addBlock('product_grid')">
+          <div class="block-card-icon">🛍️</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Store Showcase</div><div style="font-size:0.72rem; color:#94a3b8;">Product merchandise catalog</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'cta')" onclick="addBlock('cta')">
           <div class="block-card-icon">🎯</div>
@@ -331,7 +347,7 @@ export function renderEditorView(options: EditorViewOptions): string {
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'pagination')" onclick="addBlock('pagination')">
           <div class="block-card-icon">🔢</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Pagination Controls</div><div style="font-size:0.72rem; color:#94a3b8;">Numbered page buttons & next/prev</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Pagination Manager</div><div style="font-size:0.72rem; color:#94a3b8;">Numbered page buttons & range controls</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'footer')" onclick="addBlock('footer')">
           <div class="block-card-icon">⚓</div>
@@ -699,7 +715,73 @@ export function renderEditorView(options: EditorViewOptions): string {
               <span class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); padding:0.6rem 1.4rem; font-weight:700;">\${escapeText(block.settings.ctaText || 'Get Started')}</span>
               \${block.settings.secondaryCtaText ? \`<span class="btn btn-secondary" style="border-radius:var(--radius); padding:0.6rem 1.2rem; font-weight:700;">\${escapeText(block.settings.secondaryCtaText)}</span>\` : ''}
             </div>
+            \${block.settings.imageUrl ? \`
+              <div style="margin-top:1.5rem; border-radius:var(--radius); overflow:hidden; border:1px solid rgba(255,255,255,0.12); box-shadow:0 15px 35px rgba(0,0,0,0.6); max-width:700px; margin-left:auto; margin-right:auto;">
+                <img src="\${escapeText(block.settings.imageUrl)}" alt="\${escapeText(block.settings.imageAlt || 'Hero visual')}" style="width:100%; height:auto; display:block;" />
+              </div>
+            \` : ''}
           </div>\`;
+        } else if (block.type === 'video_player') {
+          const maxW = block.settings.maxWidth || '900px';
+          previewHtml = \`<div style="max-width:\${maxW}; margin:0 auto; padding:0.5rem 0;">
+            \${block.settings.title ? \`<h3 style="font-size:1.3rem; font-weight:800; color:#fff; text-align:center; margin-bottom:0.75rem;">\${escapeText(block.settings.title)}</h3>\` : ''}
+            <div style="position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:var(--radius); overflow:hidden; border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow:0 15px 35px rgba(0,0,0,0.7);">
+              \${block.settings.posterUrl ? \`<img src="\${escapeText(block.settings.posterUrl)}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.45;" />\` : ''}
+              <div style="width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--secondary)); display:grid; place-content:center; color:#fff; font-size:1.4rem; z-index:2; box-shadow:0 0 20px rgba(99,102,241,0.6);">▶</div>
+              <div style="z-index:2; margin-top:0.6rem; font-size:0.75rem; color:#cbd5e1; font-family:monospace; background:rgba(0,0,0,0.6); padding:0.2rem 0.6rem; border-radius:4px; max-width:85%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">\${escapeText(block.settings.videoUrl || 'No video source')}</div>
+            </div>
+            \${block.settings.caption ? \`<p style="color:#94a3b8; font-size:0.8rem; text-align:center; margin-top:0.5rem;">\${escapeText(block.settings.caption)}</p>\` : ''}
+          </div>\`;
+        } else if (block.type === 'image_showcase') {
+          const maxW = block.settings.maxWidth || '1000px';
+          previewHtml = \`<div style="max-width:\${maxW}; margin:0 auto; padding:0.5rem 0;">
+            <div style="position:relative; border-radius:var(--radius); overflow:hidden; border:1px solid rgba(255,255,255,0.1); box-shadow:0 15px 35px rgba(0,0,0,0.6); aspect-ratio:16/9; background:#0f172a;">
+              <img src="\${escapeText(block.settings.imageUrl || '')}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+              \${(block.settings.title || block.settings.badgeText || block.settings.caption) ? \`
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(10,15,30,0.9) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:1.25rem;">
+                  \${block.settings.badgeText ? \`<span style="background:var(--primary); color:#fff; padding:0.15rem 0.5rem; border-radius:4px; font-size:0.65rem; font-weight:800; align-self:flex-start; margin-bottom:0.4rem;">\${escapeText(block.settings.badgeText)}</span>\` : ''}
+                  \${block.settings.title ? \`<h3 style="font-size:1.2rem; font-weight:800; color:#fff; margin:0 0 0.2rem;">\${escapeText(block.settings.title)}</h3>\` : ''}
+                  \${block.settings.caption ? \`<p style="font-size:0.8rem; color:#cbd5e1; margin:0;">\${escapeText(block.settings.caption)}</p>\` : ''}
+                </div>
+              \` : ''}
+            </div>
+          </div>\`;
+        } else if (block.type === 'gallery') {
+          const images = Array.isArray(block.settings.images) && block.settings.images.length > 0 ? block.settings.images : [];
+          const cols = block.settings.columns || '3';
+          previewHtml = \`<div>
+            <h3 style="font-size:1.35rem; font-weight:900; color:#fff; text-align:center; margin:0 0 0.3rem;">\${escapeText(block.settings.title || 'Visual Gallery')}</h3>
+            \${block.settings.subtitle ? \`<p style="color:#94a3b8; font-size:0.85rem; text-align:center; margin:0 0 1rem;">\${escapeText(block.settings.subtitle)}</p>\` : ''}
+            <div style="display:grid; grid-template-columns:repeat(\${cols}, 1fr); gap:0.75rem;">
+              \${images.map(img => \`
+                <div style="position:relative; aspect-ratio:4/3; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.08); background:#0f172a;">
+                  <img src="\${escapeText(img.url || '')}" style="width:100%; height:100%; object-fit:cover;" />
+                  \${img.title ? \`<div style="position:absolute; bottom:0; inset-inline:0; padding:0.5rem; background:linear-gradient(180deg,transparent,rgba(0,0,0,0.85)); font-size:0.75rem; font-weight:700; color:#fff;">\${escapeText(img.title)}</div>\` : ''}
+                </div>
+              \`).join('')}
+            </div>
+          </div>\`;
+        } else if (block.type === 'pagination') {
+          const total = Math.max(1, Number(block.settings.totalPages || 5));
+          const current = Math.max(1, Math.min(total, Number(block.settings.currentPage || 1)));
+          const layout = block.settings.layout || 'pills';
+          if (layout === 'minimal') {
+            previewHtml = \`<div style="display:flex; justify-content:center; align-items:center; gap:0.75rem; padding:0.75rem 0;">
+              <span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.85rem;">\${escapeText(block.settings.prevText || '← Previous')}</span>
+              <span style="font-size:0.85rem; color:#94a3b8;">Page <strong style="color:#fff;">\${current}</strong> of <strong style="color:#fff;">\${total}</strong></span>
+              <span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.85rem;">\${escapeText(block.settings.nextText || 'Next →')}</span>
+            </div>\`;
+          } else {
+            previewHtml = \`<div style="display:flex; justify-content:center; align-items:center; gap:0.4rem; padding:0.75rem 0; flex-wrap:wrap;">
+              \${block.settings.showFirstLast && total > 3 ? \`<span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.7rem;">\${escapeText(block.settings.firstText || '« First')}</span>\` : ''}
+              <span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.85rem;">\${escapeText(block.settings.prevText || '← Previous')}</span>
+              \${Array.from({ length: total }, (_, i) => i + 1).map(p => \`
+                <span class="btn \${p === current ? '' : 'btn-secondary'}" style="min-width:34px; height:34px; padding:0; display:inline-grid; place-content:center; font-size:0.82rem; font-weight:700; \${p === current ? 'background:var(--primary); color:#fff; box-shadow:0 0 12px rgba(99,102,241,0.5);' : ''}">\${p}</span>
+              \`).join('')}
+              <span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.85rem;">\${escapeText(block.settings.nextText || 'Next →')}</span>
+              \${block.settings.showFirstLast && total > 3 ? \`<span class="btn btn-secondary" style="font-size:0.8rem; padding:0.35rem 0.7rem;">\${escapeText(block.settings.lastText || 'Last »')}</span>\` : ''}
+            </div>\`;
+          }
         } else if (block.type === 'stats') {
           previewHtml = \`<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; text-align:center; padding:1rem 0;">
             <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius);">
@@ -935,12 +1017,15 @@ export function renderEditorView(options: EditorViewOptions): string {
       const newBlock = {
         id: 'blk_' + Date.now(),
         type,
-        settings: type === 'navbar' ? { brandName: 'LIORAMEDIA', logoInitial: 'L', ctaText: 'Client Portal', ctaUrl: '/login' }
+        settings: type === 'navbar' ? { brandName: 'LIORAMEDIA', logoInitial: 'L', links: [{ label: 'Capabilities', url: '#features' }, { label: 'Pricing', url: '#pricing' }, { label: 'Contact', url: '#contact' }], ctaText: 'Client Portal', ctaUrl: '/login' }
                 : type === 'announcement_bar' ? { message: '🎉 Limited Time Offer: 20% off all packages!', badgeText: 'SALE', linkText: 'View Deals', linkUrl: '#pricing' }
+                : type === 'hero' ? { title: 'New Hero Headline', subtitle: 'Describe your high-impact value proposition here.', badgeText: '⚡ NEXT-GEN', ctaText: 'Get Started', ctaUrl: '#pricing', secondaryCtaText: 'Learn More →', secondaryCtaUrl: '#features', imageUrl: '' }
+                : type === 'image_showcase' ? { title: 'Next-Gen Cloud Dashboard', caption: 'High-performance real-time telemetry and isolation.', badgeText: 'FEATURED', imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80', altText: 'Cloud dashboard preview', linkUrl: '#pricing', maxWidth: '1000px', hasOverlay: true }
+                : type === 'video_player' ? { title: 'Platform Architecture Deep Dive', caption: 'Watch the zero-knowledge multi-tenant runtime engine in action.', videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', posterUrl: '', aspectRatio: '16-9', maxWidth: '900px', autoplay: false, muted: true, loop: false, controls: true }
+                : type === 'gallery' ? { title: 'Visual Portfolio & Showcase', subtitle: 'Explore screenshots, system dashboards, and schematics.', columns: '3', images: [{ url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80', alt: 'Analytics Engine', title: 'Real-Time Telemetry', caption: 'Edge analytics and latency tracing.', linkUrl: '#features' }, { url: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=600&q=80', alt: 'Global Infrastructure Map', title: 'Zero-Knowledge Crypto', caption: 'Per-tenant cipher isolation.', linkUrl: '#security' }, { url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80', alt: 'Collaboration Canvas', title: 'Presence Engine', caption: 'Live cursor tracking.', linkUrl: '#pricing' }] }
+                : type === 'pagination' ? { totalPages: 5, currentPage: 1, itemsPerPage: 12, totalItems: 60, prevText: '← Previous', nextText: 'Next →', firstText: '« First', lastText: 'Last »', showFirstLast: true, layout: 'pills', baseUrl: '?page=', align: 'center' }
                 : type === 'product_grid' ? { title: 'Merchandise & Virtual Passes', subtitle: 'Shipped from multi-warehouse inventory.', items: [{ name: 'Virtual Pass', price: 199, tag: 'IN STOCK', image: '🎬' }, { name: 'VFX Plugin', price: 99, tag: 'DIGITAL', image: '💎' }] }
-                : type === 'pagination' ? { totalPages: 5, currentPage: 1, prevText: '← Previous', nextText: 'Next →' }
                 : type === 'footer' ? { brandName: 'LIORAMEDIA', copyrightText: '© 2026 ETHENENGINE All rights reserved.' }
-                : type === 'hero' ? { title: 'New Hero Headline', subtitle: 'Describe your high-impact value proposition here.', badgeText: '⚡ NEXT-GEN', ctaText: 'Get Started', ctaUrl: '/' }
                 : type === 'features' ? { title: 'Core Features', items: [{ icon: '⚡', name: 'High Speed', desc: 'Sub-5ms execution runtime' }, { icon: '🔒', name: 'Secure Isolation', desc: 'Zero knowledge cryptographic privacy' }] }
                 : type === 'stats' ? { stat1Val: '99.99%', stat1Label: 'SLA Uptime', stat2Val: '< 5ms', stat2Label: 'Edge Latency', stat3Val: '100%', stat3Label: 'Zero-Knowledge' }
                 : type === 'cms_feed' ? { title: 'Latest Case Studies & News', contentTypeSlug: 'blog-article', limit: 3 }
@@ -1394,6 +1479,234 @@ export function renderEditorView(options: EditorViewOptions): string {
             <button class="inspector-add-btn" onclick="addArrayItem('faqs', { question: 'New Question?', answer: 'Detailed response here.' })">+ Add Question</button>
           </div>
         \`;
+      } else if (block.type === 'video_player') {
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Video Title (Optional)</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Video URL (YouTube, Vimeo, MP4)</label>
+              <button type="button" class="btn btn-secondary" onclick="openMediaPicker('setting', 'videoUrl', 0, '', true)" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(168,85,247,0.18); border-color:rgba(168,85,247,0.3); color:#d8b4fe;">🎬 Pick Video</button>
+            </div>
+            <input class="field-input" placeholder="https://www.youtube.com/watch?v=..." value="\${escapeText(block.settings.videoUrl || '')}" oninput="updateSetting('videoUrl', this.value)" />
+          </div>
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Poster / Thumbnail Image</label>
+              <button type="button" class="btn btn-secondary" onclick="openMediaPicker('setting', 'posterUrl', 0, '', false)" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🖼️ Pick Image</button>
+            </div>
+            <input class="field-input" placeholder="https://..." value="\${escapeText(block.settings.posterUrl || '')}" oninput="updateSetting('posterUrl', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Caption / Description</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('caption', this.value)">\${escapeText(block.settings.caption || '')}</textarea>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Aspect Ratio</label>
+              <select class="field-input" onchange="updateSetting('aspectRatio', this.value)">
+                <option value="16-9" \${block.settings.aspectRatio === '16-9' ? 'selected' : ''}>16:9 Widescreen</option>
+                <option value="21-9" \${block.settings.aspectRatio === '21-9' ? 'selected' : ''}>21:9 Cinematic</option>
+                <option value="4-3" \${block.settings.aspectRatio === '4-3' ? 'selected' : ''}>4:3 Standard</option>
+                <option value="1-1" \${block.settings.aspectRatio === '1-1' ? 'selected' : ''}>1:1 Square</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Max Width</label>
+              <select class="field-input" onchange="updateSetting('maxWidth', this.value)">
+                <option value="900px" \${block.settings.maxWidth === '900px' ? 'selected' : ''}>900px Container</option>
+                <option value="1100px" \${block.settings.maxWidth === '1100px' ? 'selected' : ''}>1100px Wide</option>
+                <option value="680px" \${block.settings.maxWidth === '680px' ? 'selected' : ''}>680px Compact</option>
+                <option value="100%" \${block.settings.maxWidth === '100%' ? 'selected' : ''}>100% Full Width</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; margin-top:0.4rem;">
+            <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+              <input type="checkbox" \${block.settings.autoplay ? 'checked' : ''} onchange="updateSetting('autoplay', this.checked)" /> Autoplay
+            </label>
+            <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+              <input type="checkbox" \${block.settings.muted !== false ? 'checked' : ''} onchange="updateSetting('muted', this.checked)" /> Muted
+            </label>
+            <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+              <input type="checkbox" \${block.settings.loop ? 'checked' : ''} onchange="updateSetting('loop', this.checked)" /> Loop Video
+            </label>
+            <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+              <input type="checkbox" \${block.settings.controls !== false ? 'checked' : ''} onchange="updateSetting('controls', this.checked)" /> Player Controls
+            </label>
+          </div>
+        \`;
+      } else if (block.type === 'image_showcase') {
+        fieldsHtml += \`
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Image URL</label>
+              <button type="button" class="btn btn-secondary" onclick="openMediaPicker('setting', 'imageUrl', 0, '', false)" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🖼️ Pick Image</button>
+            </div>
+            <input class="field-input" placeholder="https://..." value="\${escapeText(block.settings.imageUrl || '')}" oninput="updateSetting('imageUrl', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Alt Text (Accessibility)</label>
+            <input class="field-input" value="\${escapeText(block.settings.altText || '')}" oninput="updateSetting('altText', this.value)" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Ribbon Badge</label>
+              <input class="field-input" placeholder="FEATURED" value="\${escapeText(block.settings.badgeText || '')}" oninput="updateSetting('badgeText', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Max Width</label>
+              <select class="field-input" onchange="updateSetting('maxWidth', this.value)">
+                <option value="1000px" \${block.settings.maxWidth === '1000px' ? 'selected' : ''}>1000px Standard</option>
+                <option value="1200px" \${block.settings.maxWidth === '1200px' ? 'selected' : ''}>1200px Wide</option>
+                <option value="760px" \${block.settings.maxWidth === '760px' ? 'selected' : ''}>760px Medium</option>
+                <option value="100%" \${block.settings.maxWidth === '100%' ? 'selected' : ''}>100% Full</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Heading Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Caption Description</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('caption', this.value)">\${escapeText(block.settings.caption || '')}</textarea>
+          </div>
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Click Destination Link</label>
+              <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'linkUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick Link</button>
+            </div>
+            <input class="field-input" placeholder="#pricing" value="\${escapeText(block.settings.linkUrl || '')}" oninput="updateSetting('linkUrl', this.value)" />
+          </div>
+          <div style="margin-top:0.4rem;">
+            <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+              <input type="checkbox" \${block.settings.hasOverlay !== false ? 'checked' : ''} onchange="updateSetting('hasOverlay', this.checked)" /> Gradient Caption Overlay
+            </label>
+          </div>
+        \`;
+      } else if (block.type === 'gallery') {
+        const images = Array.isArray(block.settings.images) ? block.settings.images : [];
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Gallery Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Gallery Subtitle</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Grid Columns</label>
+            <select class="field-input" onchange="updateSetting('columns', this.value)">
+              <option value="2" \${block.settings.columns === '2' ? 'selected' : ''}>2 Columns (Large Cards)</option>
+              <option value="3" \${block.settings.columns === '3' ? 'selected' : ''}>3 Columns (Balanced Grid)</option>
+              <option value="4" \${block.settings.columns === '4' ? 'selected' : ''}>4 Columns (Compact Showcase)</option>
+            </select>
+          </div>
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Gallery Photos (\${images.length})</div>
+            \${images.map((img, iIdx) => \`
+              <div class="inspector-item-card">
+                <div class="inspector-item-header">
+                  <span>Photo \${iIdx + 1}</span>
+                  <button class="inspector-del-btn" onclick="removeArrayItem('images', \${iIdx})">✕ Delete</button>
+                </div>
+                <div class="field-group">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <label class="field-label" style="margin:0;">Image URL</label>
+                    <button type="button" class="btn btn-secondary" onclick="openMediaPicker('array', 'images', \${iIdx}, 'url', false)" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🖼️ Pick</button>
+                  </div>
+                  <input class="field-input" value="\${escapeText(img.url || '')}" oninput="updateArrayItem('images', \${iIdx}, 'url', this.value)" />
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+                  <div class="field-group">
+                    <label class="field-label">Title</label>
+                    <input class="field-input" value="\${escapeText(img.title || '')}" oninput="updateArrayItem('images', \${iIdx}, 'title', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Alt Text</label>
+                    <input class="field-input" value="\${escapeText(img.alt || '')}" oninput="updateArrayItem('images', \${iIdx}, 'alt', this.value)" />
+                  </div>
+                </div>
+                <div class="field-group" style="margin-top:0.4rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                    <label class="field-label" style="margin:0;">Click Link URL</label>
+                    <button type="button" class="btn btn-secondary" onclick="openLinkPicker('array', 'images', \${iIdx}, 'linkUrl')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick Link</button>
+                  </div>
+                  <input class="field-input" placeholder="#features" value="\${escapeText(img.linkUrl || '')}" oninput="updateArrayItem('images', \${iIdx}, 'linkUrl', this.value)" />
+                </div>
+              </div>
+            \`).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('images', { url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80', title: 'New Photo', caption: 'Photo caption', alt: 'Showcase visual', linkUrl: '' })">+ Add Image to Gallery</button>
+          </div>
+        \`;
+      } else if (block.type === 'pagination') {
+        fieldsHtml += \`
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Total Pages</label>
+              <input class="field-input" type="number" min="1" max="50" value="\${escapeText(String(block.settings.totalPages || 5))}" oninput="updateSetting('totalPages', parseInt(this.value, 10) || 1)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Active Page</label>
+              <input class="field-input" type="number" min="1" max="50" value="\${escapeText(String(block.settings.currentPage || 1))}" oninput="updateSetting('currentPage', parseInt(this.value, 10) || 1)" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Pagination Style</label>
+            <select class="field-input" onchange="updateSetting('layout', this.value)">
+              <option value="pills" \${block.settings.layout === 'pills' ? 'selected' : ''}>Numbered Pills (Glow Active)</option>
+              <option value="buttons" \${block.settings.layout === 'buttons' ? 'selected' : ''}>Button Group</option>
+              <option value="minimal" \${block.settings.layout === 'minimal' ? 'selected' : ''}>Minimal Summary (Page X of Y)</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Previous Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.prevText || '← Previous')}" oninput="updateSetting('prevText', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Next Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.nextText || 'Next →')}" oninput="updateSetting('nextText', this.value)" />
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">First Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.firstText || '« First')}" oninput="updateSetting('firstText', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Last Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.lastText || 'Last »')}" oninput="updateSetting('lastText', this.value)" />
+            </div>
+          </div>
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Target URL Base / Query</label>
+              <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'baseUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick Route</button>
+            </div>
+            <input class="field-input" placeholder="?page=" value="\${escapeText(block.settings.baseUrl || '?page=')}" oninput="updateSetting('baseUrl', this.value)" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; margin-top:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Alignment</label>
+              <select class="field-input" onchange="updateSetting('align', this.value)">
+                <option value="center" \${block.settings.align === 'center' ? 'selected' : ''}>Center</option>
+                <option value="start" \${block.settings.align === 'start' ? 'selected' : ''}>Left (Start)</option>
+                <option value="end" \${block.settings.align === 'end' ? 'selected' : ''}>Right (End)</option>
+                <option value="between" \${block.settings.align === 'between' ? 'selected' : ''}>Space Between</option>
+              </select>
+            </div>
+            <div style="display:flex; align-items:center; margin-top:1.1rem;">
+              <label style="font-size:0.75rem; color:#fff; display:flex; align-items:center; gap:0.35rem; cursor:pointer;">
+                <input type="checkbox" \${block.settings.showFirstLast ? 'checked' : ''} onchange="updateSetting('showFirstLast', this.checked)" /> First / Last
+              </label>
+            </div>
+          </div>
+        \`;
       } else if (block.type === 'hero') {
         fieldsHtml += \`
           <div class="field-group">
@@ -1414,8 +1727,11 @@ export function renderEditorView(options: EditorViewOptions): string {
               <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
             </div>
             <div class="field-group">
-              <label class="field-label">Primary CTA URL</label>
-              <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '/')}" oninput="updateSetting('ctaUrl', this.value)" />
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="field-label" style="margin:0;">Primary CTA Link</label>
+                <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'ctaUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick</button>
+              </div>
+              <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '#pricing')}" oninput="updateSetting('ctaUrl', this.value)" />
             </div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
@@ -1424,12 +1740,76 @@ export function renderEditorView(options: EditorViewOptions): string {
               <input class="field-input" placeholder="Learn More" value="\${escapeText(block.settings.secondaryCtaText || '')}" oninput="updateSetting('secondaryCtaText', this.value)" />
             </div>
             <div class="field-group">
-              <label class="field-label">Alignment</label>
-              <select class="field-input" onchange="updateSetting('align', this.value)">
-                <option value="center" \${block.settings.align !== 'left' ? 'selected' : ''}>Center</option>
-                <option value="left" \${block.settings.align === 'left' ? 'selected' : ''}>Left</option>
-              </select>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="field-label" style="margin:0;">Secondary CTA Link</label>
+                <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'secondaryCtaUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick</button>
+              </div>
+              <input class="field-input" value="\${escapeText(block.settings.secondaryCtaUrl || '#features')}" oninput="updateSetting('secondaryCtaUrl', this.value)" />
             </div>
+          </div>
+          <div class="field-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label class="field-label" style="margin:0;">Mockup / Illustration URL</label>
+              <button type="button" class="btn btn-secondary" onclick="openMediaPicker('setting', 'imageUrl', 0, '', false)" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🖼️ Pick Image</button>
+            </div>
+            <input class="field-input" placeholder="https://..." value="\${escapeText(block.settings.imageUrl || '')}" oninput="updateSetting('imageUrl', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Alignment</label>
+            <select class="field-input" onchange="updateSetting('align', this.value)">
+              <option value="center" \${block.settings.align !== 'left' ? 'selected' : ''}>Center</option>
+              <option value="left" \${block.settings.align === 'left' ? 'selected' : ''}>Left</option>
+            </select>
+          </div>
+        \`;
+      } else if (block.type === 'navbar') {
+        const navLinks = Array.isArray(block.settings.links) ? block.settings.links : [];
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Brand Logo Text</label>
+            <input class="field-input" value="\${escapeText(block.settings.brandName || '')}" oninput="updateSetting('brandName', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Logo Badge Letter</label>
+            <input class="field-input" value="\${escapeText(block.settings.logoInitial || 'E')}" oninput="updateSetting('logoInitial', this.value)" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">CTA Button Text</label>
+              <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
+            </div>
+            <div class="field-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="field-label" style="margin:0;">CTA Link</label>
+                <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'ctaUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick</button>
+              </div>
+              <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '/login')}" oninput="updateSetting('ctaUrl', this.value)" />
+            </div>
+          </div>
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Nav Menu Links (\${navLinks.length})</div>
+            \${navLinks.map((nl, nIdx) => \`
+              <div class="inspector-item-card">
+                <div class="inspector-item-header">
+                  <span>Link \${nIdx + 1}</span>
+                  <button class="inspector-del-btn" onclick="removeArrayItem('links', \${nIdx})">✕ Delete</button>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+                  <div class="field-group">
+                    <label class="field-label">Label</label>
+                    <input class="field-input" value="\${escapeText(nl.label || '')}" oninput="updateArrayItem('links', \${nIdx}, 'label', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                      <label class="field-label" style="margin:0;">URL</label>
+                      <button type="button" class="btn btn-secondary" onclick="openLinkPicker('array', 'links', \${nIdx}, 'url')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗</button>
+                    </div>
+                    <input class="field-input" value="\${escapeText(nl.url || '')}" oninput="updateArrayItem('links', \${nIdx}, 'url', this.value)" />
+                  </div>
+                </div>
+              </div>
+            \`).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('links', { label: 'New Link', url: '#features' })">+ Add Nav Link</button>
           </div>
         \`;
       } else if (block.type === 'stats') {
@@ -1460,34 +1840,24 @@ export function renderEditorView(options: EditorViewOptions): string {
             </div>
           </div>
         \`;
-      } else if (block.type === 'navbar') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Brand Logo Text</label>
-            <input class="field-input" value="\${escapeText(block.settings.brandName || '')}" oninput="updateSetting('brandName', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Logo Badge Letter</label>
-            <input class="field-input" value="\${escapeText(block.settings.logoInitial || 'E')}" oninput="updateSetting('logoInitial', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">CTA Button Text</label>
-            <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">CTA Button Link</label>
-            <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '/login')}" oninput="updateSetting('ctaUrl', this.value)" />
-          </div>
-        \`;
       } else if (block.type === 'announcement_bar') {
         fieldsHtml += \`
           <div class="field-group">
             <label class="field-label">Announcement Text</label>
             <input class="field-input" value="\${escapeText(block.settings.message || '')}" oninput="updateSetting('message', this.value)" />
           </div>
-          <div class="field-group">
-            <label class="field-label">Badge Label</label>
-            <input class="field-input" value="\${escapeText(block.settings.badgeText || '')}" oninput="updateSetting('badgeText', this.value)" />
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Badge Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.badgeText || '')}" oninput="updateSetting('badgeText', this.value)" />
+            </div>
+            <div class="field-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="field-label" style="margin:0;">Target Link</label>
+                <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'linkUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick</button>
+              </div>
+              <input class="field-input" value="\${escapeText(block.settings.linkUrl || '#pricing')}" oninput="updateSetting('linkUrl', this.value)" />
+            </div>
           </div>
         \`;
       } else if (block.type === 'cta') {
@@ -1496,13 +1866,18 @@ export function renderEditorView(options: EditorViewOptions): string {
             <label class="field-label">Banner Headline</label>
             <input class="field-input" value="\${escapeText(block.settings.headline || '')}" oninput="updateSetting('headline', this.value)" />
           </div>
-          <div class="field-group">
-            <label class="field-label">Button Label</label>
-            <input class="field-input" value="\${escapeText(block.settings.buttonText || '')}" oninput="updateSetting('buttonText', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Button Link URL</label>
-            <input class="field-input" value="\${escapeText(block.settings.buttonUrl || '/login')}" oninput="updateSetting('buttonUrl', this.value)" />
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Button Label</label>
+              <input class="field-input" value="\${escapeText(block.settings.buttonText || '')}" oninput="updateSetting('buttonText', this.value)" />
+            </div>
+            <div class="field-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                <label class="field-label" style="margin:0;">Button Link URL</label>
+                <button type="button" class="btn btn-secondary" onclick="openLinkPicker('setting', 'buttonUrl', 0, '')" style="padding:0.15rem 0.5rem; font-size:0.68rem; font-weight:700; background:rgba(99,102,241,0.18); border-color:rgba(99,102,241,0.3); color:#a5b4fc;">🔗 Pick</button>
+              </div>
+              <input class="field-input" value="\${escapeText(block.settings.buttonUrl || '/login')}" oninput="updateSetting('buttonUrl', this.value)" />
+            </div>
           </div>
         \`;
       } else if (block.type === 'footer') {
@@ -1669,9 +2044,173 @@ export function renderEditorView(options: EditorViewOptions): string {
       \`).join('');
     }
 
-    // Start Real-Time Presence Heartbeat (every 2.5 seconds)
-    syncCollabPresence();
-    setInterval(syncCollabPresence, 2500);
+    // ================= LINK & MEDIA PICKER CONTROLLER =================
+    let activeLinkTarget = null;
+    let activeMediaTarget = null;
+
+    function openLinkPicker(targetType, keyOrArrayKey, idx, field) {
+      activeLinkTarget = { targetType, keyOrArrayKey, idx, field };
+      const modal = document.getElementById('linkPickerModal');
+      if (modal) modal.style.display = 'flex';
+      switchLinkTab('pages');
+    }
+
+    function closeLinkPicker() {
+      const modal = document.getElementById('linkPickerModal');
+      if (modal) modal.style.display = 'none';
+      activeLinkTarget = null;
+    }
+
+    function switchLinkTab(tabId) {
+      document.querySelectorAll('.link-tab-btn').forEach(btn => {
+        btn.style.borderBottomColor = 'transparent';
+        btn.style.color = '#94a3b8';
+      });
+      document.querySelectorAll('.link-tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+
+      const activeBtn = document.getElementById('linkTab_' + tabId);
+      const activeContent = document.getElementById('linkTabContent_' + tabId);
+      if (activeBtn) {
+        activeBtn.style.borderBottomColor = 'var(--primary)';
+        activeBtn.style.color = '#fff';
+      }
+      if (activeContent) activeContent.style.display = 'block';
+    }
+
+    function applyLinkValue(val) {
+      if (!activeLinkTarget || !pageData.blocks || !pageData.blocks[selectedBlockIndex]) {
+        closeLinkPicker();
+        return;
+      }
+      const { targetType, keyOrArrayKey, idx, field } = activeLinkTarget;
+      if (targetType === 'setting') {
+        updateSetting(keyOrArrayKey, val);
+      } else if (targetType === 'array') {
+        updateArrayItem(keyOrArrayKey, idx, field, val);
+      }
+      closeLinkPicker();
+      renderInspector();
+      showToast('🔗 Link updated to: ' + val, true);
+    }
+
+    function openMediaPicker(targetType, keyOrArrayKey, idx, field, isVideo = false) {
+      activeMediaTarget = { targetType, keyOrArrayKey, idx, field, isVideo };
+      const modal = document.getElementById('mediaPickerModal');
+      const title = document.getElementById('mediaPickerTitle');
+      if (title) title.innerText = isVideo ? 'Video Source Selector' : 'Media Asset Library';
+      if (modal) modal.style.display = 'flex';
+      switchMediaTab(isVideo ? 'stockVideos' : 'stockImages');
+      loadTenantMediaAssets();
+    }
+
+    function closeMediaPicker() {
+      const modal = document.getElementById('mediaPickerModal');
+      if (modal) modal.style.display = 'none';
+      activeMediaTarget = null;
+    }
+
+    function switchMediaTab(tabId) {
+      document.querySelectorAll('.media-tab-btn').forEach(btn => {
+        btn.style.borderBottomColor = 'transparent';
+        btn.style.color = '#94a3b8';
+      });
+      document.querySelectorAll('.media-tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+
+      const activeBtn = document.getElementById('mediaTab_' + tabId);
+      const activeContent = document.getElementById('mediaTabContent_' + tabId);
+      if (activeBtn) {
+        activeBtn.style.borderBottomColor = 'var(--primary)';
+        activeBtn.style.color = '#fff';
+      }
+      if (activeContent) activeContent.style.display = 'block';
+    }
+
+    function selectMediaAsset(url, alt = '') {
+      if (!activeMediaTarget || !pageData.blocks || !pageData.blocks[selectedBlockIndex]) {
+        closeMediaPicker();
+        return;
+      }
+      const { targetType, keyOrArrayKey, idx, field, isVideo } = activeMediaTarget;
+      if (targetType === 'setting') {
+        updateSetting(keyOrArrayKey, url);
+        if (!isVideo && field === '' && alt) {
+          const currentBlock = pageData.blocks[selectedBlockIndex];
+          if (currentBlock && currentBlock.settings && !currentBlock.settings.altText) {
+            updateSetting('altText', alt);
+          }
+        }
+      } else if (targetType === 'array') {
+        updateArrayItem(keyOrArrayKey, idx, field, url);
+        if (!isVideo && alt) {
+          updateArrayItem(keyOrArrayKey, idx, 'alt', alt);
+        }
+      }
+      closeMediaPicker();
+      renderInspector();
+      showToast('Media asset selected!', true);
+    }
+
+    async function loadTenantMediaAssets() {
+      const container = document.getElementById('tenantAssetsContainer');
+      if (!container) return;
+      try {
+        const tenantSlug = '${escapeHtml(tenantSlug)}';
+        const res = await fetch('/api/media/assets?tenant=' + encodeURIComponent(tenantSlug), {
+          headers: {
+            'x-tenant-id': tenantSlug,
+            'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
+          }
+        });
+        const data = await res.json();
+        const assets = data.assets || [];
+        if (assets.length === 0) {
+          container.innerHTML = '<div style="color:#64748b; font-size:0.85rem; grid-column:1/-1; text-align:center; padding:2rem 0;">No media uploaded yet. Use Direct Upload to add files.</div>';
+          return;
+        }
+        container.innerHTML = assets.map(a => \`
+          <div onclick="selectMediaAsset('\${escapeText(a.url || a.path)}', '\${escapeText(a.title || a.name || 'Asset')}')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+            <img src="\${escapeText(a.url || a.path)}" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect fill=\\'%231e293b\\' width=\\'100\\' height=\\'100\\'/><text fill=\\'%2394a3b8\\' x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'12\\'>FILE</text></svg>';" />
+            <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">\${escapeText(a.title || a.name || 'File')}</div>
+          </div>
+        \`).join('');
+      } catch (e) {
+        container.innerHTML = '<div style="color:#ef4444; font-size:0.85rem; grid-column:1/-1; text-align:center; padding:2rem 0;">Failed to load tenant assets.</div>';
+      }
+    }
+
+    async function handleDirectMediaUpload(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', file.name);
+
+      showToast('Uploading asset ' + file.name + '...');
+      try {
+        const tenantSlug = '${escapeHtml(tenantSlug)}';
+        const res = await fetch('/api/media/upload?tenant=' + encodeURIComponent(tenantSlug), {
+          method: 'POST',
+          headers: {
+            'x-tenant-id': tenantSlug,
+            'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
+          },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.asset) {
+          selectMediaAsset(data.asset.url || data.asset.path, file.name);
+          showToast('Asset uploaded and inserted successfully!', true);
+        } else {
+          showToast('⚠️ Upload failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (e) {
+        showToast('⚠️ Error communicating with media server.');
+      }
+    }
 
     // Initial Render & Setup Split Mode
     renderCanvas();
@@ -1679,6 +2218,236 @@ export function renderEditorView(options: EditorViewOptions): string {
     updateWcagBadges();
     setStudioViewMode('split');
   </script>
+
+  <!-- ================= LINK PICKER MODAL ================= -->
+  <div id="linkPickerModal" class="studio-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center;">
+    <div class="studio-modal-card" style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:14px; width:92%; max-width:600px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.85);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:1.1rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.2rem;">🔗</span>
+          <span style="font-weight:800; font-size:1.05rem; color:#fff;">Insert Link & Destination</span>
+        </div>
+        <button onclick="closeLinkPicker()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer; padding:0.2rem 0.5rem;">✕</button>
+      </div>
+
+      <!-- Link Tabs -->
+      <div style="display:flex; gap:0.25rem; padding:0.75rem 1.25rem 0; border-bottom:1px solid rgba(255,255,255,0.08); background:#090d16;">
+        <button class="link-tab-btn active" id="linkTab_pages" onclick="switchLinkTab('pages')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid var(--primary); color:#fff; cursor:pointer;">📄 Pages</button>
+        <button class="link-tab-btn" id="linkTab_sections" onclick="switchLinkTab('sections')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">⚓ Section Anchors</button>
+        <button class="link-tab-btn" id="linkTab_custom" onclick="switchLinkTab('custom')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">🌐 External URL</button>
+        <button class="link-tab-btn" id="linkTab_actions" onclick="switchLinkTab('actions')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">⚡ Quick Actions</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div style="padding:1.25rem; overflow-y:auto; flex:1;">
+        <!-- Tab 1: Pages -->
+        <div id="linkTabContent_pages" class="link-tab-content">
+          <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:0.75rem;">Select a page within this tenant:</div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;" id="tenantPagesList">
+            <div onclick="applyLinkValue('/preview/home')" class="link-picker-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">🏠 Home Page</div>
+                <div style="font-size:0.72rem; color:#64748b; font-family:monospace;">/preview/home</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+            <div onclick="applyLinkValue('/preview/pricing')" class="link-picker-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">💎 Pricing & Plans</div>
+                <div style="font-size:0.72rem; color:#64748b; font-family:monospace;">/preview/pricing</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+            <div onclick="applyLinkValue('/preview/about')" class="link-picker-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">🏢 About & Team</div>
+                <div style="font-size:0.72rem; color:#64748b; font-family:monospace;">/preview/about</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+            <div onclick="applyLinkValue('/preview/contact')" class="link-picker-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">✉️ Contact & Demo</div>
+                <div style="font-size:0.72rem; color:#64748b; font-family:monospace;">/preview/contact</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Section Anchors -->
+        <div id="linkTabContent_sections" class="link-tab-content" style="display:none;">
+          <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:0.75rem;">Scroll smoothly to an on-page section:</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div onclick="applyLinkValue('#hero')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">⚡ #hero</div>
+              <div style="font-size:0.7rem; color:#64748b;">Top Hero Banner</div>
+            </div>
+            <div onclick="applyLinkValue('#features')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">✨ #features</div>
+              <div style="font-size:0.7rem; color:#64748b;">Feature Highlights</div>
+            </div>
+            <div onclick="applyLinkValue('#pricing')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">💳 #pricing</div>
+              <div style="font-size:0.7rem; color:#64748b;">Pricing Table</div>
+            </div>
+            <div onclick="applyLinkValue('#testimonials')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">💬 #testimonials</div>
+              <div style="font-size:0.7rem; color:#64748b;">Client Reviews</div>
+            </div>
+            <div onclick="applyLinkValue('#gallery')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">🖼️ #gallery</div>
+              <div style="font-size:0.7rem; color:#64748b;">Visual Grid</div>
+            </div>
+            <div onclick="applyLinkValue('#video')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">🎬 #video</div>
+              <div style="font-size:0.7rem; color:#64748b;">Video Player</div>
+            </div>
+            <div onclick="applyLinkValue('#faq')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">❓ #faq</div>
+              <div style="font-size:0.7rem; color:#64748b;">Questions & Answers</div>
+            </div>
+            <div onclick="applyLinkValue('#contact')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">📝 #contact</div>
+              <div style="font-size:0.7rem; color:#64748b;">Contact Form</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Custom URL -->
+        <div id="linkTabContent_custom" class="link-tab-content" style="display:none;">
+          <div class="field-group">
+            <label class="field-label">Custom External URL</label>
+            <input id="customLinkInput" class="field-input" placeholder="https://example.com/portal" />
+          </div>
+          <button onclick="applyLinkValue(document.getElementById('customLinkInput').value)" class="btn" style="width:100%; margin-top:0.75rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); font-weight:700; padding:0.65rem;">Apply Custom URL</button>
+        </div>
+
+        <!-- Tab 4: Actions -->
+        <div id="linkTabContent_actions" class="link-tab-content" style="display:none;">
+          <div style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div onclick="applyLinkValue('/login')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">🔐 Client Portal / Sign In</div>
+              <div style="font-size:0.7rem; color:#64748b; font-family:monospace;">/login</div>
+            </div>
+            <div onclick="applyLinkValue('mailto:hello@' + '${escapeHtml(tenantSlug)}' + '.com')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">📧 Email Action (mailto:)</div>
+              <div style="font-size:0.7rem; color:#64748b; font-family:monospace;">mailto:hello@${escapeHtml(tenantSlug)}.com</div>
+            </div>
+            <div onclick="applyLinkValue('tel:+18005550199')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">📞 Phone Call (tel:)</div>
+              <div style="font-size:0.7rem; color:#64748b; font-family:monospace;">tel:+18005550199</div>
+            </div>
+            <div onclick="applyLinkValue('#top')" class="link-picker-item" style="padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; cursor:pointer;">
+              <div style="font-weight:700; color:#fff; font-size:0.85rem;">⬆️ Scroll to Top of Page</div>
+              <div style="font-size:0.7rem; color:#64748b; font-family:monospace;">#top</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MEDIA / VIDEO PICKER MODAL ================= -->
+  <div id="mediaPickerModal" class="studio-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:99999; justify-content:center; align-items:center;">
+    <div class="studio-modal-card" style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:14px; width:92%; max-width:760px; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.85);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:1.1rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.2rem;">🖼️</span>
+          <span id="mediaPickerTitle" style="font-weight:800; font-size:1.05rem; color:#fff;">Media Asset Library</span>
+        </div>
+        <button onclick="closeMediaPicker()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer; padding:0.2rem 0.5rem;">✕</button>
+      </div>
+
+      <!-- Media Tabs -->
+      <div style="display:flex; gap:0.25rem; padding:0.75rem 1.25rem 0; border-bottom:1px solid rgba(255,255,255,0.08); background:#090d16;">
+        <button class="media-tab-btn active" id="mediaTab_stockImages" onclick="switchMediaTab('stockImages')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid var(--primary); color:#fff; cursor:pointer;">📸 Stock Photos</button>
+        <button class="media-tab-btn" id="mediaTab_stockVideos" onclick="switchMediaTab('stockVideos')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">🎬 Videos & Loops</button>
+        <button class="media-tab-btn" id="mediaTab_library" onclick="switchMediaTab('library')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">☁️ Tenant Assets</button>
+        <button class="media-tab-btn" id="mediaTab_upload" onclick="switchMediaTab('upload')" style="padding:0.5rem 0.9rem; font-size:0.8rem; font-weight:700; background:none; border:none; border-bottom:2px solid transparent; color:#94a3b8; cursor:pointer;">⬆️ Direct Upload</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div style="padding:1.25rem; overflow-y:auto; flex:1;">
+        <!-- Stock Photos -->
+        <div id="mediaTabContent_stockImages" class="media-tab-content">
+          <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:0.75rem;">Click any royalty-free HD asset to insert:</div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:0.75rem;">
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80', 'Cloud Analytics Dashboard')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">SaaS Analytics UI</div>
+            </div>
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80', 'Modern High-Tech Workflow')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Tech Dashboard</div>
+            </div>
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80', 'Data Analytics Visualization')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Data Visuals</div>
+            </div>
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80', 'Enterprise Team Collaboration')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Team Collaboration</div>
+            </div>
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80', 'Microprocessor Hardware')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Silicon Chip Architecture</div>
+            </div>
+            <div onclick="selectMediaAsset('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80', 'Zero-Knowledge Security Matrix')" class="media-grid-item" style="border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1); cursor:pointer; background:#1e293b;">
+              <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=400&q=80" style="width:100%; aspect-ratio:4/3; object-fit:cover; display:block;" />
+              <div style="padding:0.4rem; font-size:0.7rem; font-weight:700; color:#cbd5e1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Cyber Security Code</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Videos -->
+        <div id="mediaTabContent_stockVideos" class="media-tab-content" style="display:none;">
+          <div style="font-size:0.78rem; color:#94a3b8; margin-bottom:0.75rem;">Click any video embed or stream link to insert:</div>
+          <div style="display:flex; flex-direction:column; gap:0.6rem;">
+            <div onclick="selectMediaAsset('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'YouTube Video Stream')" class="media-grid-item" style="padding:0.85rem 1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:#1e293b; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">🎬 SaaS Platform Overview (YouTube)</div>
+                <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">https://www.youtube.com/watch?v=dQw4w9WgXcQ</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+            <div onclick="selectMediaAsset('https://vimeo.com/76979871', 'Vimeo Cinematic Showcase')" class="media-grid-item" style="padding:0.85rem 1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:#1e293b; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">🎥 4K Cinematic Reel (Vimeo)</div>
+                <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">https://vimeo.com/76979871</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+            <div onclick="selectMediaAsset('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'HTML5 MP4 Stream')" class="media-grid-item" style="padding:0.85rem 1rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:#1e293b; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.88rem;">⚡ Direct HTML5 MP4 Stream</div>
+                <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">https://commondatastorage.googleapis.com/.../sample.mp4</div>
+              </div>
+              <span class="btn btn-secondary" style="font-size:0.72rem; padding:0.25rem 0.6rem;">Select</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tenant Library -->
+        <div id="mediaTabContent_library" class="media-tab-content" style="display:none;">
+          <div id="tenantAssetsContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:0.75rem;">
+            <div style="color:#64748b; font-size:0.85rem; grid-column:1/-1; text-align:center; padding:2rem 0;">Loading tenant media files...</div>
+          </div>
+        </div>
+
+        <!-- Direct Upload -->
+        <div id="mediaTabContent_upload" class="media-tab-content" style="display:none;">
+          <div style="border:2px dashed rgba(255,255,255,0.15); border-radius:12px; padding:2.5rem 1.5rem; text-align:center; background:rgba(255,255,255,0.01);">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">⬆️</div>
+            <div style="font-weight:700; font-size:0.95rem; color:#fff; margin-bottom:0.3rem;">Upload Image or Video File</div>
+            <p style="color:#94a3b8; font-size:0.8rem; margin:0 0 1.25rem;">Supported formats: PNG, JPG, WebP, SVG, MP4, WebM (Max 50MB)</p>
+            <input type="file" id="mediaUploadFileInput" style="display:none;" onchange="handleDirectMediaUpload(this.files)" />
+            <button onclick="document.getElementById('mediaUploadFileInput').click()" class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); font-weight:700; padding:0.6rem 1.4rem;">Browse Local File</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- INTERACTIVE TOAST NOTIFICATION CONTAINER -->
   <div id="studioToast" class="studio-toast">

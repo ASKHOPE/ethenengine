@@ -26,234 +26,45 @@
       "domain": "amnextech.localhost",
       "status": "active",
       "createdAt": "2026-08-20T16:55:20.192Z"
+    },
+    {
+      "id": "tenant_beta",
+      "orgId": "org_acme",
+      "name": "Beta Corp",
+      "slug": "beta",
+      "domain": "beta.localhost",
+      "status": "active",
+      "createdAt": "2026-08-20T17:14:17.098Z"
+    },
+    {
+      "id": "tenant_omnicorp",
+      "orgId": "org_enterprise_test",
+      "name": "Omni Corp Global",
+      "slug": "omnicorp",
+      "domain": "omnicorp.localhost",
+      "status": "active",
+      "createdAt": "2026-08-20T17:14:17.144Z"
+    },
+    {
+      "id": "tenant_victim_tenant",
+      "orgId": "org_victim",
+      "name": "Victim Enterprise Corp",
+      "slug": "victim_tenant",
+      "domain": "victim.localhost",
+      "status": "active",
+      "createdAt": "2026-08-20T17:14:17.360Z"
+    },
+    {
+      "id": "tenant_attacker_tenant",
+      "orgId": "org_attacker",
+      "name": "Attacker Corp",
+      "slug": "attacker_tenant",
+      "domain": "attacker.localhost",
+      "status": "active",
+      "createdAt": "2026-08-20T17:14:17.361Z"
     }
   ],
   "pages": [
-    {
-      "id": "page_home",
-      "tenantId": "tenant_default",
-      "title": "Home",
-      "slug": "home",
-      "isPublished": true,
-      "seo": {
-        "title": "ETHENENGINE Enterprise - Modular Multi-Tenant Platform Solution",
-        "description": "Next generation business platform powered by modular architecture and Bun runtime."
-      },
-      "blocks": [
-        {
-          "id": "blk_hero",
-          "type": "hero",
-          "settings": {
-            "title": "Empower Your Enterprise with ETHENENGINE",
-            "subtitle": "One configurable multi-tenant platform for all your website, portal, and CMS needs.",
-            "ctaText": "Discover Core Features",
-            "ctaUrl": "/features"
-          }
-        },
-        {
-          "id": "blk_features",
-          "type": "features",
-          "settings": {
-            "title": "ETHENENGINE Core Capabilities",
-            "items": [
-              {
-                "name": "5-Tier Multi-Tenant Isolation",
-                "desc": "Isolate organizations seamlessly with zero build queue overhead."
-              },
-              {
-                "name": "Visual Website Builder",
-                "desc": "Compose dynamic layouts effortlessly with in-memory block rendering."
-              },
-              {
-                "name": "Headless CMS",
-                "desc": "Define structured content types & publish instant REST/GraphQL updates."
-              },
-              {
-                "name": "Rust Microservices",
-                "desc": "High performance vector search and sub-5ms image transformations."
-              }
-            ]
-          }
-        },
-        {
-          "id": "blk_cms",
-          "type": "cms_feed",
-          "settings": {
-            "title": "ETHENENGINE Latest Articles & Updates",
-            "contentTypeSlug": "blog-article",
-            "limit": 3
-          }
-        },
-        {
-          "id": "blk_cta",
-          "type": "cta",
-          "settings": {
-            "headline": "Ready to scale your business capabilities with ETHENENGINE?",
-            "buttonText": "Explore Enterprise Solutions"
-          }
-        }
-      ]
-    },
-    {
-      "id": "page_features",
-      "tenantId": "tenant_default",
-      "title": "Platform Features & Subsystems",
-      "slug": "features",
-      "isPublished": true,
-      "seo": {
-        "title": "ETHENENGINE Features - Architectural Subsystems",
-        "description": "Explore the full power of ETHENENGINE multi-tenancy, Rust microservices, and workflow automation."
-      },
-      "blocks": [
-        {
-          "id": "blk_features_hero",
-          "type": "hero",
-          "settings": {
-            "title": "ETHENENGINE Architecture & Features",
-            "subtitle": "Discover high-throughput event pipelines, zero-JS rendering, and enterprise governance.",
-            "ctaText": "Explore Headless CMS",
-            "ctaUrl": "/cms"
-          }
-        },
-        {
-          "id": "blk_features_matrix",
-          "type": "features",
-          "settings": {
-            "title": "Deep-Dive Feature Subsystems",
-            "items": [
-              {
-                "name": "5-Tier Hierarchy Manager",
-                "desc": "Platform -> Org -> Tenant -> Workspace -> Team -> User tenant isolation."
-              },
-              {
-                "name": "AES-256-GCM Field Encryption",
-                "desc": "Field-level database cryptographic protection operating at 400,000+ ops/sec."
-              },
-              {
-                "name": "Async EventBus Pipeline",
-                "desc": "In-memory async event distribution processing over 1.2 Million events/sec."
-              },
-              {
-                "name": "Automation Workflow Engine",
-                "desc": "n8n-style graph automation triggers, conditions, and action execution."
-              },
-              {
-                "name": "Rust Vector Search",
-                "desc": "Sub-5ms vector search indexing and instant query matching."
-              },
-              {
-                "name": "Enterprise SSO & SAML 2.0",
-                "desc": "Seamless integration with Okta, Azure AD, and Google Workspace."
-              }
-            ]
-          }
-        },
-        {
-          "id": "blk_features_cta",
-          "type": "cta",
-          "settings": {
-            "headline": "Experience ETHENENGINE Performance Firsthand",
-            "buttonText": "View Enterprise Solutions"
-          }
-        }
-      ]
-    },
-    {
-      "id": "page_cms",
-      "tenantId": "tenant_default",
-      "title": "Headless CMS Showcase",
-      "slug": "cms",
-      "isPublished": true,
-      "seo": {
-        "title": "ETHENENGINE Headless CMS - Structured Content Management",
-        "description": "Manage content types, dynamic schemas, and entries with REST API integration."
-      },
-      "blocks": [
-        {
-          "id": "blk_cms_hero",
-          "type": "hero",
-          "settings": {
-            "title": "ETHENENGINE Headless CMS",
-            "subtitle": "Structured content types, dynamic JSON fields, and instant REST API endpoint generation.",
-            "ctaText": "Open API Spec",
-            "ctaUrl": "/docs"
-          }
-        },
-        {
-          "id": "blk_cms_feed_page",
-          "type": "cms_feed",
-          "settings": {
-            "title": "Live Published Content Entries",
-            "contentTypeSlug": "blog-article",
-            "limit": 10
-          }
-        },
-        {
-          "id": "blk_cms_cta",
-          "type": "cta",
-          "settings": {
-            "headline": "Create Custom Content Types in ETHENENGINE Console",
-            "buttonText": "Launch Admin Console"
-          }
-        }
-      ]
-    },
-    {
-      "id": "page_solutions",
-      "tenantId": "tenant_default",
-      "title": "Enterprise Solutions",
-      "slug": "solutions",
-      "isPublished": true,
-      "seo": {
-        "title": "ETHENENGINE Solutions - Enterprise Governance & Disaster Recovery",
-        "description": "Subsidiary management, cost centers, point-in-time restores, and 99.99% SLA availability."
-      },
-      "blocks": [
-        {
-          "id": "blk_solutions_hero",
-          "type": "hero",
-          "settings": {
-            "title": "Enterprise Solutions & Governance",
-            "subtitle": "Built for large-scale enterprise subsidiaries, multi-region failover, and strict data compliance.",
-            "ctaText": "Back to Home",
-            "ctaUrl": "/"
-          }
-        },
-        {
-          "id": "blk_solutions_matrix",
-          "type": "features",
-          "settings": {
-            "title": "Enterprise Platform Modules",
-            "items": [
-              {
-                "name": "Subsidiary & Budgeting",
-                "desc": "Cost center allocation and multi-department budget controls."
-              },
-              {
-                "name": "Disaster Recovery Engine",
-                "desc": "Automated disk snapshot backups and point-in-time tenant restores."
-              },
-              {
-                "name": "GDPR Compliance Registry",
-                "desc": "Built-in Right of Access data export & Right to be Forgotten erasure."
-              },
-              {
-                "name": "Commerce & Financial General Ledger",
-                "desc": "Integrated ERP, general ledger posting, and procurement workflows."
-              }
-            ]
-          }
-        },
-        {
-          "id": "blk_solutions_cta",
-          "type": "cta",
-          "settings": {
-            "headline": "Deploy ETHENENGINE for your Enterprise Today",
-            "buttonText": "Access Admin Portal"
-          }
-        }
-      ]
-    },
     {
       "id": "page_liora_home",
       "tenantId": "tenant_lioramedia",
@@ -350,56 +161,12 @@
           }
         }
       ]
-    },
-    {
-      "tenantId": "tenant_amnextech",
-      "title": "Home",
-      "slug": "home",
-      "isPublished": true,
-      "seo": {
-        "title": "Amnex Tech — Home",
-        "description": "Official digital storefront and portal for Amnex Tech."
-      },
-      "blocks": [
-        {
-          "id": "blk_hero_1787245490189",
-          "type": "hero",
-          "settings": {
-            "title": "Welcome to Amnex Tech",
-            "subtitle": "Crafting exceptional digital experiences powered by ETHENENGINE.",
-            "ctaText": "Explore Platform ↗",
-            "ctaUrl": "#features"
-          }
-        },
-        {
-          "id": "blk_features_1787245490189",
-          "type": "features",
-          "settings": {
-            "title": "Enterprise Platform Capabilities",
-            "items": [
-              {
-                "name": "Ultra-Fast Performance",
-                "desc": "Sub-millisecond edge execution powered by Bun."
-              },
-              {
-                "name": "Zero-Knowledge Security",
-                "desc": "PBKDF2 AES-256-GCM tenant cryptographic isolation."
-              },
-              {
-                "name": "Dynamic Theme Harmonizer",
-                "desc": "Design tokens and automated color science palettes."
-              }
-            ]
-          }
-        }
-      ],
-      "id": "page_1787245490189_alwo"
     }
   ],
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787245374489",
+      "contentTypeId": "ct_1787246058136",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -408,8 +175,22 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787245374489",
-      "updatedAt": "2026-08-20T17:02:54.489Z"
+      "id": "entry_1787246058136",
+      "updatedAt": "2026-08-20T17:14:18.136Z"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "contentTypeId": "ct_1787246058188",
+      "slug": "ai-commercial-pipeline",
+      "data": {
+        "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
+        "content": "Generated 500 localized 4K commercial variations in 2 hours using custom trained Flux video diffusion models.",
+        "author": "AI Tech Lead",
+        "client": "Porsche Digital"
+      },
+      "status": "published",
+      "id": "entry_1787246058188",
+      "updatedAt": "2026-08-20T17:14:18.188Z"
     }
   ],
   "products": [
@@ -421,7 +202,17 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787245374489"
+      "id": "prod_1787246058136"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "name": "Monthly AI Commercial Ad Retainer",
+      "sku": "LIO-AI-RETAINER",
+      "price": 4500,
+      "currency": "USD",
+      "stock": 50,
+      "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
+      "id": "prod_1787246058188"
     }
   ],
   "leads": [
@@ -432,8 +223,18 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787245374489",
-      "createdAt": "2026-08-20T17:02:54.489Z"
+      "id": "lead_1787246058136",
+      "createdAt": "2026-08-20T17:14:18.136Z"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "contactName": "Felix Baum",
+      "email": "fbaum@redbull.com",
+      "company": "Red Bull Media House",
+      "dealValue": 45000,
+      "stage": "contacted",
+      "id": "lead_1787246058188",
+      "createdAt": "2026-08-20T17:14:18.188Z"
     }
   ]
 }

@@ -128,32 +128,94 @@ export class BlockRegistry {
       `,
     });
 
+function parseVideoEmbedHtml(url: string, settings: any = {}): string {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  const autoplay = !!settings.autoplay;
+  const muted = !!settings.muted || autoplay;
+  const loop = !!settings.loop;
+  const controls = settings.controls !== false;
+  const poster = settings.posterUrl ? escapeHtml(settings.posterUrl) : '';
+
+  // YouTube
+  const ytMatch = trimmed.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    const id = ytMatch[1];
+    const params = new URLSearchParams();
+    if (autoplay) params.set('autoplay', '1');
+    if (muted) params.set('mute', '1');
+    if (loop) {
+      params.set('loop', '1');
+      params.set('playlist', id);
+    }
+    if (!controls) params.set('controls', '0');
+    params.set('rel', '0');
+    return `<iframe src="https://www.youtube.com/embed/${id}?${params.toString()}" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>`;
+  }
+
+  // Vimeo
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?([0-9]+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    const id = vimeoMatch[1];
+    const params = new URLSearchParams();
+    if (autoplay) params.set('autoplay', '1');
+    if (muted) params.set('muted', '1');
+    if (loop) params.set('loop', '1');
+    return `<iframe src="https://player.vimeo.com/video/${id}?${params.toString()}" title="Video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>`;
+  }
+
+  // Direct MP4 / WebM / HTML5 video
+  const isDirect = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(trimmed) || trimmed.startsWith('data:video') || trimmed.includes('/uploads/');
+  if (isDirect || !trimmed.startsWith('http')) {
+    return `<video src="${escapeHtml(trimmed)}" ${controls ? 'controls' : ''} ${autoplay ? 'autoplay' : ''} ${muted ? 'muted' : ''} ${loop ? 'loop' : ''} ${poster ? `poster="${poster}"` : ''} playsinline style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;"></video>`;
+  }
+
+  // Fallback generic iframe
+  return `<iframe src="${escapeHtml(trimmed)}" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"></iframe>`;
+}
+
     // 3. HERO SECTION
     this.register({
       type: 'hero',
       name: 'Hero Section',
       category: 'header',
       icon: '⚡',
-      description: 'High-impact headline, subtitle, and primary call-to-action button.',
+      description: 'High-impact headline, subtitle, primary/secondary action buttons, and media showcase.',
       defaultSettings: {
         title: 'Empower Your Business Velocity',
         subtitle: 'The unified multi-tenant operating system for enterprise commerce, CRM, and publishing.',
+        badgeText: '⚡ NEXT-GEN V2.0',
         ctaText: 'Get Started Today',
-        ctaUrl: '/',
+        ctaUrl: '#pricing',
+        secondaryCtaText: 'Learn More →',
+        secondaryCtaUrl: '#features',
+        imageUrl: '',
+        imageAlt: 'Platform Interface Showcase',
       },
       fields: [
         { name: 'title', label: 'Headline Title', type: 'text', defaultValue: 'Hero Headline' },
         { name: 'subtitle', label: 'Subtitle Description', type: 'textarea', defaultValue: 'Hero subtitle text description.' },
-        { name: 'ctaText', label: 'Button CTA Text', type: 'text', defaultValue: 'Get Started' },
-        { name: 'ctaUrl', label: 'Button Link URL', type: 'text', defaultValue: '/' },
+        { name: 'badgeText', label: 'Eyebrow Badge Text', type: 'text', defaultValue: '⚡ NEXT-GEN' },
+        { name: 'ctaText', label: 'Primary CTA Text', type: 'text', defaultValue: 'Get Started' },
+        { name: 'ctaUrl', label: 'Primary CTA Link', type: 'text', defaultValue: '#pricing' },
+        { name: 'secondaryCtaText', label: 'Secondary CTA Text', type: 'text', defaultValue: 'Learn More →' },
+        { name: 'secondaryCtaUrl', label: 'Secondary CTA Link', type: 'text', defaultValue: '#features' },
+        { name: 'imageUrl', label: 'Mockup / Image URL', type: 'text', defaultValue: '' },
       ],
       renderHtml: (s) => `
         <section class="block-hero">
+          ${s.badgeText ? `<div style="margin-bottom:1rem;"><span class="badge" style="background:rgba(99,102,241,0.15); color:#818cf8; border:1px solid rgba(99,102,241,0.3); font-weight:800; padding:0.35rem 0.85rem; border-radius:999px; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px;">${escapeHtml(s.badgeText)}</span></div>` : ''}
           <h1 class="block-hero__title">${escapeHtml(s.title)}</h1>
           <p class="block-hero__subtitle">${escapeHtml(s.subtitle)}</p>
-          <div class="block-hero__actions">
-            <a href="${escapeHtml(s.ctaUrl || '/')}" class="btn">${escapeHtml(s.ctaText || 'Get Started')}</a>
+          <div class="block-hero__actions" style="display:flex; justify-content:center; align-items:center; gap:0.85rem; flex-wrap:wrap; margin-top:1.5rem;">
+            <a href="${escapeHtml(s.ctaUrl || '/')}" class="btn" style="padding:0.75rem 1.75rem; font-weight:800;">${escapeHtml(s.ctaText || 'Get Started')}</a>
+            ${s.secondaryCtaText ? `<a href="${escapeHtml(s.secondaryCtaUrl || '#')}" class="btn btn-secondary" style="padding:0.75rem 1.5rem; font-weight:700;">${escapeHtml(s.secondaryCtaText)}</a>` : ''}
           </div>
+          ${s.imageUrl ? `
+            <div style="margin-top:2.5rem; max-width:820px; margin-left:auto; margin-right:auto; border-radius:var(--radius, 12px); overflow:hidden; border:1px solid rgba(255,255,255,0.12); box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);">
+              <img src="${escapeHtml(s.imageUrl)}" alt="${escapeHtml(s.imageAlt || 'Hero visual')}" style="width:100%; height:auto; display:block;" />
+            </div>
+          ` : ''}
         </section>
       `,
     });
@@ -639,34 +701,71 @@ export class BlockRegistry {
       `,
     });
 
-    // 12. PAGINATION & NAVIGATION CONTROLS
+    // 12. PAGINATION CONTROLS & MANAGER
     this.register({
       type: 'pagination',
-      name: 'Pagination Controls',
+      name: 'Pagination Manager',
       category: 'content',
       icon: '🔢',
-      description: 'Page numbers, next/prev navigation controls, and page indicator pills.',
+      description: 'Dynamic page numbering, next/prev controls, item counter, and query parameter manager.',
       defaultSettings: {
         totalPages: 5,
         currentPage: 1,
+        itemsPerPage: 12,
+        totalItems: 60,
         prevText: '← Previous',
         nextText: 'Next →',
+        firstText: '« First',
+        lastText: 'Last »',
+        showFirstLast: true,
+        layout: 'pills',
+        baseUrl: '?page=',
+        align: 'center',
       },
       fields: [
         { name: 'totalPages', label: 'Total Pages Count', type: 'number', defaultValue: 5 },
         { name: 'currentPage', label: 'Active Page Number', type: 'number', defaultValue: 1 },
         { name: 'prevText', label: 'Previous Button Text', type: 'text', defaultValue: '← Previous' },
         { name: 'nextText', label: 'Next Button Text', type: 'text', defaultValue: 'Next →' },
+        { name: 'baseUrl', label: 'URL Query / Target Route', type: 'text', defaultValue: '?page=' },
+        { name: 'layout', label: 'Pagination Style', type: 'select', defaultValue: 'pills', options: [
+          { label: 'Numbered Pills (Glow Active)', value: 'pills' },
+          { label: 'Button Group', value: 'buttons' },
+          { label: 'Minimal Summary (Page X of Y)', value: 'minimal' },
+        ]},
       ],
-      renderHtml: (s) => `
-        <div class="block-pagination">
-          <a href="?page=${Math.max(1, (s.currentPage || 1) - 1)}" class="btn btn-secondary">${escapeHtml(s.prevText || '← Previous')}</a>
-          ${Array.from({ length: Number(s.totalPages || 5) }, (_, i) => i + 1).map(p => `
-            <a href="?page=${p}" class="btn block-pagination__pill ${p === Number(s.currentPage || 1) ? '' : 'btn-secondary'}">${p}</a>
-          `).join('')}
-          <a href="?page=${Math.min(Number(s.totalPages || 5), (s.currentPage || 1) + 1)}" class="btn btn-secondary">${escapeHtml(s.nextText || 'Next →')}</a>
-        </div>
-      `,
+      renderHtml: (s) => {
+        const total = Math.max(1, Number(s.totalPages || 5));
+        const current = Math.max(1, Math.min(total, Number(s.currentPage || 1)));
+        const baseUrl = s.baseUrl || '?page=';
+        const alignClass = s.align === 'start' ? 'block-pagination--start' : s.align === 'end' ? 'block-pagination--end' : s.align === 'between' ? 'block-pagination--between' : '';
+        const prevUrl = `${baseUrl}${Math.max(1, current - 1)}`;
+        const nextUrl = `${baseUrl}${Math.min(total, current + 1)}`;
+
+        const cls = alignClass ? `block-pagination ${alignClass}` : 'block-pagination';
+
+        if (s.layout === 'minimal') {
+          return `
+            <div class="${cls}">
+              <a href="${escapeHtml(prevUrl)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 1rem;">${escapeHtml(s.prevText || '← Previous')}</a>
+              <span class="block-pagination__info">Page <strong style="color:#fff;">${current}</strong> of <strong style="color:#fff;">${total}</strong></span>
+              <a href="${escapeHtml(nextUrl)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 1rem;">${escapeHtml(s.nextText || 'Next →')}</a>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="${cls}">
+            ${s.showFirstLast && total > 3 ? `<a href="${escapeHtml(`${baseUrl}1`)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 0.85rem;">${escapeHtml(s.firstText || '« First')}</a>` : ''}
+            <a href="${escapeHtml(prevUrl)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 1rem;">${escapeHtml(s.prevText || '← Previous')}</a>
+            ${Array.from({ length: total }, (_, i) => i + 1).map(p => `
+              <a href="${escapeHtml(`${baseUrl}${p}`)}" class="btn block-pagination__pill ${p === current ? 'block-pagination__pill--active' : 'btn-secondary'}">${p}</a>
+            `).join('')}
+            <a href="${escapeHtml(nextUrl)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 1rem;">${escapeHtml(s.nextText || 'Next →')}</a>
+            ${s.showFirstLast && total > 3 ? `<a href="${escapeHtml(`${baseUrl}${total}`)}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.45rem 0.85rem;">${escapeHtml(s.lastText || 'Last »')}</a>` : ''}
+          </div>
+        `;
+      },
     });
 
     // 13. INTERACTIVE FORM BUILDER & LEAD CAPTURE
@@ -737,5 +836,201 @@ export class BlockRegistry {
         </section>
       `,
     });
+
+    // 14. UNIVERSAL VIDEO PLAYER & EMBED
+    this.register({
+      type: 'video_player',
+      name: 'Video Player / Embed',
+      category: 'content',
+      icon: '🎬',
+      description: 'Responsive video player for YouTube, Vimeo, and direct MP4/WebM video streams with custom controls and poster.',
+      defaultSettings: {
+        title: 'Platform Architecture Deep Dive',
+        caption: 'Watch the full walkthrough of our zero-knowledge multi-tenant runtime engine.',
+        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        posterUrl: '',
+        aspectRatio: '16-9',
+        maxWidth: '900px',
+        autoplay: false,
+        muted: true,
+        loop: false,
+        controls: true,
+      },
+      fields: [
+        { name: 'title', label: 'Video Title (Optional)', type: 'text', defaultValue: 'Video Title' },
+        { name: 'caption', label: 'Video Caption / Subtitle', type: 'textarea', defaultValue: 'Video description or notes.' },
+        { name: 'videoUrl', label: 'Video URL (YouTube, Vimeo, MP4)', type: 'text', defaultValue: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+        { name: 'posterUrl', label: 'Thumbnail / Poster Image URL', type: 'text', defaultValue: '' },
+        { name: 'aspectRatio', label: 'Aspect Ratio', type: 'select', defaultValue: '16-9', options: [
+          { label: 'Widescreen (16:9)', value: '16-9' },
+          { label: 'Cinematic Ultrawide (21:9)', value: '21-9' },
+          { label: 'Classic TV (4:3)', value: '4-3' },
+          { label: 'Square (1:1)', value: '1-1' },
+        ]},
+        { name: 'maxWidth', label: 'Container Width', type: 'select', defaultValue: '900px', options: [
+          { label: 'Standard Container (900px)', value: '900px' },
+          { label: 'Wide Container (1100px)', value: '1100px' },
+          { label: 'Compact Box (680px)', value: '680px' },
+          { label: 'Full Width (100%)', value: '100%' },
+        ]},
+      ],
+      renderHtml: (s) => {
+        const ratioClass = `block-video__ratio-${s.aspectRatio || '16-9'}`;
+        const maxW = s.maxWidth || '900px';
+        const embedHtml = parseVideoEmbedHtml(s.videoUrl || '', s);
+
+        return `
+          <section class="block-video" style="max-width:${maxW};">
+            ${s.title ? `
+              <div class="block-video__header">
+                <h2 class="block-video__title">${escapeHtml(s.title)}</h2>
+              </div>
+            ` : ''}
+            <div class="block-video__container ${ratioClass}">
+              ${embedHtml || '<div style="position:absolute; inset:0; display:grid; place-content:center; color:#64748b; font-size:0.9rem;">No video URL specified</div>'}
+            </div>
+            ${s.caption ? `<p class="block-video__caption">${escapeHtml(s.caption)}</p>` : ''}
+          </section>
+        `;
+      },
+    });
+
+    // 15. IMAGE SHOWCASE & BANNER
+    this.register({
+      type: 'image_showcase',
+      name: 'Image Banner & Showcase',
+      category: 'content',
+      icon: '🖼️',
+      description: 'Single high-impact responsive image card with clickable link destination, badge, and gradient overlay caption.',
+      defaultSettings: {
+        title: 'Next-Gen Cloud Dashboard Experience',
+        caption: 'Engineered for extreme performance, cryptographic data isolation, and instant real-time telemetry.',
+        badgeText: 'PRODUCT HIGHLIGHT',
+        imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80',
+        altText: 'Interactive Analytics Dashboard UI',
+        linkUrl: '#pricing',
+        maxWidth: '1000px',
+        hasOverlay: true,
+      },
+      fields: [
+        { name: 'imageUrl', label: 'Image URL', type: 'text', defaultValue: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80' },
+        { name: 'altText', label: 'Alt Text (Accessibility)', type: 'text', defaultValue: 'Product showcase visual' },
+        { name: 'badgeText', label: 'Eyebrow Ribbon Badge', type: 'text', defaultValue: 'NEW RELEASE' },
+        { name: 'title', label: 'Image Title / Heading', type: 'text', defaultValue: 'Showcase Heading' },
+        { name: 'caption', label: 'Caption Subtitle', type: 'textarea', defaultValue: 'Detailed description of the visual.' },
+        { name: 'linkUrl', label: 'Click Destination URL', type: 'text', defaultValue: '#pricing' },
+      ],
+      renderHtml: (s) => {
+        const maxW = s.maxWidth || '1000px';
+        const imgTag = `<img src="${escapeHtml(s.imageUrl || '')}" alt="${escapeHtml(s.altText || 'Showcase image')}" class="block-image__img" />`;
+        const contentOverlay = (s.hasOverlay !== false && (s.title || s.caption || s.badgeText)) ? `
+          <div class="block-image__overlay">
+            ${s.badgeText ? `<span class="block-image__badge">${escapeHtml(s.badgeText)}</span>` : ''}
+            ${s.title ? `<h3 class="block-image__title">${escapeHtml(s.title)}</h3>` : ''}
+            ${s.caption ? `<p class="block-image__caption">${escapeHtml(s.caption)}</p>` : ''}
+          </div>
+        ` : '';
+
+        const inner = `
+          <div class="block-image__card">
+            ${imgTag}
+            ${contentOverlay}
+          </div>
+        `;
+
+        if (s.linkUrl) {
+          return `
+            <section class="block-image" style="max-width:${maxW};">
+              <a href="${escapeHtml(s.linkUrl)}" style="display:block; text-decoration:none;">${inner}</a>
+            </section>
+          `;
+        }
+
+        return `
+          <section class="block-image" style="max-width:${maxW};">
+            ${inner}
+          </section>
+        `;
+      },
+    });
+
+    // 16. MULTI-IMAGE GALLERY
+    this.register({
+      type: 'gallery',
+      name: 'Media Gallery Grid',
+      category: 'content',
+      icon: '📸',
+      description: 'Responsive multi-image showcase grid with link triggers, image captions, and column layout controls.',
+      defaultSettings: {
+        title: 'Platform Visual Portfolio',
+        subtitle: 'Explore screenshots, system dashboards, and architectural schematics.',
+        columns: '3',
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
+            alt: 'Financial Analytics Engine',
+            title: 'Real-Time Telemetry',
+            caption: 'Edge analytics and latency tracing.',
+            linkUrl: '#features',
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=600&q=80',
+            alt: 'Global Infrastructure Map',
+            title: 'Zero-Knowledge Crypto',
+            caption: 'Per-tenant PBKDF2 cipher isolation.',
+            linkUrl: '#security',
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80',
+            alt: 'Collaboration Canvas',
+            title: 'Presence Engine',
+            caption: 'Live multi-user cursor tracking.',
+            linkUrl: '#pricing',
+          },
+        ],
+      },
+      fields: [
+        { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Image Gallery' },
+        { name: 'subtitle', label: 'Section Subtitle', type: 'textarea', defaultValue: 'Browse our visual showcase.' },
+        { name: 'columns', label: 'Grid Columns', type: 'select', defaultValue: '3', options: [
+          { label: '2 Columns (Large Cards)', value: '2' },
+          { label: '3 Columns (Balanced Grid)', value: '3' },
+          { label: '4 Columns (Compact Gallery)', value: '4' },
+        ]},
+      ],
+      renderHtml: (s) => {
+        const images = Array.isArray(s.images) && s.images.length > 0 ? s.images : [];
+        const colsClass = `block-gallery__grid--cols-${s.columns || '3'}`;
+
+        return `
+          <section class="block-gallery">
+            <div class="block-gallery__header">
+              <h2 class="block-gallery__title">${escapeHtml(s.title || 'Gallery')}</h2>
+              ${s.subtitle ? `<p class="block-gallery__subtitle">${escapeHtml(s.subtitle)}</p>` : ''}
+            </div>
+            <div class="block-gallery__grid ${colsClass}">
+              ${images.map((img: any) => {
+                const innerCard = `
+                  <img src="${escapeHtml(img.url || '')}" alt="${escapeHtml(img.alt || 'Gallery photo')}" class="block-gallery__img" loading="lazy" />
+                  ${(img.title || img.caption) ? `
+                    <div class="block-gallery__meta">
+                      ${img.title ? `<div class="block-gallery__item-title">${escapeHtml(img.title)}</div>` : ''}
+                      ${img.caption ? `<div class="block-gallery__item-desc">${escapeHtml(img.caption)}</div>` : ''}
+                    </div>
+                  ` : ''}
+                `;
+
+                if (img.linkUrl) {
+                  return `<a href="${escapeHtml(img.linkUrl)}" class="block-gallery__item">${innerCard}</a>`;
+                }
+                return `<div class="block-gallery__item">${innerCard}</div>`;
+              }).join('')}
+            </div>
+          </section>
+        `;
+      },
+    });
   }
 }
+
+
