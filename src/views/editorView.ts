@@ -76,8 +76,8 @@ export function renderEditorView(options: EditorViewOptions): string {
         <!-- Rendered dynamically via Collab Presence loop -->
       </div>
 
-      <button class="btn" onclick="savePage()" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-weight:700; padding:0.45rem 1rem;">💾 Save Page</button>
-      <a href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.45rem 0.9rem;">👁️ Preview ↗</a>
+      <button id="savePageBtn" class="btn" onclick="savePage()" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-weight:700; padding:0.45rem 1rem;">💾 Save Page</button>
+      <a id="livePreviewBtn" href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.45rem 0.9rem;">👁️ Preview ↗</a>
     </div>
   </div>
 
@@ -472,14 +472,15 @@ export function renderEditorView(options: EditorViewOptions): string {
         ];
         showToast('Scaffolded Product Hub Template!', true);
       }
-      renderCanvas();
+      renderCanvas(true);
     }
 
-    function renderCanvas() {
+    function renderCanvas(updateInspector = true) {
       const container = document.getElementById('canvasContainer');
+      if (!container) return;
       if (!pageData.blocks || pageData.blocks.length === 0) {
         container.innerHTML = '<div style="color:#64748b; padding:4rem 0; text-align:center; font-size:1.1rem;">Your page is empty. Click or drag components from the left drawer!</div>';
-        renderInspector();
+        if (updateInspector) renderInspector();
         return;
       }
 
@@ -628,12 +629,15 @@ export function renderEditorView(options: EditorViewOptions): string {
         \`;
       }).join('');
 
-      renderInspector();
+      if (updateInspector) {
+        renderInspector();
+      }
     }
 
     function selectBlock(idx) {
+      if (selectedBlockIndex === idx) return;
       selectedBlockIndex = idx;
-      renderCanvas();
+      renderCanvas(true);
     }
 
     let undoHistory = null;
@@ -1144,25 +1148,41 @@ export function renderEditorView(options: EditorViewOptions): string {
     }
 
     function updateSetting(key, val) {
-      if (!pageData.blocks[selectedBlockIndex]) return;
+      if (!pageData.blocks || !pageData.blocks[selectedBlockIndex]) return;
       pageData.blocks[selectedBlockIndex].settings[key] = val;
-      renderCanvas();
+      renderCanvas(false); // Update canvas visual preview without blowing away the active focused input!
     }
 
     async function savePage() {
+      const saveBtn = document.getElementById('savePageBtn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerText = '💾 Saving...';
+      }
       try {
-        const res = await fetch('/api/website/pages/' + pageData.id + '/blocks', {
+        const tenantSlug = '${escapeHtml(tenantSlug)}';
+        const res = await fetch('/api/website/pages/' + encodeURIComponent(pageData.id) + '/blocks?tenant=' + encodeURIComponent(tenantSlug), {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-tenant-id': tenantSlug,
+            'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
+          },
           body: JSON.stringify({ blocks: pageData.blocks })
         });
+        const data = await res.json();
         if (res.ok) {
-          alert('Page saved successfully!');
+          showToast('✅ Page saved successfully!');
         } else {
-          alert('Failed to save page.');
+          showToast('⚠️ ' + (data.error || 'Failed to save page.'));
         }
       } catch (e) {
-        alert('Network error while saving.');
+        showToast('⚠️ Network error while saving page.');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerText = '💾 Save Page';
+        }
       }
     }
 

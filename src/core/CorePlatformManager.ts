@@ -2,6 +2,7 @@
 
 import { EventBus } from '../foundation/EventBus.js';
 import { AuditLogger } from '../foundation/AuditLogger.js';
+import { PersistenceDriver } from '../foundation/PersistenceDriver.js';
 
 export interface User {
   id: string;
@@ -73,7 +74,7 @@ export class CorePlatformManager {
     };
     this.orgs.set(org.id, org);
 
-    const tenant: Tenant = {
+    const defaultTenant: Tenant = {
       id: 'tenant_default',
       orgId: org.id,
       name: 'ETHENENGINE Core Tenant',
@@ -82,16 +83,28 @@ export class CorePlatformManager {
       status: 'active',
       createdAt: new Date().toISOString(),
     };
-    this.tenants.set(tenant.id, tenant);
+    this.tenants.set(defaultTenant.id, defaultTenant);
 
     const workspace: Workspace = {
       id: 'ws_prod',
-      tenantId: tenant.id,
+      tenantId: defaultTenant.id,
       name: 'Production Workspace',
       environment: 'production',
       createdAt: new Date().toISOString(),
     };
     this.workspaces.set(workspace.id, workspace);
+
+    // Rehydrate persisted tenants from disk / DB
+    try {
+      const persisted = PersistenceDriver.getInstance().getCollection<Tenant>('tenants');
+      if (persisted && persisted.length > 0) {
+        for (const t of persisted) {
+          if (t && t.id && t.slug) {
+            this.tenants.set(t.id, t);
+          }
+        }
+      }
+    } catch { /* early init fallback */ }
   }
 
   // Identity & Auth
@@ -131,6 +144,13 @@ export class CorePlatformManager {
       createdAt: new Date().toISOString(),
     };
     this.workspaces.set(ws.id, ws);
+
+    // Save to PersistenceDriver disk snapshot and dual-write to PostgreSQL
+    try {
+      PersistenceDriver.getInstance().saveCollection('tenants', this.listTenants());
+    } catch (e) {
+      console.error('[CorePlatformManager] Failed to persist tenant to disk/DB:', e);
+    }
 
     this.eventBus.publish('tenant.created', tenant, { tenantId: tenant.id, actorId });
     this.auditLogger.log({

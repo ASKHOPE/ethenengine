@@ -1,6 +1,8 @@
 // Capabilities: Website Builder Subsystem
 
 import { EventBus } from '../../foundation/EventBus.js';
+import { BlockRegistry } from './BlockRegistry.js';
+import { PersistenceDriver } from '../../foundation/PersistenceDriver.js';
 
 export interface PageBlock {
   id: string;
@@ -233,14 +235,29 @@ export class WebsiteBuilder {
     this.pages.set(featuresPage.id, featuresPage);
     this.pages.set(cmsPage.id, cmsPage);
     this.pages.set(solutionsPage.id, solutionsPage);
+
+    // Rehydrate persisted pages from disk & database
+    try {
+      const persisted = PersistenceDriver.getInstance().getCollection('pages');
+      if (persisted && persisted.length > 0) {
+        for (const p of persisted) {
+          if (p && p.id) {
+            this.pages.set(p.id, p);
+          }
+        }
+      }
+    } catch { /* early init fallback */ }
   }
 
   public createPage(page: Omit<WebsitePage, 'id'>): WebsitePage {
     const newPage: WebsitePage = {
       ...page,
-      id: `page_${Date.now()}`,
+      id: `page_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     };
     this.pages.set(newPage.id, newPage);
+    try {
+      PersistenceDriver.getInstance().saveCollection('pages', Array.from(this.pages.values()));
+    } catch { /* non-fatal */ }
     this.eventBus.publish('website.page.created', newPage, { tenantId: page.tenantId });
     return newPage;
   }
@@ -249,6 +266,9 @@ export class WebsiteBuilder {
     const page = this.pages.get(pageId);
     if (!page) throw new Error(`Page ${pageId} not found`);
     page.blocks = blocks;
+    try {
+      PersistenceDriver.getInstance().saveCollection('pages', Array.from(this.pages.values()));
+    } catch { /* non-fatal */ }
     this.eventBus.publish('website.page.updated', page, { tenantId: page.tenantId });
     return page;
   }
@@ -260,6 +280,9 @@ export class WebsiteBuilder {
       updates.slug = updates.slug.replace(/^\/+/, ''); // Trim leading slashes
     }
     Object.assign(page, updates);
+    try {
+      PersistenceDriver.getInstance().saveCollection('pages', Array.from(this.pages.values()));
+    } catch { /* non-fatal */ }
     this.eventBus.publish('website.page.updated', page, { tenantId: page.tenantId });
     return page;
   }
@@ -268,6 +291,9 @@ export class WebsiteBuilder {
     const page = this.pages.get(pageId);
     if (!page) return false;
     this.pages.delete(pageId);
+    try {
+      PersistenceDriver.getInstance().saveCollection('pages', Array.from(this.pages.values()));
+    } catch { /* non-fatal */ }
     this.eventBus.publish('website.page.deleted', { pageId }, { tenantId: page.tenantId });
     return true;
   }
@@ -278,7 +304,7 @@ export class WebsiteBuilder {
   }
 
   public renderPage(page: WebsitePage, context?: any): string {
-    const registry = (require('./BlockRegistry.js') as any).BlockRegistry.getInstance();
+    const registry = BlockRegistry.getInstance();
     return page.blocks.map(b => registry.renderBlock(b.type, b.settings, context)).join('\n');
   }
 
