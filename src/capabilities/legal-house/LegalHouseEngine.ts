@@ -73,6 +73,34 @@ export interface CourtDeadline {
   isCompleted: boolean;
 }
 
+export interface AttorneyProfile {
+  id: string;
+  name: string;
+  title: string;
+  practiceAreas: string[];
+  barAdmissions: string[];
+  winRatePercent: number;
+  photoUrl: string;
+  bioSummary: string;
+}
+
+export interface DocumentVersionAudit {
+  id: string;
+  documentId: string;
+  versionNumber: number;
+  editorName: string;
+  changeSummary: string;
+  timestamp: string;
+}
+
+export interface ClientPortalData {
+  clientName: string;
+  activeCases: LegalCase[];
+  upcomingDeadlines: CourtDeadline[];
+  trustBalance: number;
+  vaultFiles: StatuteDocument[];
+}
+
 export class LegalHouseEngine {
   private cases: Map<string, LegalCase[]> = new Map();
   private statutes: Map<string, StatuteDocument[]> = new Map();
@@ -86,6 +114,8 @@ export class LegalHouseEngine {
   }
 
   private seedDefaults(tenantId: string): void {
+    if (this.cases.has(tenantId)) return;
+
     const defaultCases: LegalCase[] = [
       {
         id: 'case_701',
@@ -209,10 +239,53 @@ export class LegalHouseEngine {
   }
 
   public listCases(tenantId: string): LegalCase[] {
+    this.seedDefaults(tenantId);
     return this.cases.get(tenantId) || [];
   }
 
+  public getClientPortalData(tenantId: string, clientName: string): ClientPortalData {
+    this.seedDefaults(tenantId);
+    const cases = this.listCases(tenantId).filter(c => c.clientName.toLowerCase().includes(clientName.toLowerCase()));
+    const deadlines = this.listCourtDeadlines(tenantId);
+    const trustLedger = (this.trustLedgers.get(tenantId) || []).find(t => t.clientName.toLowerCase().includes(clientName.toLowerCase()));
+    const vaultFiles = this.listStatutes(tenantId);
+
+    return {
+      clientName,
+      activeCases: cases,
+      upcomingDeadlines: deadlines,
+      trustBalance: trustLedger?.currentTrustBalance || 0,
+      vaultFiles
+    };
+  }
+
+  public listAttorneyProfiles(): AttorneyProfile[] {
+    return [
+      {
+        id: 'att_101',
+        name: 'Attorney Sarah Jenkins, Esq.',
+        title: 'Senior Litigation & IP Partner',
+        practiceAreas: ['Intellectual Property', 'Patent Litigation', 'Tech M&A'],
+        barAdmissions: ['State Bar of California', 'U.S. Court of Appeals for Federal Circuit'],
+        winRatePercent: 94,
+        photoUrl: '/assets/attorney_jenkins.jpg',
+        bioSummary: 'Over 15 years specializing in cross-border software patents and high-stakes media copyright defense.'
+      },
+      {
+        id: 'att_102',
+        name: 'Robert Sterling, Esq.',
+        title: 'Managing Partner — Corporate Code & Chancery',
+        practiceAreas: ['Corporate Governance', 'Delaware Chancery Court', 'Securities Regulation'],
+        barAdmissions: ['Delaware State Bar', 'New York State Bar'],
+        winRatePercent: 96,
+        photoUrl: '/assets/attorney_sterling.jpg',
+        bioSummary: 'Former Vice Chancellor advisor representing Fortune 500 boards in merger disputes.'
+      }
+    ];
+  }
+
   public createCase(tenantId: string, caseData: Omit<LegalCase, 'id' | 'tenantId' | 'createdAt'>): LegalCase {
+    this.seedDefaults(tenantId);
     const newCase: LegalCase = {
       id: `case_${Date.now()}`,
       tenantId,
@@ -226,6 +299,7 @@ export class LegalHouseEngine {
   }
 
   public updateCaseStatus(tenantId: string, caseId: string, status: LegalCase['status']): LegalCase | null {
+    this.seedDefaults(tenantId);
     const list = this.cases.get(tenantId) || [];
     const target = list.find(c => c.id === caseId);
     if (!target) return null;
@@ -234,10 +308,12 @@ export class LegalHouseEngine {
   }
 
   public listStatutes(tenantId: string): StatuteDocument[] {
+    this.seedDefaults(tenantId);
     return this.statutes.get(tenantId) || [];
   }
 
   public addStatute(tenantId: string, statute: Omit<StatuteDocument, 'id' | 'tenantId'>): StatuteDocument {
+    this.seedDefaults(tenantId);
     const newStatute: StatuteDocument = {
       id: `stat_${Date.now()}`,
       tenantId,
@@ -262,6 +338,7 @@ export class LegalHouseEngine {
   }
 
   public listBillables(tenantId: string): LegalBillableLog[] {
+    this.seedDefaults(tenantId);
     return this.billables.get(tenantId) || [];
   }
 
@@ -273,6 +350,7 @@ export class LegalHouseEngine {
     hoursSpent: number,
     hourlyRate: number = 450
   ): LegalBillableLog {
+    this.seedDefaults(tenantId);
     const totalFee = hoursSpent * hourlyRate;
     const log: LegalBillableLog = {
       id: `bill_${Date.now()}`,
@@ -293,14 +371,17 @@ export class LegalHouseEngine {
   }
 
   public listSummaries(tenantId: string): LegalBriefSummary[] {
+    this.seedDefaults(tenantId);
     return this.summaries.get(tenantId) || [];
   }
 
   public listTrustLedgers(tenantId: string): TrustAccountLedger[] {
+    this.seedDefaults(tenantId);
     return this.trustLedgers.get(tenantId) || [];
   }
 
   public listCourtDeadlines(tenantId: string): CourtDeadline[] {
+    this.seedDefaults(tenantId);
     return this.courtDeadlines.get(tenantId) || [];
   }
 }

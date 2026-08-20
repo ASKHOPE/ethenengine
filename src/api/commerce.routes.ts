@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { CommerceEngine } from '../capabilities/commerce/CommerceEngine.js';
 
-export const commerceRouter = new Hono();
+export const commerceRouter = new Hono<{ Variables: Record<string, any> }>();
 const commerce = CommerceEngine.getInstance();
 
 // Products Catalog

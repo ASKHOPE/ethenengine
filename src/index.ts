@@ -3,6 +3,8 @@
 
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
+
+declare const Bun: any;
 import { CorePlatformManager } from './core/CorePlatformManager.js';
 import { CapabilityRegistry, FutureCapabilitiesMap } from './capability-sdk/CapabilityRegistry.js';
 import { ThemeEngine } from './capabilities/theme-engine/ThemeEngine.js';
@@ -51,7 +53,8 @@ import {
   legalHouseRouter,
   abodePropertyRouter,
   reservationsRouter,
-  taxCurrencyRouter
+  taxCurrencyRouter,
+  publicApiRouter
 } from './api/subsystems.routes.js';
 
 // Modular HTML View Controllers
@@ -79,7 +82,7 @@ import { IdentityEngine } from './core/IdentityEngine.js';
 import { TelemetryEngine } from './foundation/TelemetryEngine.js';
 import { AnalyticsEngine } from './capabilities/analytics/AnalyticsEngine.js';
 
-export const app = new Hono();
+export const app = new Hono<{ Variables: Record<string, any> }>();
 
 // Global Security, Watchdog & Load Defense Pipeline
 app.use('*', SecurityGuard.securityMiddleware());
@@ -214,9 +217,19 @@ app.route('/api/community-admin', communityAdminRouter);
 app.route('/api/trades', tradesCraftRouter);
 app.route('/api/travel', travelFleetRouter);
 app.route('/api/legal', legalHouseRouter);
+import { SystemHealthEngine } from './capabilities/health/SystemHealthEngine.js';
+
 app.route('/api/abode', abodePropertyRouter);
 app.route('/api/reservations', reservationsRouter);
 app.route('/api/tax-currency', taxCurrencyRouter);
+app.route('/api/public-apis', publicApiRouter);
+
+app.get('/api/core/health-status', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const health = await SystemHealthEngine.getInstance().runSystemHealthCheck(tenant?.id || 'tenant_lioramedia');
+  return c.json({ health });
+});
+
 app.get('/api/identities', (c) => {
   const tenant = c.get('tenant' as any) as any;
   return c.json({ identities: IdentityEngine.getInstance().listIdentities(tenant.id) });

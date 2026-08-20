@@ -16,6 +16,8 @@ import { LegalHouseEngine } from '../capabilities/legal-house/LegalHouseEngine.j
 import { AbodePropertyEngine } from '../capabilities/abode-property/AbodePropertyEngine.js';
 import { ServiceReservationEngine } from '../capabilities/reservations/ServiceReservationEngine.js';
 import { GlobalTaxCurrencyEngine } from '../capabilities/tax-currency/GlobalTaxCurrencyEngine.js';
+import { PublicApiGatewayEngine } from '../capabilities/public-api/PublicApiGatewayEngine.js';
+import { SystemHealthEngine } from '../capabilities/health/SystemHealthEngine.js';
 import { CollaborationEngine } from '../capabilities/collab/CollaborationEngine.js';
 import { AnalyticsEngine } from '../capabilities/analytics/AnalyticsEngine.js';
 import { SearchEngine } from '../core/SearchEngine.js';
@@ -41,6 +43,7 @@ const legalHouseEngine = new LegalHouseEngine();
 const abodePropertyEngine = new AbodePropertyEngine();
 const reservationEngine = new ServiceReservationEngine();
 const taxCurrencyEngine = GlobalTaxCurrencyEngine.getInstance();
+const publicApiEngine = PublicApiGatewayEngine.getInstance();
 const eventBus = EventBus.getInstance();
 
 // ============================================================
@@ -819,14 +822,25 @@ tradesCraftRouter.post('/quotes/calculate', async (c) => {
   const body = await c.req.json();
   const quote = tradesCraftEngine.calculateEstimate(
     tenant.id,
-    body.customerName || 'Client',
-    body.customerEmail || 'client@example.com',
-    body.tradeType || 'handyman',
-    body.materials || [],
-    Number(body.laborHours || 1),
+    body.customerName || 'Valued Customer',
+    body.customerEmail || 'customer@example.com',
+    body.tradeType || 'plumbing',
+    body.materials || [{ item: 'Standard Fitting Set', cost: 150 }],
+    Number(body.laborHours || 2),
     Number(body.hourlyRate || 85)
   );
   return c.json({ quote });
+});
+
+tradesCraftRouter.get('/tiered-quotes', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ tieredQuotes: tradesCraftEngine.listTieredQuotes(tenant.id) });
+});
+
+tradesCraftRouter.post('/zip-check', async (c) => {
+  const body = await c.req.json();
+  const coverage = tradesCraftEngine.checkZipCodeCoverage(body.zipCode || '');
+  return c.json({ coverage });
 });
 
 // ============================================================
@@ -895,6 +909,28 @@ travelFleetRouter.post('/bookings', async (c) => {
   return c.json({ booking }, 201);
 });
 
+travelFleetRouter.get('/search', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const dest = c.req.query('destination');
+  const maxPrice = c.req.query('maxPrice');
+  const category = c.req.query('category');
+
+  const packages = travelFleetEngine.searchPackages(tenant.id, {
+    destination: dest || undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    category: category || undefined
+  });
+  return c.json({ packages });
+});
+
+travelFleetRouter.get('/addons', (c) => {
+  return c.json({ addons: travelFleetEngine.listRentalAddons() });
+});
+
+travelFleetRouter.get('/reviews', (c) => {
+  return c.json({ reviews: travelFleetEngine.listSocialReviews() });
+});
+
 // ============================================================
 // Legal House & Practice Router
 // ============================================================
@@ -903,6 +939,17 @@ export const legalHouseRouter = new Hono();
 legalHouseRouter.get('/cases', (c) => {
   const tenant = c.get('tenant' as any) as any;
   return c.json({ cases: legalHouseEngine.listCases(tenant.id) });
+});
+
+legalHouseRouter.get('/client-portal', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const clientName = c.req.query('clientName') || 'Acme Media';
+  const portalData = legalHouseEngine.getClientPortalData(tenant.id, clientName);
+  return c.json({ portalData });
+});
+
+legalHouseRouter.get('/attorneys', (c) => {
+  return c.json({ attorneys: legalHouseEngine.listAttorneyProfiles() });
 });
 
 legalHouseRouter.post('/cases', async (c) => {
@@ -1129,5 +1176,47 @@ taxCurrencyRouter.post('/calculate-tax', async (c) => {
   );
   return c.json({ result });
 });
+
+// ============================================================
+// Public API Gateway Integration Router (from public-apis list)
+// ============================================================
+export const publicApiRouter = new Hono();
+
+publicApiRouter.get('/weather', async (c) => {
+  const city = c.req.query('city') || 'San Francisco';
+  const weather = await publicApiEngine.getWeatherForecast(city);
+  return c.json({ weather });
+});
+
+publicApiRouter.get('/rates', async (c) => {
+  const base = c.req.query('base') || 'USD';
+  const rates = await publicApiEngine.getLiveExchangeRates(base);
+  return c.json({ rates });
+});
+
+publicApiRouter.get('/ip-geo', async (c) => {
+  const ip = c.req.query('ip') || '198.51.100.42';
+  const geo = await publicApiEngine.lookupIpLocation(ip);
+  return c.json({ geo });
+});
+
+publicApiRouter.get('/geocode', async (c) => {
+  const address = c.req.query('address') || '100 Ocean Drive, Miami FL';
+  const location = await publicApiEngine.geocodeAddress(address);
+  return c.json({ location });
+});
+
+publicApiRouter.get('/trending-news', async (c) => {
+  const category = (c.req.query('category') as any) || 'tech';
+  const news = await publicApiEngine.fetchTrendingNews(category);
+  return c.json({ news });
+});
+
+publicApiRouter.get('/legal-citations', async (c) => {
+  const q = c.req.query('q') || 'copyright';
+  const citations = await publicApiEngine.searchLegalCitations(q);
+  return c.json({ citations });
+});
+
 
 

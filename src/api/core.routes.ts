@@ -5,7 +5,7 @@ import { AuditLogger } from '../foundation/AuditLogger.js';
 import { EventBus } from '../foundation/EventBus.js';
 import { SyncEngine } from '../foundation/SyncEngine.js';
 
-export const coreRouter = new Hono();
+export const coreRouter = new Hono<{ Variables: Record<string, any> }>();
 const core = CorePlatformManager.getInstance();
 const capabilityRegistry = CapabilityRegistry.getInstance();
 const auditLogger = AuditLogger.getInstance();

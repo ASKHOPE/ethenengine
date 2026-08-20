@@ -279,6 +279,56 @@ async function runApiTests() {
   });
   assert(taxRes.status === 200, 'POST /api/tax-currency/calculate-tax applies regional VAT/GST tax rates');
 
+  // 20. Research-Driven Industry API Matrix (Tiered Quotes, ZIP Check, Client Portal, Attorney Profiles)
+  console.log('\n🔬 20. Research-Driven Industry API Matrix');
+  const zipRes = await app.request('/api/trades/zip-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ zipCode: '95110' })
+  });
+  assert(zipRes.status === 200, 'POST /api/trades/zip-check performs instant service area coverage lookup');
+
+  const tieredRes = await app.request('/api/trades/tiered-quotes');
+  assert(tieredRes.status === 200, 'GET /api/trades/tiered-quotes returns Good/Better/Best estimate options');
+
+  const travelSearchRes = await app.request('/api/travel/search?destination=Switzerland');
+  assert(travelSearchRes.status === 200, 'GET /api/travel/search filters corporate retreat packages');
+
+  const portalRes = await app.request('/api/legal/client-portal?clientName=Acme');
+  assert(portalRes.status === 200, 'GET /api/legal/client-portal returns secure client portal data');
+
+  const attorneysRes = await app.request('/api/legal/attorneys');
+  assert(attorneysRes.status === 200, 'GET /api/legal/attorneys returns partner credentials and practice areas');
+
+  // 21. Public API Gateway Integration Matrix (Open-Meteo, Frankfurter, ip-api, Nominatim, HackerNews, CourtListener)
+  console.log('\n🌐 21. Public API Gateway Integration Matrix');
+  const weatherRes = await app.request('/api/public-apis/weather?city=San%20Francisco');
+  assert(weatherRes.status === 200, 'GET /api/public-apis/weather returns Open-Meteo live forecast & outdoor work safety');
+
+  const ratesRes = await app.request('/api/public-apis/rates?base=USD');
+  assert(ratesRes.status === 200, 'GET /api/public-apis/rates returns Frankfurter live ECB exchange rates');
+
+  const ipGeoRes = await app.request('/api/public-apis/ip-geo?ip=198.51.100.42');
+  assert(ipGeoRes.status === 200, 'GET /api/public-apis/ip-geo returns ip-api location metadata');
+
+  const geoRes = await app.request('/api/public-apis/geocode?address=100%20Ocean%20Drive');
+  assert(geoRes.status === 200, 'GET /api/public-apis/geocode returns Nominatim OpenStreetMap coordinates');
+
+  const newsRes = await app.request('/api/public-apis/trending-news?category=tech');
+  assert(newsRes.status === 200, 'GET /api/public-apis/trending-news returns HackerNews trending topic feed');
+
+  const citeRes = await app.request('/api/public-apis/legal-citations?q=copyright');
+  assert(citeRes.status === 200, 'GET /api/public-apis/legal-citations returns CourtListener precedent citations');
+
+  // 22. System Health & Running Services Diagnostic Probes
+  console.log('\n⚡ 22. Platform System Health & Running Services Diagnostic Probes');
+  const healthRes = await app.request('/api/core/health-status');
+  assert(healthRes.status === 200, 'GET /api/core/health-status returns 200 OK');
+  const healthJson = await healthRes.json();
+  assert(healthJson.health.overallStatus === 'HEALTHY', 'Platform overall status is HEALTHY');
+  assert(healthJson.health.totalServicesRunning === 17, 'All 17 subsystem services are running concurrently');
+  assert(healthJson.health.healthyServicesCount === 17, '100% of probed services (17/17) report HEALTHY status');
+
   console.log('\n======================================================================');
   console.log(` 🏁 API TEST COMPLETE: ${passed} PASSED, ${failed} FAILED (TOTAL: ${passed + failed})`);
   console.log('======================================================================\n');

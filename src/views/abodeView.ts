@@ -1,4 +1,4 @@
-import { Tenant } from '../core/TenantManager.js';
+import { Tenant } from '../core/CorePlatformManager.js';
 import { AbodePropertyEngine } from '../capabilities/abode-property/AbodePropertyEngine.js';
 
 function escapeHtml(str: string): string {

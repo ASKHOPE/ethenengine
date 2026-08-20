@@ -1,4 +1,4 @@
-import { Tenant } from '../core/TenantManager.js';
+import { Tenant } from '../core/CorePlatformManager.js';
 import { TravelFleetEngine } from '../capabilities/travel-fleet/TravelFleetEngine.js';
 
 function escapeHtml(str: string): string {
@@ -15,6 +15,8 @@ export function renderTravelView(activeTenant: Tenant): string {
   const fleet = engine.listFleet(activeTenant.id);
   const packages = engine.listCorporatePackages(activeTenant.id);
   const bookings = engine.listBookings(activeTenant.id);
+  const addons = engine.listRentalAddons();
+  const reviews = engine.listSocialReviews();
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -25,99 +27,140 @@ export function renderTravelView(activeTenant: Tenant): string {
   <link rel="stylesheet" href="/styles.css">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b1329; color: #f8fafc; display: flex; flex-direction: column; min-height: 100vh; }
-    .header { background: #16203a; border-bottom: 1px solid #233258; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .brand { font-size: 1.25rem; font-weight: 800; color: #a855f7; display: flex; align-items: center; gap: 0.6rem; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b101d; color: #f8fafc; display: flex; flex-direction: column; min-height: 100vh; }
+    .header { background: #131b2e; border-bottom: 1px solid #1e293b; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 1.25rem; font-weight: 800; color: #a78bfa; display: flex; align-items: center; gap: 0.6rem; }
     .container { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem 1rem; display: flex; flex-direction: column; gap: 2rem; }
-    .hero { background: linear-gradient(135deg, #1e1b4b, #0b1329); border: 1px solid #3730a3; border-radius: 12px; padding: 2.5rem; text-align: center; }
+    .hero { background: linear-gradient(135deg, #131b2e, #0b101d); border: 1px solid #1e293b; border-radius: 12px; padding: 2.5rem; text-align: center; }
     .hero h1 { font-size: 2rem; margin-bottom: 0.75rem; color: #f8fafc; }
-    .hero p { color: #a5b4fc; max-width: 650px; margin: 0 auto 1.5rem auto; font-size: 0.95rem; }
+    .hero p { color: #c4b5fd; max-width: 650px; margin: 0 auto 1.5rem auto; font-size: 0.95rem; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
-    .card { background: #16203a; border: 1px solid #233258; border-radius: 12px; padding: 1.5rem; }
-    .card h3 { font-size: 1.1rem; color: #c084fc; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+    .card { background: #131b2e; border: 1px solid #1e293b; border-radius: 12px; padding: 1.5rem; }
+    .card h3 { font-size: 1.1rem; color: #c4b5fd; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
     .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
-    .badge-purple { background: #581c87; color: #c084fc; }
+    .badge-purple { background: #5b21b6; color: #ddd6fe; }
     .badge-green { background: #065f46; color: #34d399; }
     .badge-amber { background: #78350f; color: #fde047; }
-    .btn { background: #8b5cf6; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
-    .btn:hover { background: #7c3aed; }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="brand">✈️ ${escapeHtml(activeTenant.name)} Travel & Fleet Operations</div>
-    <a href="/admin?tenant=${escapeHtml(activeTenant.slug)}" style="color:#a5b4fc; text-decoration:none; font-weight:600; font-size:0.85rem;">← Back to Admin Console</a>
+    <div class="brand">✈️ ${escapeHtml(activeTenant.name)} Travel, Mobility & Fleet Engine</div>
+    <a href="/admin?tenant=${escapeHtml(activeTenant.slug)}" style="color:#c4b5fd; text-decoration:none; font-weight:600; font-size:0.85rem;">← Back to Admin Console</a>
   </div>
 
   <div class="container">
     <div class="hero">
-      <h1>Corporate Vacation Trips & Chauffeur Fleet Operations</h1>
-      <p>Company-sponsored retreats, executive chauffeur services, self-driving rentals, and customized employee holiday trip bundles.</p>
+      <h1>Corporate Vacation Retreats & Executive Chauffeur Fleet</h1>
+      <p>Inspiring destination itineraries, transparent corporate pricing, luxury chauffeur deals, and self-drive rentals.</p>
+    </div>
+
+    <!-- TRIP & RETREAT SEARCH FILTER -->
+    <div class="card" style="background:#0b101d; border:1px solid #8b5cf6;">
+      <h3 style="color:#fff;">🔍 Destination & Budget Search Portal</h3>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.75rem;">
+        <input type="text" id="destInput" placeholder="Filter Destination (e.g. Switzerland, California)..." style="flex:1; padding:0.6rem; border-radius:6px; background:#131b2e; border:1px solid #1e293b; color:#fff;" />
+        <select id="catSelect" style="padding:0.6rem; border-radius:6px; background:#131b2e; border:1px solid #1e293b; color:#fff;">
+          <option value="">All Trip Categories</option>
+          <option value="leadership">Leadership Retreat</option>
+          <option value="tech_retreat">Tech Team Outing</option>
+        </select>
+        <button onclick="filterPackages()" style="background:#8b5cf6; color:#fff; font-weight:700; padding:0.6rem 1.2rem; border:none; border-radius:6px; cursor:pointer;">Search Packages</button>
+      </div>
     </div>
 
     <div class="grid-3">
-      <!-- CORPORATE PACKAGES -->
+      <!-- CORPORATE TRIP PACKAGES -->
       <div class="card">
         <h3>
-          <span>🌴 Corporate Trip Packages</span>
-          <span class="badge badge-purple">${packages.length} Destinations</span>
+          <span>🏝️ Corporate Retreats</span>
+          <span class="badge badge-purple">${packages.length} Active</span>
         </h3>
-        <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div id="pkgList" style="display:flex; flex-direction:column; gap:1rem;">
           ${packages.map(p => `
-            <div style="background:#0b1329; border:1px solid #233258; padding:1rem; border-radius:8px;">
+            <div style="background:#0b101d; border:1px solid #1e293b; padding:1rem; border-radius:8px;">
               <strong style="color:#f8fafc; font-size:0.95rem;">${escapeHtml(p.title)}</strong>
-              <div style="font-size:0.78rem; color:#a5b4fc; margin:0.3rem 0;">📍 ${escapeHtml(p.destination)} • ${p.durationDays} Days</div>
-              <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.6rem;">Includes: ${p.inclusions.slice(0, 2).join(', ')}</div>
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span class="badge badge-green">$${p.pricePerEmployee}/employee</span>
-                <span style="font-size:0.75rem; color:#cbd5e1;">Max ${p.maxEmployees} guests</span>
+              <div style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0;">📍 ${escapeHtml(p.destination)} (${p.durationDays} Days)</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+                <span class="badge badge-green">$${p.pricePerEmployee.toLocaleString()}/person</span>
+                <span class="badge badge-purple">Max ${p.maxEmployees} Employees</span>
               </div>
             </div>
           `).join('')}
         </div>
       </div>
 
-      <!-- VEHICLE FLEET -->
+      <!-- LUXURY FLEET INVENTORY & ADDONS -->
       <div class="card">
         <h3>
-          <span>🚘 Luxury Vehicle Fleet</span>
-          <span class="badge badge-green">${fleet.length} Available</span>
-        </h3>
-        <div style="display:flex; flex-direction:column; gap:1rem;">
-          ${fleet.map(v => `
-            <div style="background:#0b1329; border:1px solid #233258; padding:1rem; border-radius:8px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-                <strong style="color:#f8fafc;">${escapeHtml(v.make)} ${escapeHtml(v.model)} (${v.year})</strong>
-                <span class="badge badge-amber">$${v.dailyRate}/day</span>
-              </div>
-              <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.4rem;">Plate: ${escapeHtml(v.licensePlate)} • Type: ${escapeHtml(v.fleetType)}</div>
-              <div style="font-size:0.72rem; color:#a5b4fc;">✨ ${v.features.join(' • ')}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <!-- FLEET BOOKINGS -->
-      <div class="card">
-        <h3>
-          <span>📅 Corporate & Fleet Bookings</span>
-          <span class="badge badge-amber">${bookings.length} Confirmed</span>
+          <span>🚘 Executive Chauffeur Fleet</span>
+          <span class="badge badge-green">${fleet.length} Vehicles</span>
         </h3>
         <div style="display:flex; flex-direction:column; gap:0.85rem;">
-          ${bookings.map(b => `
-            <div style="background:#0b1329; border:1px solid #233258; padding:0.85rem; border-radius:8px;">
-              <strong style="color:#f8fafc; font-size:0.9rem;">${escapeHtml(b.customerName)}</strong>
-              <div style="font-size:0.78rem; color:#a5b4fc; margin-top:0.2rem;">Dates: ${b.startDate} to ${b.endDate}</div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
-                <span class="badge badge-purple">$${b.totalCost.toLocaleString()}</span>
-                <span class="badge badge-green">${escapeHtml(b.status)}</span>
+          ${fleet.map(v => `
+            <div style="background:#0b101d; border:1px solid #1e293b; padding:0.85rem; border-radius:8px;">
+              <strong style="color:#f8fafc; font-size:0.88rem;">${escapeHtml(v.make)} ${escapeHtml(v.model)} (${v.year})</strong>
+              <div style="font-size:0.72rem; color:#94a3b8; margin:0.2rem 0;">Plate: ${escapeHtml(v.licensePlate)} | ${v.features.join(', ')}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+                <span style="font-size:0.85rem; font-weight:700; color:#34d399;">$${v.dailyRate}/day</span>
+                <span class="badge badge-green">${v.isAvailable ? 'AVAILABLE' : 'BOOKED'}</span>
               </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <h4 style="color:#c4b5fd; margin-top:1.25rem; font-size:0.85rem;">✨ VIP Rental Add-Ons</h4>
+        <div style="display:flex; flex-direction:column; gap:0.4rem; margin-top:0.5rem;">
+          ${addons.map(a => `
+            <div style="font-size:0.75rem; background:#0b101d; padding:0.4rem 0.6rem; border-radius:4px; display:flex; justify-content:space-between;">
+              <span style="color:#fff;">${escapeHtml(a.name)}</span>
+              <span style="color:#34d399;">+$${a.dailyPrice}/day</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- TRIPADVISOR SOCIAL PROOF REVIEWS -->
+      <div class="card">
+        <h3>
+          <span>⭐ TripAdvisor Social Proof</span>
+          <span class="badge badge-amber">5.0 Star Rating</span>
+        </h3>
+        <div style="display:flex; flex-direction:column; gap:0.85rem;">
+          ${reviews.map(r => `
+            <div style="background:#0b101d; border:1px solid #1e293b; padding:0.85rem; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="color:#fff; font-size:0.85rem;">${escapeHtml(r.reviewerName)}</strong>
+                <span class="badge badge-amber">${escapeHtml(r.source)}</span>
+              </div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0;">"${escapeHtml(r.comment)}"</p>
+              <div style="font-size:0.7rem; color:#fde047;">★★★★★ Verified Corporate Trip</div>
             </div>
           `).join('')}
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    async function filterPackages() {
+      const dest = document.getElementById('destInput').value;
+      const cat = document.getElementById('catSelect').value;
+      const res = await fetch('/api/travel/search?destination=' + encodeURIComponent(dest) + '&category=' + encodeURIComponent(cat));
+      const data = await res.json();
+      const listDiv = document.getElementById('pkgList');
+      listDiv.innerHTML = data.packages.map(p => \`
+        <div style="background:#0b101d; border:1px solid #1e293b; padding:1rem; border-radius:8px;">
+          <strong style="color:#f8fafc; font-size:0.95rem;">\${p.title}</strong>
+          <div style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0;">📍 \${p.destination} (\${p.durationDays} Days)</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+            <span class="badge badge-green">$\${p.pricePerEmployee.toLocaleString()}/person</span>
+            <span class="badge badge-purple">Max \${p.maxEmployees} Employees</span>
+          </div>
+        </div>
+      \`).join('');
+    }
+  </script>
 </body>
 </html>`;
 }

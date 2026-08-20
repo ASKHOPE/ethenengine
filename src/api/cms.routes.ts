@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { BasicCMS } from '../capabilities/basic-cms/BasicCMS.js';
 
-export const cmsRouter = new Hono();
+export const cmsRouter = new Hono<{ Variables: Record<string, any> }>();
 const cms = BasicCMS.getInstance();
 
 cmsRouter.get('/content-types', (c) => {

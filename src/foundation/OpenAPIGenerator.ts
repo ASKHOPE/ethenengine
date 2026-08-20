@@ -7,7 +7,7 @@ export class OpenAPIGenerator {
       info: {
         title: 'ETHENENGINE Enterprise Multi-Tenant Platform API',
         version: '1.0.0',
-        description: 'Comprehensive REST API specs for ETHENENGINE Multi-Tenant Business Operating System. Exposes zero-knowledge tenant isolation, headless CMS, no-code visual builder, multi-warehouse inventory, double-entry accounting, CRM pipelines, and real-time collaboration.',
+        description: 'Comprehensive REST API specs for ETHENENGINE Multi-Tenant Business Operating System. Exposes zero-knowledge tenant isolation, headless CMS, visual builder, multi-warehouse inventory, double-entry accounting, CRM pipelines, real-time collaboration, trades portfolio, travel fleet, legal house, property management, service reservations, global tax engine, public API gateway, and live system health diagnostics.',
         contact: {
           name: 'ETHENENGINE Architecture Team',
           url: 'https://github.com/ASKHOPE/ethenengine',
@@ -21,7 +21,7 @@ export class OpenAPIGenerator {
       ],
       tags: [
         { name: 'Authentication & IAM', description: 'Token issuance, registration, verification & session management' },
-        { name: 'Multi-Tenant Core', description: 'Tenant provisioning, capabilities registry & audit logging' },
+        { name: 'Multi-Tenant Core & Health', description: 'Tenant provisioning, system health diagnostics & audit logging' },
         { name: 'Website Builder & Themes', description: 'Page management, block schemas & design token compilation' },
         { name: 'Commerce & Orders', description: 'Product catalog, shopping cart, promo codes & instant checkout' },
         { name: 'Multi-Warehouse Inventory', description: 'Warehouse logistics, bin/aisle allocations & stock transfers' },
@@ -29,378 +29,216 @@ export class OpenAPIGenerator {
         { name: 'ERP & Accounting', description: 'Procurement orders, double-entry balanced general ledger' },
         { name: 'Real-Time Presence & Collab', description: 'Collaborative cursor tracking, block locking & heartbeat' },
         { name: 'Analytics & A/B Testing', description: 'Edge telemetry, goal conversions & split experiment evaluation' },
-        { name: 'Media Assets', description: 'Asset library storage & file uploads' },
-        { name: 'Full-Text Search', description: 'Search query engine across CMS and platform documents' },
-        { name: 'Support Delegation', description: 'Zero-knowledge break-glass diagnostic access grants' },
+        { name: 'Media LLM Publisher', description: 'AI social publishing channels, post generation & analytics' },
+        { name: 'Community Admin', description: 'Meeting agendas, callings roster & library search' },
+        { name: 'Trades & Craftsmen', description: 'Project portfolio, tiered estimates, ZIP coverage & credentials' },
+        { name: 'Travel & Corporate Fleet', description: 'Vehicle fleet, retreat packages, VIP add-ons & reviews' },
+        { name: 'Legal House & Practice', description: 'Court cases, legal statutes, billable hours & client portal' },
+        { name: 'Abode Property Management', description: 'Property listings, lease agreements, maintenance & occupancy' },
+        { name: 'Service Reservations', description: 'Time slot calendar & provider-customer dispatch order book' },
+        { name: 'Global Tax & Currency', description: 'Real-time 8-currency conversion & regional VAT/GST calculation' },
+        { name: 'Public API Gateway', description: 'Open-Meteo weather, Frankfurter rates, ip-api, Nominatim geocoding & CourtListener citations' },
         { name: 'Watchdog & Disaster Recovery', description: 'Runtime anomaly detection, circuit breakers, auto-healing, outage failover and point-in-time data recovery' },
       ],
       paths: {
+        '/api/core/health-status': {
+          get: {
+            tags: ['Multi-Tenant Core & Health'],
+            summary: 'Get platform health summary, latency probes & 17 running services status',
+            responses: {
+              '200': { description: 'Overall HEALTHY status, active tenant count, heap memory usage, and 17 service health probes' },
+            },
+          },
+        },
+        '/api/public-apis/weather': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Get Open-Meteo weather forecast and outdoor work safety evaluation',
+            parameters: [{ name: 'city', in: 'query', schema: { type: 'string', example: 'San Francisco' } }],
+            responses: { '200': { description: 'Weather temperature, conditions, wind speed, and outdoor safety status' } },
+          },
+        },
+        '/api/public-apis/rates': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Get Frankfurter European Central Bank live currency exchange rates',
+            parameters: [{ name: 'base', in: 'query', schema: { type: 'string', example: 'USD' } }],
+            responses: { '200': { description: 'Real-time exchange rates for USD, EUR, GBP, JPY, AUD, CAD, INR, CHF' } },
+          },
+        },
+        '/api/public-apis/ip-geo': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Lookup IP address geolocation metadata',
+            parameters: [{ name: 'ip', in: 'query', schema: { type: 'string', example: '198.51.100.42' } }],
+            responses: { '200': { description: 'City, region, country, latitude, longitude, and ISP provider' } },
+          },
+        },
+        '/api/public-apis/geocode': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Geocode address via Nominatim OpenStreetMap API',
+            parameters: [{ name: 'address', in: 'query', schema: { type: 'string', example: '100 Ocean Drive' } }],
+            responses: { '200': { description: 'Formatted address, coordinates (lat/lon), and place ID' } },
+          },
+        },
+        '/api/public-apis/trending-news': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Fetch HackerNews trending industry news topics',
+            parameters: [{ name: 'category', in: 'query', schema: { type: 'string', example: 'tech' } }],
+            responses: { '200': { description: 'Array of trending stories with source links' } },
+          },
+        },
+        '/api/public-apis/legal-citations': {
+          get: {
+            tags: ['Public API Gateway'],
+            summary: 'Search federal & state legal precedent citations via CourtListener',
+            parameters: [{ name: 'q', in: 'query', schema: { type: 'string', example: 'copyright' } }],
+            responses: { '200': { description: 'Legal citations, case titles, court jurisdictions, and summaries' } },
+          },
+        },
+        '/api/trades/portfolio': {
+          get: {
+            tags: ['Trades & Craftsmen'],
+            summary: 'List contractor showcase project gallery',
+            responses: { '200': { description: 'Before/after project photos, materials used, and client feedback' } },
+          },
+        },
+        '/api/trades/tiered-quotes': {
+          get: {
+            tags: ['Trades & Craftsmen'],
+            summary: 'Get Good/Better/Best tiered price estimate options',
+            responses: { '200': { description: 'Tiered proposals with scope breakdowns and price points' } },
+          },
+        },
+        '/api/trades/zip-check': {
+          post: {
+            tags: ['Trades & Craftsmen'],
+            summary: 'Check instant service area coverage by ZIP code',
+            requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { zipCode: { type: 'string', example: '95110' } } } } } },
+            responses: { '200': { description: 'Coverage boolean, estimated arrival time, and primary dispatch hub' } },
+          },
+        },
+        '/api/travel/fleet': {
+          get: {
+            tags: ['Travel & Corporate Fleet'],
+            summary: 'List available vehicle fleet roster',
+            responses: { '200': { description: 'Vehicles, category, daily rate, seating capacity, and status' } },
+          },
+        },
+        '/api/travel/search': {
+          get: {
+            tags: ['Travel & Corporate Fleet'],
+            summary: 'Filter corporate vacation retreat packages by destination and budget',
+            parameters: [
+              { name: 'destination', in: 'query', schema: { type: 'string', example: 'Switzerland' } },
+              { name: 'maxBudget', in: 'query', schema: { type: 'number', example: 5000 } },
+            ],
+            responses: { '200': { description: 'Filtered array of corporate retreat packages' } },
+          },
+        },
+        '/api/legal/cases': {
+          get: {
+            tags: ['Legal House & Practice'],
+            summary: 'List active court cases and dockets',
+            responses: { '200': { description: 'Case numbers, court jurisdictions, status, and lead counsel' } },
+          },
+        },
+        '/api/legal/client-portal': {
+          get: {
+            tags: ['Legal House & Practice'],
+            summary: 'Get encrypted client portal view data',
+            parameters: [{ name: 'clientName', in: 'query', schema: { type: 'string', example: 'Acme Media' } }],
+            responses: { '200': { description: 'Client cases, upcoming filing deadlines, and IOLTA retainer balance' } },
+          },
+        },
+        '/api/legal/attorneys': {
+          get: {
+            tags: ['Legal House & Practice'],
+            summary: 'List law firm partner directory profiles and credentials',
+            responses: { '200': { description: 'Attorney names, titles, practice areas, bar admissions, and trial win rates' } },
+          },
+        },
+        '/api/abode/properties': {
+          get: {
+            tags: ['Abode Property Management'],
+            summary: 'List real estate property inventory and occupancy',
+            responses: { '200': { description: 'Properties, addresses, unit counts, monthly rent, and occupancy rate' } },
+          },
+        },
+        '/api/reservations/slots': {
+          get: {
+            tags: ['Service Reservations'],
+            summary: 'List service provider booking calendar time slots',
+            responses: { '200': { description: 'Time slots, provider names, service domain, rate, and availability' } },
+          },
+        },
+        '/api/reservations/orders': {
+          get: {
+            tags: ['Service Reservations'],
+            summary: 'Get provider-customer order book with interactive messages',
+            responses: { '200': { description: 'Dispatched orders, status, negotiated prices, and live chat logs' } },
+          },
+        },
+        '/api/tax-currency/convert': {
+          post: {
+            tags: ['Global Tax & Currency'],
+            summary: 'Convert currency amount between supported international currencies',
+            requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { amount: { type: 'number', example: 100 }, from: { type: 'string', example: 'USD' }, to: { type: 'string', example: 'EUR' } } } } } },
+            responses: { '200': { description: 'Converted amount, exchange rate, and timestamp' } },
+          },
+        },
+        '/api/tax-currency/calculate-tax': {
+          post: {
+            tags: ['Global Tax & Currency'],
+            summary: 'Calculate regional sales tax, EU/UK VAT, or AU/IN/CA GST',
+            requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { subtotal: { type: 'number', example: 500 }, regionCode: { type: 'string', example: 'EU' } } } } } },
+            responses: { '200': { description: 'Tax rate percentage, tax amount, and total with tax' } },
+          },
+        },
         '/api/watchdog/health': {
           get: {
             tags: ['Watchdog & Disaster Recovery'],
             summary: 'Get platform health status, circuit breakers & memory telemetry',
-            responses: {
-              '200': { description: 'Health status, p95 latency, circuit breaker states, and failover status' },
-            },
+            responses: { '200': { description: 'Health status, p95 latency, circuit breaker states, and failover status' } },
           },
         },
         '/api/watchdog/incidents': {
           get: {
             tags: ['Watchdog & Disaster Recovery'],
             summary: 'List runtime anomaly and unhandled error incidents with stack traces',
-            responses: {
-              '200': { description: 'Array of runtime incidents' },
-            },
+            responses: { '200': { description: 'Array of runtime incidents' } },
           },
         },
         '/api/watchdog/heal': {
           post: {
             tags: ['Watchdog & Disaster Recovery'],
             summary: 'Trigger auto-healing routine to reset circuit breakers and flush telemetry buffers',
-            responses: {
-              '200': { description: 'Healed actions and restored subsystems' },
-            },
+            responses: { '200': { description: 'Healed actions and restored subsystems' } },
           },
         },
         '/api/watchdog/dr/snapshot': {
           post: {
             tags: ['Watchdog & Disaster Recovery'],
             summary: 'Create an immutable point-in-time backup snapshot with SHA-256 HMAC checksum',
-            requestBody: {
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      label: { type: 'string', example: 'Pre-Deployment Backup' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Snapshot generated with item counts and checksum' },
-            },
-          },
-        },
-        '/api/watchdog/dr/restore': {
-          post: {
-            tags: ['Watchdog & Disaster Recovery'],
-            summary: 'Rollback tenant or system state to a previous point-in-time snapshot',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['snapshotId'],
-                    properties: {
-                      snapshotId: { type: 'string', example: 'snap_1786988500000_abc1' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '200': { description: 'Snapshot restored with HMAC verification' },
-              '500': { description: 'Integrity or restoration error' },
-            },
-          },
-        },
-        '/api/auth/register': {
-          post: {
-            tags: ['Authentication & IAM'],
-            summary: 'Register a new tenant user',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['email', 'name', 'password'],
-                    properties: {
-                      email: { type: 'string', format: 'email', example: 'developer@enterprise.com' },
-                      name: { type: 'string', example: 'Alex Mercer' },
-                      password: { type: 'string', example: 'SecretP@ss123' },
-                      type: { type: 'string', enum: ['PUBLIC_USER', 'TENANT_USER', 'PLATFORM_USER'], default: 'PUBLIC_USER' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'User successfully registered' },
-              '400': { description: 'Validation error' },
-            },
-          },
-        },
-        '/api/auth/login': {
-          post: {
-            tags: ['Authentication & IAM'],
-            summary: 'Authenticate and receive a JWT token',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['email', 'password'],
-                    properties: {
-                      email: { type: 'string', format: 'email', example: 'admin@lioramedia.com' },
-                      password: { type: 'string', example: 'password123' },
-                      tenantSlug: { type: 'string', example: 'lioramedia' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '200': { description: 'Authentication successful with JWT token' },
-              '401': { description: 'Invalid email or password' },
-            },
-          },
-        },
-        '/api/auth/logout': {
-          post: {
-            tags: ['Authentication & IAM'],
-            summary: 'Revoke active JWT token and clear session cookies',
-            responses: {
-              '200': { description: 'Logged out successfully' },
-            },
-          },
-        },
-        '/api/core/tenants': {
-          get: {
-            tags: ['Multi-Tenant Core'],
-            summary: 'List all multi-tenant environments',
-            responses: {
-              '200': { description: 'Array of tenant organizations' },
-            },
-          },
-          post: {
-            tags: ['Multi-Tenant Core'],
-            summary: 'Provision a new tenant organization',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['name', 'slug', 'domain'],
-                    properties: {
-                      name: { type: 'string', example: 'Acme Global' },
-                      slug: { type: 'string', example: 'acme' },
-                      domain: { type: 'string', example: 'acme.localhost' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Tenant created with dedicated cryptographic salt' },
-            },
-          },
-        },
-        '/api/website/pages': {
-          get: {
-            tags: ['Website Builder & Themes'],
-            summary: 'List all published and draft website pages for the current tenant',
-            responses: {
-              '200': { description: 'Array of page schemas and block hierarchies' },
-            },
-          },
-          post: {
-            tags: ['Website Builder & Themes'],
-            summary: 'Create a new website page',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['title', 'slug'],
-                    properties: {
-                      title: { type: 'string', example: 'Enterprise Solutions' },
-                      slug: { type: 'string', example: 'solutions' },
-                      blocks: { type: 'array', items: { type: 'object' } },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Page created successfully' },
-            },
-          },
-        },
-        '/api/commerce/products': {
-          get: {
-            tags: ['Commerce & Orders'],
-            summary: 'List commerce merchandise items for tenant',
-            responses: {
-              '200': { description: 'List of products with stock availability' },
-            },
-          },
-          post: {
-            tags: ['Commerce & Orders'],
-            summary: 'Create a new catalog product',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['name', 'price'],
-                    properties: {
-                      name: { type: 'string', example: '8K Virtual Stage Pass' },
-                      price: { type: 'number', example: 499 },
-                      currency: { type: 'string', default: 'USD' },
-                      stock: { type: 'number', default: 100 },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Product created' },
-            },
-          },
-        },
-        '/api/commerce/cart': {
-          get: {
-            tags: ['Commerce & Orders'],
-            summary: 'Get active shopping cart with subtotal calculation',
-            parameters: [
-              { name: 'userId', in: 'query', schema: { type: 'string', default: 'guest' } },
-            ],
-            responses: {
-              '200': { description: 'Cart contents with computed subtotal' },
-            },
-          },
-        },
-        '/api/commerce/checkout': {
-          post: {
-            tags: ['Commerce & Orders'],
-            summary: 'Simulate instant cart checkout with promo code support',
-            requestBody: {
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      userId: { type: 'string', default: 'guest' },
-                      promoCode: { type: 'string', example: 'BLACKFRIDAY20' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Order created and receipt emitted' },
-              '400': { description: 'Empty cart or invalid item error' },
-            },
-          },
-        },
-        '/api/inventory/warehouses': {
-          get: {
-            tags: ['Multi-Warehouse Inventory'],
-            summary: 'List warehouse facilities',
-            responses: {
-              '200': { description: 'Array of warehouses' },
-            },
-          },
-        },
-        '/api/crm/leads': {
-          get: {
-            tags: ['CRM & Lead Capture'],
-            summary: 'List enterprise sales leads in tenant pipeline',
-            responses: {
-              '200': { description: 'Array of leads' },
-            },
-          },
-        },
-        '/api/forms/submit': {
-          post: {
-            tags: ['CRM & Lead Capture'],
-            summary: 'Submit public lead capture form and sync into CRM',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    required: ['contactName', 'email'],
-                    properties: {
-                      contactName: { type: 'string', example: 'Jane Doe' },
-                      email: { type: 'string', format: 'email', example: 'jane@enterprise.com' },
-                      company: { type: 'string', example: 'Global Industries' },
-                      dealValue: { type: 'number', example: 50000 },
-                      notes: { type: 'string', example: 'Need 8K virtual production rollout' },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '201': { description: 'Lead created and conversion telemetry recorded' },
-            },
-          },
-        },
-        '/api/collab/heartbeat': {
-          post: {
-            tags: ['Real-Time Presence & Collab'],
-            summary: 'Synchronize active designer presence and mouse cursor position',
-            requestBody: {
-              required: true,
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'string', example: 'usr_abc123' },
-                      name: { type: 'string', example: 'Lead Designer Alice' },
-                      avatarColor: { type: 'string', example: '#6366f1' },
-                      pageId: { type: 'string', example: 'home' },
-                      cursor: {
-                        type: 'object',
-                        properties: {
-                          x: { type: 'number', example: 340 },
-                          y: { type: 'number', example: 580 },
-                        },
-                      },
-                      selectedBlockIndex: { type: 'number', example: 2 },
-                    },
-                  },
-                },
-              },
-            },
-            responses: {
-              '200': { description: 'List of active teammates and delta operations' },
-            },
+            responses: { '201': { description: 'Snapshot generated with item counts and checksum' } },
           },
         },
         '/api/analytics/summary': {
           get: {
             tags: ['Analytics & A/B Testing'],
             summary: 'Get edge pageview telemetry and A/B variant conversion split rates',
-            parameters: [
-              { name: 'pageSlug', in: 'query', schema: { type: 'string', example: 'home' } },
-            ],
-            responses: {
-              '200': { description: 'Total views, conversions, and A/B split percentages' },
-            },
+            parameters: [{ name: 'pageSlug', in: 'query', schema: { type: 'string', example: 'home' } }],
+            responses: { '200': { description: 'Total views, conversions, and A/B split percentages' } },
           },
         },
         '/api/search': {
           get: {
             tags: ['Full-Text Search'],
             summary: 'Full-text indexed search across CMS and platform documents',
-            parameters: [
-              { name: 'q', in: 'query', required: true, schema: { type: 'string', example: 'Cryptographic' } },
-            ],
-            responses: {
-              '200': { description: 'Array of matched documents' },
-            },
+            parameters: [{ name: 'q', in: 'query', required: true, schema: { type: 'string', example: 'Cryptographic' } }],
+            responses: { '200': { description: 'Array of matched documents' } },
           },
         },
       },

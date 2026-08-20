@@ -44,6 +44,41 @@ export interface EstimateQuote {
   createdAt: string;
 }
 
+export interface EstimateTierOption {
+  tierName: 'good' | 'better' | 'best';
+  title: string;
+  description: string;
+  totalPrice: number;
+  warrantyPeriod: string;
+  includedFeatures: string[];
+}
+
+export interface TieredEstimateQuote {
+  id: string;
+  tenantId: string;
+  customerName: string;
+  customerEmail: string;
+  tradeType: TradeType;
+  options: EstimateTierOption[];
+  selectedTier?: 'good' | 'better' | 'best';
+  createdAt: string;
+}
+
+export interface ContractorCredentials {
+  licenseNumber: string;
+  stateJurisdiction: string;
+  bbbRating: string;
+  insurancePolicyNumber: string;
+  insuranceExpiryDate: string;
+  isVerified: boolean;
+}
+
+export interface ServiceAreaConfig {
+  coveredZipCodes: string[];
+  primaryCity: string;
+  radiusMiles: number;
+}
+
 export interface TechnicianGpsTrack {
   technicianId: string;
   technicianName: string;
@@ -77,6 +112,7 @@ export class TradesCraftEngine {
   private portfolioItems: Map<string, TradePortfolioItem[]> = new Map();
   private workOrders: Map<string, WorkOrder[]> = new Map();
   private estimateQuotes: Map<string, EstimateQuote[]> = new Map();
+  private tieredQuotes: Map<string, TieredEstimateQuote[]> = new Map();
   private gpsTracks: Map<string, TechnicianGpsTrack[]> = new Map();
   private subcontractors: Map<string, SubcontractorRecord[]> = new Map();
   private damageInspections: Map<string, DamageInspection[]> = new Map();
@@ -86,6 +122,8 @@ export class TradesCraftEngine {
   }
 
   private seedDefaultItems(tenantId: string): void {
+    if (this.portfolioItems.has(tenantId)) return;
+
     const defaultPortfolio: TradePortfolioItem[] = [
       {
         id: 'port_001',
@@ -149,6 +187,23 @@ export class TradesCraftEngine {
       }
     ];
 
+    const defaultTiered: TieredEstimateQuote[] = [
+      {
+        id: 'tier_901',
+        tenantId,
+        customerName: 'David Sterling',
+        customerEmail: 'david@sterling.com',
+        tradeType: 'hvac',
+        options: [
+          { tierName: 'good', title: 'Standard HVAC Repair & Component Cleaning', description: 'Replaces faulty capacitor and recharges refrigerant leak.', totalPrice: 650, warrantyPeriod: '90 Days', includedFeatures: ['Basic Diagnostic', 'Standard Refrigerant Charge'] },
+          { tierName: 'better', title: 'Complete System Recondition & Air Duct Scrub', description: 'Reconditions compressor coils, installs smart thermostat, and scrubs main ducts.', totalPrice: 1450, warrantyPeriod: '2 Years', includedFeatures: ['Smart Thermostat Included', 'Full Duct Scrubbing', '2-Year Parts & Labor Warranty'] },
+          { tierName: 'best', title: 'High-Efficiency Inverter Heat Pump Upgrade', description: 'Complete installation of ultra-quiet 20 SEER dual-stage inverter system.', totalPrice: 4800, warrantyPeriod: '10 Years Lifetime', includedFeatures: ['20 SEER Ultra Efficiency', '10-Year Bumper-to-Bumper Warranty', '24/7 Priority Emergency Service'] }
+        ],
+        selectedTier: 'better',
+        createdAt: new Date().toISOString()
+      }
+    ];
+
     const defaultGps: TechnicianGpsTrack[] = [
       {
         technicianId: 'tech_jake',
@@ -176,15 +231,18 @@ export class TradesCraftEngine {
     this.portfolioItems.set(tenantId, defaultPortfolio);
     this.workOrders.set(tenantId, defaultWorkOrders);
     this.estimateQuotes.set(tenantId, defaultQuotes);
+    this.tieredQuotes.set(tenantId, defaultTiered);
     this.gpsTracks.set(tenantId, defaultGps);
     this.subcontractors.set(tenantId, defaultSubcontractors);
   }
 
   public listPortfolio(tenantId: string): TradePortfolioItem[] {
+    this.seedDefaultItems(tenantId);
     return this.portfolioItems.get(tenantId) || [];
   }
 
   public createPortfolioItem(tenantId: string, item: Omit<TradePortfolioItem, 'id' | 'tenantId' | 'createdAt'>): TradePortfolioItem {
+    this.seedDefaultItems(tenantId);
     const newItem: TradePortfolioItem = {
       id: `port_${Date.now()}`,
       tenantId,
@@ -198,10 +256,12 @@ export class TradesCraftEngine {
   }
 
   public listWorkOrders(tenantId: string): WorkOrder[] {
+    this.seedDefaultItems(tenantId);
     return this.workOrders.get(tenantId) || [];
   }
 
   public createWorkOrder(tenantId: string, wo: Omit<WorkOrder, 'id' | 'tenantId' | 'createdAt'>): WorkOrder {
+    this.seedDefaultItems(tenantId);
     const newWo: WorkOrder = {
       id: `wo_${Date.now()}`,
       tenantId,
@@ -215,6 +275,7 @@ export class TradesCraftEngine {
   }
 
   public updateWorkOrderStatus(tenantId: string, workOrderId: string, status: WorkOrder['status']): WorkOrder | null {
+    this.seedDefaultItems(tenantId);
     const list = this.workOrders.get(tenantId) || [];
     const target = list.find(w => w.id === workOrderId);
     if (!target) return null;
@@ -223,6 +284,7 @@ export class TradesCraftEngine {
   }
 
   public listQuotes(tenantId: string): EstimateQuote[] {
+    this.seedDefaultItems(tenantId);
     return this.estimateQuotes.get(tenantId) || [];
   }
 
@@ -235,6 +297,7 @@ export class TradesCraftEngine {
     laborHours: number,
     hourlyRate: number = 85
   ): EstimateQuote {
+    this.seedDefaultItems(tenantId);
     const materialsTotal = materials.reduce((acc, m) => acc + m.cost, 0);
     const laborTotal = laborHours * hourlyRate;
     const totalPrice = materialsTotal + laborTotal;
@@ -259,15 +322,67 @@ export class TradesCraftEngine {
     return quote;
   }
 
+  public listTieredQuotes(tenantId: string): TieredEstimateQuote[] {
+    this.seedDefaultItems(tenantId);
+    return this.tieredQuotes.get(tenantId) || [];
+  }
+
+  public createTieredEstimate(
+    tenantId: string,
+    customerName: string,
+    customerEmail: string,
+    tradeType: TradeType,
+    options: EstimateTierOption[]
+  ): TieredEstimateQuote {
+    this.seedDefaultItems(tenantId);
+    const tiered: TieredEstimateQuote = {
+      id: `tier_${Date.now()}`,
+      tenantId,
+      customerName,
+      customerEmail,
+      tradeType,
+      options,
+      createdAt: new Date().toISOString()
+    };
+    const existing = this.tieredQuotes.get(tenantId) || [];
+    existing.push(tiered);
+    this.tieredQuotes.set(tenantId, existing);
+    return tiered;
+  }
+
+  public getCredentials(tenantId: string): ContractorCredentials {
+    return {
+      licenseNumber: 'LIC-CA-9920148-A',
+      stateJurisdiction: 'California State License Board (CSLB)',
+      bbbRating: 'A+ Accredited Business',
+      insurancePolicyNumber: 'INS-GL-8840192',
+      insuranceExpiryDate: '2027-04-30',
+      isVerified: true
+    };
+  }
+
+  public checkZipCodeCoverage(zipCode: string): { isCovered: boolean; estimatedArrivalMinutes: number; regionName: string } {
+    const coveredZips = ['95110', '95112', '95125', '94102', '94103', '94107', '90210', '90001', '33139', '33101'];
+    const isCovered = coveredZips.includes(zipCode.trim());
+    return {
+      isCovered,
+      estimatedArrivalMinutes: isCovered ? 25 : 0,
+      regionName: isCovered ? 'Primary Dispatch Zone' : 'Outside Service Area'
+    };
+  }
+
   public getGpsTracks(tenantId: string): TechnicianGpsTrack[] {
+    this.seedDefaultItems(tenantId);
     return this.gpsTracks.get(tenantId) || [];
   }
 
   public listSubcontractors(tenantId: string): SubcontractorRecord[] {
+    this.seedDefaultItems(tenantId);
     return this.subcontractors.get(tenantId) || [];
   }
 
   public runAiDamageInspection(tenantId: string, photoUrl: string, identifiedDamage: string): DamageInspection {
+    this.seedDefaultItems(tenantId);
     const inspection: DamageInspection = {
       id: `dmg_${Date.now()}`,
       tenantId,

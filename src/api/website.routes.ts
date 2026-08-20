@@ -3,8 +3,8 @@ import { WebsiteBuilder } from '../capabilities/website-builder/WebsiteBuilder.j
 import { ThemeEngine, THEME_PRESETS } from '../capabilities/theme-engine/ThemeEngine.js';
 import { PersistenceDriver } from '../foundation/PersistenceDriver.js';
 
-export const websiteRouter = new Hono();
-export const themeRouter = new Hono();
+export const websiteRouter = new Hono<{ Variables: Record<string, any> }>();
+export const themeRouter = new Hono<{ Variables: Record<string, any> }>();
 
 const websiteBuilder = WebsiteBuilder.getInstance();
 const themeEngine = ThemeEngine.getInstance();

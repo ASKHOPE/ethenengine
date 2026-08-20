@@ -21,6 +21,7 @@ export interface CorporateTripPackage {
   title: string;
   targetCompany?: string;
   destination: string;
+  category: 'leadership' | 'adventure' | 'coastal' | 'tech_retreat';
   durationDays: number;
   maxEmployees: number;
   pricePerEmployee: number;
@@ -41,6 +42,23 @@ export interface FleetBooking {
   totalCost: number;
   status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
   createdAt: string;
+}
+
+export interface RentalAddon {
+  id: string;
+  name: string;
+  dailyPrice: number;
+  description: string;
+}
+
+export interface SocialProofReview {
+  id: string;
+  reviewerName: string;
+  companyName?: string;
+  source: 'TripAdvisor' | 'Google' | 'Yelp';
+  rating: number;
+  comment: string;
+  reviewDate: string;
 }
 
 export interface VehicleInspectionLog {
@@ -79,6 +97,8 @@ export class TravelFleetEngine {
   }
 
   private seedDefaults(tenantId: string): void {
+    if (this.vehicles.has(tenantId)) return;
+
     const defaultVehicles: FleetVehicle[] = [
       {
         id: 'veh_101',
@@ -113,6 +133,7 @@ export class TravelFleetEngine {
         title: 'Executive Leadership Swiss Alps Mountain Retreat',
         targetCompany: 'Acme Corp Executives',
         destination: 'St. Moritz, Switzerland',
+        category: 'leadership',
         durationDays: 5,
         maxEmployees: 25,
         pricePerEmployee: 2400,
@@ -124,6 +145,7 @@ export class TravelFleetEngine {
         tenantId,
         title: 'Silicon Valley Innovation & Tech Team Outing',
         destination: 'Napa Valley & Big Sur, California',
+        category: 'tech_retreat',
         durationDays: 3,
         maxEmployees: 50,
         pricePerEmployee: 1100,
@@ -184,10 +206,12 @@ export class TravelFleetEngine {
   }
 
   public listFleet(tenantId: string): FleetVehicle[] {
+    this.seedDefaults(tenantId);
     return this.vehicles.get(tenantId) || [];
   }
 
   public addVehicle(tenantId: string, vehicle: Omit<FleetVehicle, 'id' | 'tenantId'>): FleetVehicle {
+    this.seedDefaults(tenantId);
     const newVeh: FleetVehicle = {
       id: `veh_${Date.now()}`,
       tenantId,
@@ -200,10 +224,39 @@ export class TravelFleetEngine {
   }
 
   public listCorporatePackages(tenantId: string): CorporateTripPackage[] {
+    this.seedDefaults(tenantId);
     return this.packages.get(tenantId) || [];
   }
 
+  public searchPackages(tenantId: string, query?: { destination?: string; maxPrice?: number; category?: string }): CorporateTripPackage[] {
+    const list = this.listCorporatePackages(tenantId);
+    if (!query) return list;
+
+    return list.filter(pkg => {
+      if (query.destination && !pkg.destination.toLowerCase().includes(query.destination.toLowerCase())) return false;
+      if (query.maxPrice && pkg.pricePerEmployee > query.maxPrice) return false;
+      if (query.category && pkg.category !== query.category) return false;
+      return true;
+    });
+  }
+
+  public listRentalAddons(): RentalAddon[] {
+    return [
+      { id: 'addon_01', name: 'VIP Airport Meet & Greet Gate Escort', dailyPrice: 75, description: 'Dedicated tarmac agent and baggage concierge handling.' },
+      { id: 'addon_02', name: 'Executive Chauffeur Multi-Lingual Guard', dailyPrice: 120, description: 'Bilingual certified executive protection chauffeur.' },
+      { id: 'addon_03', name: 'Unlimited Supercharging & Toll Pass', dailyPrice: 25, description: 'Zero friction charging across all EV fast chargers.' }
+    ];
+  }
+
+  public listSocialReviews(): SocialProofReview[] {
+    return [
+      { id: 'rev_1', reviewerName: 'Evelyn Vance', companyName: 'Vance Capital', source: 'TripAdvisor', rating: 5, comment: 'Flawless Swiss Alps retreat execution! Jet charters were seamless.', reviewDate: '2026-08-15' },
+      { id: 'rev_2', reviewerName: 'Marcus Aurelius', companyName: 'Stark Corp', source: 'Google', rating: 5, comment: 'Maybach S580 chauffeur service in San Francisco is top-tier.', reviewDate: '2026-08-18' }
+    ];
+  }
+
   public addCorporatePackage(tenantId: string, pkg: Omit<CorporateTripPackage, 'id' | 'tenantId'>): CorporateTripPackage {
+    this.seedDefaults(tenantId);
     const newPkg: CorporateTripPackage = {
       id: `pkg_${Date.now()}`,
       tenantId,
@@ -216,10 +269,12 @@ export class TravelFleetEngine {
   }
 
   public listBookings(tenantId: string): FleetBooking[] {
+    this.seedDefaults(tenantId);
     return this.bookings.get(tenantId) || [];
   }
 
   public createBooking(tenantId: string, booking: Omit<FleetBooking, 'id' | 'tenantId' | 'createdAt'>): FleetBooking {
+    this.seedDefaults(tenantId);
     const newBooking: FleetBooking = {
       id: `book_${Date.now()}`,
       tenantId,
@@ -233,6 +288,7 @@ export class TravelFleetEngine {
   }
 
   public updateBookingStatus(tenantId: string, bookingId: string, status: FleetBooking['status']): FleetBooking | null {
+    this.seedDefaults(tenantId);
     const list = this.bookings.get(tenantId) || [];
     const target = list.find(b => b.id === bookingId);
     if (!target) return null;
@@ -241,10 +297,12 @@ export class TravelFleetEngine {
   }
 
   public listInspectionLogs(tenantId: string): VehicleInspectionLog[] {
+    this.seedDefaults(tenantId);
     return this.inspectionLogs.get(tenantId) || [];
   }
 
   public listExpenseApprovals(tenantId: string): CorporateExpenseApproval[] {
+    this.seedDefaults(tenantId);
     return this.expenseApprovals.get(tenantId) || [];
   }
 }

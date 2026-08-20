@@ -83,6 +83,8 @@ export class AbodePropertyEngine {
   }
 
   private seedDefaults(tenantId: string): void {
+    if (this.properties.has(tenantId)) return;
+
     const defaultProperties: PropertyListing[] = [
       {
         id: 'prop_101',
@@ -184,10 +186,22 @@ export class AbodePropertyEngine {
   }
 
   public listProperties(tenantId: string): PropertyListing[] {
+    this.seedDefaults(tenantId);
     return this.properties.get(tenantId) || [];
   }
 
+  public getOccupancyMetrics(tenantId: string): { totalProperties: number; occupiedCount: number; vacantCount: number; occupancyRatePercent: number } {
+    const list = this.listProperties(tenantId);
+    const totalProperties = list.length;
+    const occupiedCount = list.filter(p => p.status === 'occupied').length;
+    const vacantCount = list.filter(p => p.status === 'vacant').length;
+    const occupancyRatePercent = totalProperties > 0 ? Math.round((occupiedCount / totalProperties) * 100) : 0;
+
+    return { totalProperties, occupiedCount, vacantCount, occupancyRatePercent };
+  }
+
   public createProperty(tenantId: string, property: Omit<PropertyListing, 'id' | 'tenantId' | 'createdAt'>): PropertyListing {
+    this.seedDefaults(tenantId);
     const newProp: PropertyListing = {
       id: `prop_${Date.now()}`,
       tenantId,
@@ -201,10 +215,12 @@ export class AbodePropertyEngine {
   }
 
   public listLeases(tenantId: string): TenantLease[] {
+    this.seedDefaults(tenantId);
     return this.leases.get(tenantId) || [];
   }
 
   public createLease(tenantId: string, lease: Omit<TenantLease, 'id' | 'tenantId' | 'createdAt'>): TenantLease {
+    this.seedDefaults(tenantId);
     const newLease: TenantLease = {
       id: `lease_${Date.now()}`,
       tenantId,
@@ -214,14 +230,22 @@ export class AbodePropertyEngine {
     const existing = this.leases.get(tenantId) || [];
     existing.push(newLease);
     this.leases.set(tenantId, existing);
+
+    // Update property status to occupied
+    const props = this.listProperties(tenantId);
+    const targetProp = props.find(p => p.id === lease.propertyId);
+    if (targetProp) targetProp.status = 'occupied';
+
     return newLease;
   }
 
   public listInvoices(tenantId: string): RentInvoice[] {
+    this.seedDefaults(tenantId);
     return this.invoices.get(tenantId) || [];
   }
 
   public generateRentInvoice(tenantId: string, leaseId: string, amount: number, dueDate: string): RentInvoice {
+    this.seedDefaults(tenantId);
     const leases = this.listLeases(tenantId);
     const targetLease = leases.find(l => l.id === leaseId);
     const invoice: RentInvoice = {
@@ -240,11 +264,26 @@ export class AbodePropertyEngine {
     return invoice;
   }
 
+  public applyOverdueLateFees(tenantId: string, lateFeeAmount: number = 75): RentInvoice[] {
+    const list = this.listInvoices(tenantId);
+    const today = new Date().toISOString().split('T')[0];
+
+    return list.map(inv => {
+      if (inv.status === 'unpaid' && inv.dueDate < today) {
+        inv.status = 'overdue';
+        inv.lateFee = lateFeeAmount;
+      }
+      return inv;
+    });
+  }
+
   public listMaintenanceTickets(tenantId: string): MaintenanceTicket[] {
+    this.seedDefaults(tenantId);
     return this.maintenanceTickets.get(tenantId) || [];
   }
 
   public createMaintenanceTicket(tenantId: string, ticket: Omit<MaintenanceTicket, 'id' | 'tenantId' | 'createdAt'>): MaintenanceTicket {
+    this.seedDefaults(tenantId);
     const newTicket: MaintenanceTicket = {
       id: `maint_${Date.now()}`,
       tenantId,
@@ -258,10 +297,12 @@ export class AbodePropertyEngine {
   }
 
   public listOwnerPayouts(tenantId: string): OwnerPayout[] {
+    this.seedDefaults(tenantId);
     return this.ownerPayouts.get(tenantId) || [];
   }
 
   public calculateOwnerPayout(tenantId: string, ownerName: string, propertyId: string, grossRent: number, feePercent: number = 8): OwnerPayout {
+    this.seedDefaults(tenantId);
     const managementFeeDeduction = (grossRent * feePercent) / 100;
     const netPayoutAmount = grossRent - managementFeeDeduction;
 
