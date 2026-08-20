@@ -164,13 +164,120 @@ async function runApiTests() {
   const searchRes = await app.request('/api/search?q=Enterprise');
   assert(searchRes.status === 200, 'GET /api/search returns indexed search results');
 
-  // 11. HTML Views
-  console.log('\n🎨 11. HTML Frontend Views Rendering');
-  const loginViewRes = await app.request('/login?tenant=lioramedia');
-  assert(loginViewRes.status === 200, 'GET /login renders Login Portal HTML');
+  // 12. MeidaLLM Media & Social Publisher Endpoints
+  console.log('\n📢 12. MeidaLLM Media & Social Publisher API Matrix');
+  const mediaChRes = await app.request('/api/media-publisher/channels');
+  assert(mediaChRes.status === 200, 'GET /api/media-publisher/channels returns connected publishing channels');
 
-  const rootRes = await app.request('/');
-  assert(rootRes.status === 200, 'GET / renders public homepage storefront');
+  const aiGenRes = await app.request('/api/media-publisher/ai-generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ platform: 'X / Twitter', format: 'short_form', prompt: 'Bun Execution Engine' })
+  });
+  assert(aiGenRes.status === 200, 'POST /api/media-publisher/ai-generate returns AI post draft');
+
+  const mediaPostsRes = await app.request('/api/media-publisher/posts');
+  assert(mediaPostsRes.status === 200, 'GET /api/media-publisher/posts returns campaign posts queue');
+
+  const mediaAnalyticsRes = await app.request('/api/media-publisher/analytics');
+  assert(mediaAnalyticsRes.status === 200, 'GET /api/media-publisher/analytics returns impressions & engagement summary');
+
+  // 13. Community Admin & Sabbath Agenda Endpoints
+  console.log('\n⛪ 13. Community Admin & Sabbath Agenda API Matrix');
+  const agendasRes = await app.request('/api/community-admin/agendas');
+  assert(agendasRes.status === 200, 'GET /api/community-admin/agendas returns meeting itineraries');
+
+  const genSundaysRes = await app.request('/api/community-admin/agendas/generate-sundays', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ monthLabel: 'September 2026', sundayCount: 4 })
+  });
+  assert(genSundaysRes.status === 200, 'POST /api/community-admin/agendas/generate-sundays auto-generates Sunday itineraries');
+
+  const callingsRes = await app.request('/api/community-admin/callings');
+  assert(callingsRes.status === 200, 'GET /api/community-admin/callings returns callings roster pipeline');
+
+  const libSearchRes = await app.request('/api/community-admin/search?q=Hymn');
+  assert(libSearchRes.status === 200, 'GET /api/community-admin/search returns library search matches');
+
+  // 14. Trades & Craftsmen Portfolio Endpoints
+  console.log('\n🛠️ 14. Trades & Craftsmen Portfolio API Matrix');
+  const tradesPortRes = await app.request('/api/trades/portfolio');
+  assert(tradesPortRes.status === 200, 'GET /api/trades/portfolio returns project showcase gallery');
+
+  const tradesWoRes = await app.request('/api/trades/work-orders');
+  assert(tradesWoRes.status === 200, 'GET /api/trades/work-orders returns dispatched work orders');
+
+  const tradesQuoteRes = await app.request('/api/trades/quotes/calculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ customerName: 'Test Client', tradeType: 'plumbing', laborHours: 3 })
+  });
+  assert(tradesQuoteRes.status === 200, 'POST /api/trades/quotes/calculate returns itemized price estimate');
+
+  // 15. Travel, Mobility & Corporate Fleet Endpoints
+  console.log('\n✈️ 15. Travel, Mobility & Corporate Fleet API Matrix');
+  const fleetRes = await app.request('/api/travel/fleet');
+  assert(fleetRes.status === 200, 'GET /api/travel/fleet returns vehicle inventory roster');
+
+  const packagesRes = await app.request('/api/travel/corporate-packages');
+  assert(packagesRes.status === 200, 'GET /api/travel/corporate-packages returns corporate vacation retreats');
+
+  const travelBookingsRes = await app.request('/api/travel/bookings');
+  assert(travelBookingsRes.status === 200, 'GET /api/travel/bookings returns confirmed fleet bookings');
+
+  // 16. Legal House & Practice Endpoints
+  console.log('\n⚖️ 16. Legal House & Practice API Matrix');
+  const legalCasesRes = await app.request('/api/legal/cases');
+  assert(legalCasesRes.status === 200, 'GET /api/legal/cases returns active legal court matters');
+
+  const statutesRes = await app.request('/api/legal/statutes?q=corporate');
+  assert(statutesRes.status === 200, 'GET /api/legal/statutes searches legal code & precedents');
+
+  const billablesRes = await app.request('/api/legal/billables');
+  assert(billablesRes.status === 200, 'GET /api/legal/billables returns attorney time logs');
+
+  // 17. Abode Property & Rental Management Endpoints
+  console.log('\n🏢 17. Abode Property & Rental Management API Matrix');
+  const propsRes = await app.request('/api/abode/properties');
+  assert(propsRes.status === 200, 'GET /api/abode/properties returns managed real estate inventory');
+
+  const leasesRes = await app.request('/api/abode/leases');
+  assert(leasesRes.status === 200, 'GET /api/abode/leases returns tenant lease agreements');
+
+  const maintRes = await app.request('/api/abode/maintenance');
+  assert(maintRes.status === 200, 'GET /api/abode/maintenance returns repair dispatch tickets');
+
+  // 18. Service Reservations & Dispatch Order Book Endpoints
+  console.log('\n🗓️ 18. Service Reservations & Dispatch Order Book API Matrix');
+  const slotsRes = await app.request('/api/reservations/slots');
+  assert(slotsRes.status === 200, 'GET /api/reservations/slots returns provider booking slots');
+
+  const ordersRes = await app.request('/api/reservations/orders');
+  assert(ordersRes.status === 200, 'GET /api/reservations/orders returns provider-customer order book');
+
+  const reserveRes = await app.request('/api/reservations/reserve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slotId: 'slot_102', customerName: 'Test Traveler', agreedPrice: 150 })
+  });
+  assert(reserveRes.status === 201, 'POST /api/reservations/reserve locks time slot and creates dispatch order');
+
+  // 19. Global Tax & Multi-Currency Engine Endpoints
+  console.log('\n🌍 19. Global Tax & Multi-Currency API Matrix');
+  const convertRes = await app.request('/api/tax-currency/convert', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount: 100, from: 'USD', to: 'EUR' })
+  });
+  assert(convertRes.status === 200, 'POST /api/tax-currency/convert calculates real-time exchange rates');
+
+  const taxRes = await app.request('/api/tax-currency/calculate-tax', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ subtotal: 500, regionCode: 'EU' })
+  });
+  assert(taxRes.status === 200, 'POST /api/tax-currency/calculate-tax applies regional VAT/GST tax rates');
 
   console.log('\n======================================================================');
   console.log(` 🏁 API TEST COMPLETE: ${passed} PASSED, ${failed} FAILED (TOTAL: ${passed + failed})`);

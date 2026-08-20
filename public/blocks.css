@@ -666,4 +666,97 @@
   margin: 0;
 }
 
+/* 17. DAY & NIGHT THEME MODES */
+:root {
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
 
+body, .tenant-page-container {
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+}
+
+/* DAYLIGHT / LIGHT MODE PRESET */
+.theme-light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.theme-light .block-hero__title,
+.theme-light .block-navbar__brand-name,
+.theme-light .block-features__title,
+.theme-light .block-pricing__title,
+.theme-light .block-pricing__card-title,
+.theme-light .block-testimonials__title,
+.theme-light .block-faq__title,
+.theme-light .block-products__title,
+.theme-light .block-gallery__title,
+.theme-light .block-video__title {
+  color: #0f172a !important;
+}
+
+.theme-light .block-hero__subtitle,
+.theme-light .block-features__subtitle,
+.theme-light .block-pricing__subtitle,
+.theme-light .block-products__subtitle,
+.theme-light .block-gallery__subtitle,
+.theme-light .block-stats__label,
+.theme-light .block-faq__answer,
+.theme-light .block-testimonials__role {
+  color: #475569 !important;
+}
+
+.theme-light .block-features__card,
+.theme-light .block-pricing__card,
+.theme-light .block-testimonials__card,
+.theme-light .block-products__card,
+.theme-light .block-faq__item,
+.theme-light .block-stats__item,
+.theme-light .block-navbar {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* MIDNIGHT / DARK MODE PRESET */
+.theme-dark {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+}
+
+.theme-dark .block-hero__title,
+.theme-dark .block-navbar__brand-name,
+.theme-dark .block-features__title,
+.theme-dark .block-pricing__title,
+.theme-dark .block-testimonials__title,
+.theme-dark .block-faq__title,
+.theme-dark .block-products__title,
+.theme-dark .block-gallery__title,
+.theme-dark .block-video__title {
+  color: #ffffff !important;
+}
+
+.theme-dark .block-hero__subtitle,
+.theme-dark .block-features__subtitle,
+.theme-dark .block-pricing__subtitle,
+.theme-dark .block-products__subtitle,
+.theme-dark .block-gallery__subtitle,
+.theme-dark .block-stats__label {
+  color: #94a3b8 !important;
+}
+
+.theme-dark .block-features__card,
+.theme-dark .block-pricing__card,
+.theme-dark .block-testimonials__card,
+.theme-dark .block-products__card,
+.theme-dark .block-faq__item,
+.theme-dark .block-stats__item,
+.theme-dark .block-navbar {
+  background-color: #131d31 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
+}

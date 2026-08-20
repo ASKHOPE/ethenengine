@@ -34,7 +34,7 @@
       "slug": "beta",
       "domain": "beta.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T17:14:17.098Z"
+      "createdAt": "2026-08-20T18:26:24.816Z"
     },
     {
       "id": "tenant_omnicorp",
@@ -43,7 +43,7 @@
       "slug": "omnicorp",
       "domain": "omnicorp.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T17:14:17.144Z"
+      "createdAt": "2026-08-20T18:26:24.875Z"
     },
     {
       "id": "tenant_victim_tenant",
@@ -52,7 +52,7 @@
       "slug": "victim_tenant",
       "domain": "victim.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T17:14:17.360Z"
+      "createdAt": "2026-08-20T18:26:25.092Z"
     },
     {
       "id": "tenant_attacker_tenant",
@@ -61,7 +61,7 @@
       "slug": "attacker_tenant",
       "domain": "attacker.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T17:14:17.361Z"
+      "createdAt": "2026-08-20T18:26:25.093Z"
     }
   ],
   "pages": [
@@ -166,7 +166,7 @@
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787246058136",
+      "contentTypeId": "ct_1787250423907",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -175,22 +175,8 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787246058136",
-      "updatedAt": "2026-08-20T17:14:18.136Z"
-    },
-    {
-      "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787246058188",
-      "slug": "ai-commercial-pipeline",
-      "data": {
-        "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
-        "content": "Generated 500 localized 4K commercial variations in 2 hours using custom trained Flux video diffusion models.",
-        "author": "AI Tech Lead",
-        "client": "Porsche Digital"
-      },
-      "status": "published",
-      "id": "entry_1787246058188",
-      "updatedAt": "2026-08-20T17:14:18.188Z"
+      "id": "entry_1787250423907",
+      "updatedAt": "2026-08-20T18:27:03.907Z"
     }
   ],
   "products": [
@@ -202,17 +188,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787246058136"
-    },
-    {
-      "tenantId": "tenant_lioramedia",
-      "name": "Monthly AI Commercial Ad Retainer",
-      "sku": "LIO-AI-RETAINER",
-      "price": 4500,
-      "currency": "USD",
-      "stock": 50,
-      "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787246058188"
+      "id": "prod_1787250423907"
     }
   ],
   "leads": [
@@ -223,18 +199,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787246058136",
-      "createdAt": "2026-08-20T17:14:18.136Z"
-    },
-    {
-      "tenantId": "tenant_lioramedia",
-      "contactName": "Felix Baum",
-      "email": "fbaum@redbull.com",
-      "company": "Red Bull Media House",
-      "dealValue": 45000,
-      "stage": "contacted",
-      "id": "lead_1787246058188",
-      "createdAt": "2026-08-20T17:14:18.188Z"
+      "id": "lead_1787250423907",
+      "createdAt": "2026-08-20T18:27:03.907Z"
     }
   ]
 }

@@ -44,6 +44,14 @@ import {
   analyticsRouter,
   formsRouter,
   searchRouter,
+  mediaPublisherRouter,
+  communityAdminRouter,
+  tradesCraftRouter,
+  travelFleetRouter,
+  legalHouseRouter,
+  abodePropertyRouter,
+  reservationsRouter,
+  taxCurrencyRouter
 } from './api/subsystems.routes.js';
 
 // Modular HTML View Controllers
@@ -51,6 +59,12 @@ import { renderLoginView } from './views/loginView.js';
 import { renderEditorView } from './views/editorView.js';
 import { renderAdminView } from './views/adminView.js';
 import { renderPreviewView } from './views/previewView.js';
+import { renderMeidaLLMView } from './views/meidallmView.js';
+import { renderCommunityAdminView } from './views/communityAdminView.js';
+import { renderTradesView } from './views/tradesView.js';
+import { renderTravelView } from './views/travelView.js';
+import { renderLegalView } from './views/legalView.js';
+import { renderAbodeView } from './views/abodeView.js';
 
 // Capabilities for Views
 import { CommerceEngine } from './capabilities/commerce/CommerceEngine.js';
@@ -195,6 +209,14 @@ app.route('/api/collab', collabRouter);
 app.route('/api/analytics', analyticsRouter);
 app.route('/api/forms', formsRouter);
 app.route('/api/search', searchRouter);
+app.route('/api/media-publisher', mediaPublisherRouter);
+app.route('/api/community-admin', communityAdminRouter);
+app.route('/api/trades', tradesCraftRouter);
+app.route('/api/travel', travelFleetRouter);
+app.route('/api/legal', legalHouseRouter);
+app.route('/api/abode', abodePropertyRouter);
+app.route('/api/reservations', reservationsRouter);
+app.route('/api/tax-currency', taxCurrencyRouter);
 app.get('/api/identities', (c) => {
   const tenant = c.get('tenant' as any) as any;
   return c.json({ identities: IdentityEngine.getInstance().listIdentities(tenant.id) });
@@ -350,6 +372,37 @@ app.get('/admin', requireAuth, (c) => {
     snapshots,
     loadStats,
   }));
+});
+
+app.get('/meidallm', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const tenantSlug = tenant?.slug || 'lioramedia';
+  return c.html(renderMeidaLLMView(tenantSlug));
+});
+
+app.get('/community-admin', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderCommunityAdminView(tenant));
+});
+
+app.get('/trades', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderTradesView(tenant));
+});
+
+app.get('/travel', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderTravelView(tenant));
+});
+
+app.get('/legal', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderLegalView(tenant));
+});
+
+app.get('/abode', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderAbodeView(tenant));
 });
 
 app.get('/preview/:slug', (c) => {

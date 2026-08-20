@@ -155,7 +155,7 @@ export function renderEditorView(options: EditorViewOptions): string {
   <div class="editor-toolbar" style="height:54px; background:#070a14; border-bottom:1px solid rgba(255,255,255,0.08); padding:0 1.25rem; display:flex; align-items:center; justify-content:space-between; z-index:100;">
     <div style="display:flex; align-items:center; gap:0.85rem;">
       <div class="toolbar-brand" style="font-weight:900; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem;">
-        <div class="brand-icon" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); width:28px; height:28px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900; font-size:0.85rem; position:relative;">E</div>
+        <div class="brand-icon" style="background:var(--primary, #6366f1); width:28px; height:28px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900; font-size:0.85rem; position:relative;">E</div>
         <span style="letter-spacing:-0.02em;">ETHENENGINE STUDIO</span>
       </div>
       <a href="/admin?tenant=${escapeHtml(tenantSlug)}&view=website" class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.75rem;">← Admin</a>
@@ -193,7 +193,7 @@ export function renderEditorView(options: EditorViewOptions): string {
         <!-- Rendered dynamically via Collab Presence loop -->
       </div>
 
-      <button id="savePageBtn" class="btn" onclick="savePage()" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-weight:700; padding:0.45rem 1rem;">💾 Save Page</button>
+      <button id="savePageBtn" class="btn" onclick="savePage()" style="background:#6366f1; font-weight:700; padding:0.45rem 1rem;">💾 Save Page</button>
       <a id="livePreviewBtn" href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.45rem 0.9rem;">👁️ Pop Out ↗</a>
     </div>
   </div>
@@ -231,7 +231,7 @@ export function renderEditorView(options: EditorViewOptions): string {
       <div class="drawer-content" id="drawerPagesTab" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:0;">Tenant Pages (${pages.length})</h4>
-          <button onclick="promptCreatePage()" class="btn" style="padding:0.25rem 0.6rem; font-size:0.72rem; font-weight:700;">+ New Page</button>
+          <button onclick="openCreatePageModal()" class="btn" style="padding:0.25rem 0.6rem; font-size:0.72rem; font-weight:700;">+ New Page</button>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:0.5rem;">
@@ -278,6 +278,10 @@ export function renderEditorView(options: EditorViewOptions): string {
 
       <!-- BLOCKS TAB -->
       <div class="drawer-content" id="drawerBlocksTab">
+        <button onclick="openBlockLibraryModal('all')" class="btn" style="width:100%; margin-bottom:1.1rem; padding:0.65rem; background:var(--primary, #6366f1); font-weight:800; font-size:0.82rem; border-radius:8px; display:flex; justify-content:center; align-items:center; gap:0.5rem;">
+          <span>🧩 Open Block Selector Window</span>
+        </button>
+
         <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:0.75rem;">Navigation & Header</h4>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'navbar')" onclick="addBlock('navbar')">
           <div class="block-card-icon">🧭</div>
@@ -359,10 +363,44 @@ export function renderEditorView(options: EditorViewOptions): string {
       <div class="drawer-content" id="drawerThemeTab" style="display:none;">
         <!-- DAY / NIGHT MODE SWITCH -->
         <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <div style="font-size:0.8rem; font-weight:700; color:#fff;">🌗 Day / Night Mode</div>
+          <div style="font-size:0.8rem; font-weight:700; color:#fff;">🌗 Day / Night Theme Mode</div>
           <div style="display:flex; gap:0.35rem;">
             <button onclick="applyDayMode()" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" title="Clean Sunlight mode">☀️ Day</button>
             <button onclick="applyNightMode()" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" title="Midnight Dark Slate">🌙 Night</button>
+          </div>
+        </div>
+
+        <!-- EXTENSIVE FREE OPEN GOOGLE FONTS LIBRARY -->
+        <div style="margin-bottom:1rem; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem;">
+          <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>🔤 Google Open Fonts Library</span>
+          </div>
+          <div class="field-group" style="margin-bottom:0.5rem;">
+            <label class="field-label">Heading Font Family</label>
+            <select class="field-input" onchange="changeFontHeading(this.value)">
+              <option value="Inter">Inter (Clean Tech Sans)</option>
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans (Modern Geometric)</option>
+              <option value="Outfit">Outfit (Bold Contemporary)</option>
+              <option value="Poppins">Poppins (Rounded Geometric)</option>
+              <option value="Playfair Display">Playfair Display (Editorial Serif)</option>
+              <option value="Space Grotesk">Space Grotesk (Futuristic Tech)</option>
+              <option value="Cinzel">Cinzel (Classical Luxury Serif)</option>
+              <option value="Fira Code">Fira Code (Monospace Code)</option>
+              <option value="Lora">Lora (Literary Warm Serif)</option>
+              <option value="Montserrat">Montserrat (Architectural Sans)</option>
+              <option value="Urbanist">Urbanist (Minimalist Geometric)</option>
+            </select>
+          </div>
+          <div class="field-group" style="margin-bottom:0;">
+            <label class="field-label">Body Text Font Family</label>
+            <select class="field-input" onchange="changeFontBody(this.value)">
+              <option value="Inter">Inter (Readable Neutral)</option>
+              <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+              <option value="Poppins">Poppins</option>
+              <option value="Roboto">Roboto (Clean Universal)</option>
+              <option value="Lora">Lora (Serif Body)</option>
+              <option value="Fira Code">Fira Code (Monospace)</option>
+            </select>
           </div>
         </div>
 
@@ -829,8 +867,8 @@ export function renderEditorView(options: EditorViewOptions): string {
                 const isHigh = Boolean(t.isHighlighted);
                 const feats = Array.isArray(t.features) ? t.features : String(t.features || '').split('\\n').filter(Boolean);
                 return \`
-                  <div style="background:\${isHigh ? 'linear-gradient(180deg,rgba(99,102,241,0.15),#111827)' : '#111827'}; border:\${isHigh ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)'}; border-radius:var(--radius); padding:1.25rem; position:relative; display:flex; flex-direction:column; justify-content:space-between;">
-                    \${t.badge ? \`<div style="position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; font-size:0.6rem; font-weight:800; padding:0.15rem 0.5rem; border-radius:999px;">\${escapeText(t.badge)}</div>\` : ''}
+                  <div style="background:\${isHigh ? 'rgba(99,102,241,0.12)' : '#111827'}; border:\${isHigh ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)'}; border-radius:var(--radius); padding:1.25rem; position:relative; display:flex; flex-direction:column; justify-content:space-between;">
+                    \${t.badge ? \`<div style="position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:var(--primary); color:#fff; font-size:0.6rem; font-weight:800; padding:0.15rem 0.5rem; border-radius:999px;">\${escapeText(t.badge)}</div>\` : ''}
                     <div>
                       <div style="font-size:1rem; font-weight:800; color:#fff;">\${escapeText(t.name || 'Tier')}</div>
                       <div style="font-size:1.6rem; font-weight:900; color:#34d399; margin:0.3rem 0;">\${escapeText(currency)}\${escapeText(String(t.price || '0'))}<span style="font-size:0.75rem; color:#94a3b8; font-weight:400;">\${escapeText(t.period || '/mo')}</span></div>
@@ -839,7 +877,7 @@ export function renderEditorView(options: EditorViewOptions): string {
                         \${feats.map(f => \`<li style="display:flex; gap:0.4rem; align-items:center;"><span style="color:#34d399; font-weight:900;">✓</span>\${escapeText(f)}</li>\`).join('')}
                       </ul>
                     </div>
-                    <button class="btn" style="width:100%; padding:0.5rem; font-size:0.8rem; background:\${isHigh ? 'linear-gradient(135deg,var(--primary),var(--secondary))' : 'rgba(255,255,255,0.08)'}; border-radius:var(--radius); font-weight:700;">\${escapeText(t.ctaText || 'Select Plan')}</button>
+                    <button class="btn" style="width:100%; padding:0.5rem; font-size:0.8rem; background:\${isHigh ? 'var(--primary)' : 'rgba(255,255,255,0.08)'}; border-radius:var(--radius); font-weight:700;">\${escapeText(t.ctaText || 'Select Plan')}</button>
                   </div>
                 \`;
               }).join('')}
@@ -883,14 +921,14 @@ export function renderEditorView(options: EditorViewOptions): string {
             </div>
           </div>\`;
         } else if (block.type === 'cta') {
-          previewHtml = \`<div style="background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.18)); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); padding:2rem; text-align:center;">
+          previewHtml = \`<div style="background:rgba(99,102,241,0.12); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); padding:2rem; text-align:center;">
             <h3 style="font-size:1.4rem; font-weight:900; color:#fff; margin-bottom:0.75rem; letter-spacing:-0.02em;">\${escapeText(block.settings.headline || 'Ready to produce your next campaign?')}</h3>
-            <span class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); padding:0.65rem 1.6rem; font-weight:700;">\${escapeText(block.settings.buttonText || 'Book Consultation')}</span>
+            <span class="btn" style="background:var(--primary); border-radius:var(--radius); padding:0.65rem 1.6rem; font-weight:700;">\${escapeText(block.settings.buttonText || 'Book Consultation')}</span>
           </div>\`;
         } else if (block.type === 'navbar') {
           previewHtml = \`<div style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius);">
             <div style="display:flex; align-items:center; gap:0.6rem;">
-              <div class="brand-icon" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); width:30px; height:30px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900; font-size:0.85rem; position:relative;">\${escapeText(block.settings.logoInitial || 'E')}</div>
+              <div class="brand-icon" style="background:var(--primary); width:30px; height:30px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900; font-size:0.85rem; position:relative;">\${escapeText(block.settings.logoInitial || 'E')}</div>
               <span style="font-weight:800; font-size:1.05rem; color:#fff;">\${escapeText(block.settings.brandName || 'BRAND')}</span>
             </div>
             <div style="display:flex; align-items:center; gap:1rem; font-size:0.82rem; color:#94a3b8;">
@@ -899,7 +937,7 @@ export function renderEditorView(options: EditorViewOptions): string {
             </div>
           </div>\`;
         } else if (block.type === 'announcement_bar') {
-          previewHtml = \`<div style="background:linear-gradient(90deg,var(--primary),var(--secondary)); color:#fff; padding:0.5rem 1rem; border-radius:6px; display:flex; justify-content:center; align-items:center; gap:0.6rem; font-size:0.82rem; font-weight:700;">
+          previewHtml = \`<div style="background:var(--primary); color:#fff; padding:0.5rem 1rem; border-radius:6px; display:flex; justify-content:center; align-items:center; gap:0.6rem; font-size:0.82rem; font-weight:700;">
             <span style="background:rgba(0,0,0,0.25); padding:0.1rem 0.4rem; border-radius:4px; font-size:0.7rem;">\${escapeText(block.settings.badgeText || 'SPECIAL')}</span>
             <span>\${escapeText(block.settings.message || 'Limited time promotional announcement banner.')}</span>
           </div>\`;
@@ -931,16 +969,10 @@ export function renderEditorView(options: EditorViewOptions): string {
             <div style="display:flex; flex-direction:column; gap:0.6rem;">
               <input class="field-input" placeholder="Full Name *" disabled style="opacity:0.7;" />
               <input class="field-input" placeholder="Work Email *" disabled style="opacity:0.7;" />
-              <button class="btn" style="width:100%; margin-top:0.4rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); font-weight:700;">\${escapeText(block.settings.buttonText || 'Submit Inquiry')}</button>
+              <button class="btn" style="width:100%; margin-top:0.4rem; background:var(--primary); border-radius:var(--radius); font-weight:700;">\${escapeText(block.settings.buttonText || 'Submit Inquiry')}</button>
             </div>
           </div>\`;
         } else if (block.type === 'footer') {
-          previewHtml = \`<div style="padding:1.5rem 0 0.5rem; border-top:1px solid rgba(255,255,255,0.08); text-align:center;">
-            <div style="font-weight:800; font-size:1rem; color:#fff; margin-bottom:0.4rem;">\${escapeText(block.settings.brandName || 'BRAND')}</div>
-            <p style="color:#64748b; font-size:0.78rem;">\${escapeText(block.settings.copyrightText || '© 2026 All Rights Reserved.')}</p>
-          </div>\`;
-        } else {
-          previewHtml = \`<div style="color:#94a3b8; font-size:0.85rem;">Block Type: <strong>\${escapeText(block.type)}</strong></div>\`;
         }
 
         return \`
@@ -1905,6 +1937,19 @@ export function renderEditorView(options: EditorViewOptions): string {
             <label class="field-label">Submit Button Label</label>
             <input class="field-input" value="\${escapeText(block.settings.buttonText || '')}" oninput="updateSetting('buttonText', this.value)" />
           </div>
+
+          <div style="margin-top:1rem; padding:0.75rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); border-radius:8px;">
+            <div style="font-size:0.72rem; font-weight:800; color:#34d399; text-transform:uppercase; margin-bottom:0.4rem;">🗄️ Internal Database Mapping</div>
+            <div class="field-group" style="margin-bottom:0.5rem;">
+              <label class="field-label">Target Storage Table</label>
+              <select class="field-input" onchange="updateSetting('targetTable', this.value)" style="background:#0f172a;">
+                <option value="crm_leads" \${(block.settings.targetTable || 'crm_leads') === 'crm_leads' ? 'selected' : ''}>crm_leads (CRM Lead Pipeline)</option>
+                <option value="form_submissions" \${block.settings.targetTable === 'form_submissions' ? 'selected' : ''}>form_submissions (General Inquiries Table)</option>
+                <option value="email_subscriptions" \${block.settings.targetTable === 'email_subscriptions' ? 'selected' : ''}>email_subscriptions (Newsletter List)</option>
+              </select>
+            </div>
+            <button onclick="openFormExportModal('\${block.settings.targetTable || 'crm_leads'}')" class="btn" style="width:100%; margin-top:0.4rem; background:linear-gradient(135deg,#10b981,#059669); font-weight:800; font-size:0.78rem; border-radius:6px; padding:0.55rem; display:flex; justify-content:center; align-items:center; gap:0.4rem; box-shadow:0 4px 12px rgba(16,185,129,0.35);">🗄️ Open Database & Data Export</button>
+          </div>
         \`;
       } else {
         fieldsHtml += \`
@@ -2207,9 +2252,219 @@ export function renderEditorView(options: EditorViewOptions): string {
         } else {
           showToast('⚠️ Upload failed: ' + (data.error || 'Unknown error'));
         }
-      } catch (e) {
-        showToast('⚠️ Error communicating with media server.');
+    // --- DAY & NIGHT THEME MODE FUNCTIONS ---
+    let activeThemeMode = 'dark';
+    function applyDayMode() {
+      activeThemeMode = 'light';
+      document.body.classList.remove('theme-dark');
+      document.body.classList.add('theme-light');
+      const canvasContainer = document.getElementById('canvasContainer');
+      if (canvasContainer) {
+        canvasContainer.classList.remove('theme-dark');
+        canvasContainer.classList.add('theme-light');
       }
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+        iframe.contentDocument.body.classList.remove('theme-dark');
+        iframe.contentDocument.body.classList.add('theme-light');
+      }
+      showToast('☀️ Daylight Clean Light Theme Applied!');
+    }
+
+    function applyNightMode() {
+      activeThemeMode = 'dark';
+      document.body.classList.remove('theme-light');
+      document.body.classList.add('theme-dark');
+      const canvasContainer = document.getElementById('canvasContainer');
+      if (canvasContainer) {
+        canvasContainer.classList.remove('theme-light');
+        canvasContainer.classList.add('theme-dark');
+      }
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+        iframe.contentDocument.body.classList.remove('theme-light');
+        iframe.contentDocument.body.classList.add('theme-dark');
+      }
+      showToast('🌙 Midnight Dark Slate Theme Applied!');
+    }
+
+    // --- GOOGLE OPEN FONTS LIBRARY LOADER ---
+    function loadGoogleFont(fontName) {
+      if (!fontName) return;
+      const fontSlug = fontName.replace(/\s+/g, '+');
+      const fontId = 'googleFont_' + fontName.replace(/\s+/g, '_');
+      if (!document.getElementById(fontId)) {
+        const link = document.createElement('link');
+        link.id = fontId;
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=' + fontSlug + ':wght@400;600;700;800;900&display=swap';
+        document.head.appendChild(link);
+      }
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe && iframe.contentDocument && iframe.contentDocument.head) {
+        if (!iframe.contentDocument.getElementById(fontId)) {
+          const iframeLink = document.createElement('link');
+          iframeLink.id = fontId;
+          iframeLink.rel = 'stylesheet';
+          iframeLink.href = 'https://fonts.googleapis.com/css2?family=' + fontSlug + ':wght@400;600;700;800;900&display=swap';
+          iframe.contentDocument.head.appendChild(iframeLink);
+        }
+      }
+    }
+
+    function changeFontHeading(fontName) {
+      loadGoogleFont(fontName);
+      document.documentElement.style.setProperty('--font-heading', "'" + fontName + "', sans-serif");
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe && iframe.contentDocument && iframe.contentDocument.documentElement) {
+        iframe.contentDocument.documentElement.style.setProperty('--font-heading', "'" + fontName + "', sans-serif");
+      }
+      showToast('🔤 Heading Font updated to ' + fontName + '!');
+    }
+
+    function changeFontBody(fontName) {
+      loadGoogleFont(fontName);
+      document.documentElement.style.setProperty('--font-body', "'" + fontName + "', sans-serif");
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe && iframe.contentDocument && iframe.contentDocument.documentElement) {
+        iframe.contentDocument.documentElement.style.setProperty('--font-body', "'" + fontName + "', sans-serif");
+      }
+      showToast('🔤 Body Font updated to ' + fontName + '!');
+    }
+
+    // --- CATEGORIZED BLOCK SELECTOR POPUP MODAL ---
+    function openBlockLibraryModal(category) {
+      const modal = document.getElementById('blockLibraryModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      switchBlockCategoryTab(category || 'all');
+    }
+
+    function closeBlockLibraryModal() {
+      const modal = document.getElementById('blockLibraryModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function switchBlockCategoryTab(category) {
+      ['all', 'basics', 'social', 'media', 'forms'].forEach(cat => {
+        const btn = document.getElementById('blockCatTab_' + cat);
+        const content = document.getElementById('blockCatContent_' + cat);
+        if (btn) {
+          btn.style.borderBottomColor = cat === category ? 'var(--primary)' : 'transparent';
+          btn.style.color = cat === category ? '#fff' : '#94a3b8';
+        }
+        if (content) {
+          content.style.display = (category === 'all' || cat === category) ? 'grid' : 'none';
+        }
+      });
+    }
+
+    function filterBlockLibraryCards(query) {
+      const q = (query || '').toLowerCase();
+      const cards = document.querySelectorAll('.block-library-card');
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    // --- IN-APP CREATE PAGE MODAL ---
+    function openCreatePageModal() {
+      const modal = document.getElementById('createPageModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      const titleInput = document.getElementById('newPageTitleInput');
+      const slugInput = document.getElementById('newPageSlugInput');
+      if (titleInput) titleInput.value = '';
+      if (slugInput) slugInput.value = '';
+    }
+
+    function closeCreatePageModal() {
+      const modal = document.getElementById('createPageModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function handleCreatePageSubmit(event) {
+      if (event) event.preventDefault();
+      const titleInput = document.getElementById('newPageTitleInput');
+      const slugInput = document.getElementById('newPageSlugInput');
+      const templateSelect = document.getElementById('newPageTemplateSelect');
+      
+      const title = titleInput ? titleInput.value.trim() : '';
+      let slug = slugInput ? slugInput.value.trim() : '';
+      const template = templateSelect ? templateSelect.value : 'blank';
+
+      if (!title) {
+        showToast('⚠️ Please enter a page title!');
+        return;
+      }
+      if (!slug) {
+        slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      }
+
+      showToast('Creating new page [' + title + ']...');
+      try {
+        const tenantSlug = '${escapeHtml(tenantSlug)}';
+        const res = await fetch('/api/website/pages?tenant=' + encodeURIComponent(tenantSlug), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
+          },
+          body: JSON.stringify({ title, slug, template })
+        });
+        const data = await res.json();
+        if (res.ok && data.page) {
+          closeCreatePageModal();
+          showToast('Page created! Redirecting to editor...', true);
+          window.location.href = '/editor?tenant=' + encodeURIComponent(tenantSlug) + '&pageId=' + data.page.id;
+        } else {
+          showToast('⚠️ Failed to create page: ' + (data.error || 'Unknown error'));
+        }
+      } catch (e) {
+        showToast('⚠️ Network error while creating page.');
+      }
+    }
+
+    // --- FORM SUBMISSION DATABASE & DATA EXPORT MODAL ---
+    function openFormExportModal(targetTable) {
+      const modal = document.getElementById('formExportModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      loadFormSubmissionsSummary(targetTable || 'crm_leads');
+    }
+
+    function closeFormExportModal() {
+      const modal = document.getElementById('formExportModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function loadFormSubmissionsSummary(targetTable) {
+      const countEl = document.getElementById('formSubmissionsCount');
+      if (!countEl) return;
+      try {
+        const tenantSlug = '${escapeHtml(tenantSlug)}';
+        const res = await fetch('/api/forms/submissions?tenant=' + encodeURIComponent(tenantSlug), {
+          headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') }
+        });
+        const data = await res.json();
+        const total = data.count || 0;
+        countEl.innerText = total + ' Record(s) stored in table [' + (targetTable || 'crm_leads') + ']';
+      } catch (e) {
+        countEl.innerText = 'Submissions ready for download.';
+      }
+    }
+
+    function downloadFormExport(format) {
+      const tenantSlug = '${escapeHtml(tenantSlug)}';
+      if (format === 'csv') {
+        window.open('/api/forms/export/csv?tenant=' + encodeURIComponent(tenantSlug), '_blank');
+      } else if (format === 'sql') {
+        window.open('/api/forms/export/sql?tenant=' + encodeURIComponent(tenantSlug), '_blank');
+      } else if (format === 'json') {
+        window.open('/api/forms/submissions?tenant=' + encodeURIComponent(tenantSlug), '_blank');
+      }
+      showToast('📥 Export initiated for format: ' + format.toUpperCase());
     }
 
     // Initial Render & Setup Split Mode
@@ -2445,6 +2700,333 @@ export function renderEditorView(options: EditorViewOptions): string {
             <button onclick="document.getElementById('mediaUploadFileInput').click()" class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); font-weight:700; padding:0.6rem 1.4rem;">Browse Local File</button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CATEGORIZED BLOCK SELECTOR POPUP WINDOW ================= -->
+  <div id="blockLibraryModal" class="studio-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:99999; justify-content:center; align-items:center;">
+    <div class="studio-modal-card" style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:16px; width:94%; max-width:850px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 60px -15px rgba(0,0,0,0.9);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:1.25rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.4rem;">🧩</span>
+          <div>
+            <span style="font-weight:900; font-size:1.1rem; color:#fff;">Component Block Library</span>
+            <div style="font-size:0.72rem; color:#94a3b8;">Choose code-less building blocks to implement on your page</div>
+          </div>
+        </div>
+        <button onclick="closeBlockLibraryModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0.2rem 0.5rem;">✕</button>
+      </div>
+
+      <!-- Search & Category Tabs Bar -->
+      <div style="padding:0.85rem 1.5rem; background:#090d16; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:0.75rem;">
+        <input class="field-input" placeholder="🔍 Search building blocks (e.g. Hero, Video, Pricing, Form)..." oninput="filterBlockLibraryCards(this.value)" style="background:#131d31; font-size:0.85rem;" />
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="btn btn-secondary" id="blockCatTab_all" onclick="switchBlockCategoryTab('all')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700;">All Blocks (17)</button>
+          <button class="btn btn-secondary" id="blockCatTab_basics" onclick="switchBlockCategoryTab('basics')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700;">🧱 Basics & Structure</button>
+          <button class="btn btn-secondary" id="blockCatTab_social" onclick="switchBlockCategoryTab('social')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700;">🤝 Social & Conversion</button>
+          <button class="btn btn-secondary" id="blockCatTab_media" onclick="switchBlockCategoryTab('media')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700;">🎬 Media & Visuals</button>
+          <button class="btn btn-secondary" id="blockCatTab_forms" onclick="switchBlockCategoryTab('forms')" style="padding:0.4rem 0.85rem; font-size:0.78rem; font-weight:700;">📋 Forms & Data</button>
+        </div>
+      </div>
+
+      <!-- Modal Body Grid -->
+      <div style="padding:1.5rem; overflow-y:auto; flex:1;">
+        <div id="blockCatContent_all" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:1rem;">
+          <!-- 1. BASICS & STRUCTURE -->
+          <div class="block-library-card" onclick="addBlock('navbar'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🧭</span>
+                <span style="font-size:0.65rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">BASICS</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Navigation Bar</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Header branding, monogram logo, responsive links & action CTA button.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Navigation</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('hero'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">⚡</span>
+                <span style="font-size:0.65rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">BASICS</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Hero Section</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Eyebrow badge, high-impact title, subtitle, dual CTAs, & device mockup.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Hero</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('announcement_bar'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">📢</span>
+                <span style="font-size:0.65rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">BASICS</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Announcement Bar</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Top notification ticker for promotional sales, deals, and announcements.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Announcement</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('footer'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">⚓</span>
+                <span style="font-size:0.65rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">BASICS</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Site Footer</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Brand copyright notice, sitemap links, social icons & footer layout.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Footer</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('stats'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">📊</span>
+                <span style="font-size:0.65rem; background:rgba(99,102,241,0.2); color:#a5b4fc; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">BASICS</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Metrics & Stats</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Highlight SLA uptime, latency benchmarks, customer count & key proof stats.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Metrics</button>
+          </div>
+
+          <!-- 2. SOCIAL & CONVERSION -->
+          <div class="block-library-card" onclick="addBlock('testimonials'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">💬</span>
+                <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">SOCIAL</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Customer Reviews</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Star ratings, executive quotes, avatar monograms & social proof cards.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Testimonials</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('pricing'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">💎</span>
+                <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">SOCIAL</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Pricing Tiers</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Multi-tier plan cards, popular badges, feature lists & billing period toggles.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Pricing</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('faq'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">❓</span>
+                <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">SOCIAL</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">FAQ Accordion</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Expandable question and answer cards for customer objection handling.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert FAQ</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('cta'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🎯</span>
+                <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">SOCIAL</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">CTA Banner</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">High-impact gradient call-to-action block for sign-ups and leads.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert CTA</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('product_grid'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🛍️</span>
+                <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">SOCIAL</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Store Showcase</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Merchandise catalog with pricing, stock tags & cart actions.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Store</button>
+          </div>
+
+          <!-- 3. MEDIA & VISUALS -->
+          <div class="block-library-card" onclick="addBlock('image_showcase'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🖼️</span>
+                <span style="font-size:0.65rem; background:rgba(168,85,247,0.2); color:#d8b4fe; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">MEDIA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Image Showcase</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">HD image hero with gradient overlays, ribbon badges & links.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Image Showcase</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('video_player'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🎬</span>
+                <span style="font-size:0.65rem; background:rgba(168,85,247,0.2); color:#d8b4fe; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">MEDIA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Video Player & Embed</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Embed YouTube, Vimeo, or direct MP4 videos with custom aspect ratios.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Video Player</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('gallery'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">📸</span>
+                <span style="font-size:0.65rem; background:rgba(168,85,247,0.2); color:#d8b4fe; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">MEDIA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Visual Portfolio Gallery</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Multi-column image grid (2, 3, or 4 columns) with title overlays and link pickers.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Gallery</button>
+          </div>
+
+          <!-- 4. FORMS & DATA -->
+          <div class="block-library-card" onclick="addBlock('form_builder'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">📋</span>
+                <span style="font-size:0.65rem; background:rgba(52,211,153,0.2); color:#6ee7b7; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">FORMS & DATA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Form Builder & DB Storage</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Lead capture form linked to internal database tables with XLS/SQL export.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Form Builder</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('pagination'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">🔢</span>
+                <span style="font-size:0.65rem; background:rgba(52,211,153,0.2); color:#6ee7b7; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">FORMS & DATA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Pagination Manager</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Page numbers, pills, button groups, and route base URL query manager.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert Pagination</button>
+          </div>
+
+          <div class="block-library-card" onclick="addBlock('cms_feed'); closeBlockLibraryModal();" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:1.1rem; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <span style="font-size:1.6rem;">📝</span>
+                <span style="font-size:0.65rem; background:rgba(52,211,153,0.2); color:#6ee7b7; padding:0.15rem 0.45rem; border-radius:4px; font-weight:800;">FORMS & DATA</span>
+              </div>
+              <div style="font-weight:800; color:#fff; font-size:0.95rem;">Headless CMS Feed</div>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:0.3rem 0 1rem; line-height:1.4;">Dynamic blog articles, releases, and full-text search indexing feed.</p>
+            </div>
+            <button class="btn btn-secondary" style="width:100%; font-size:0.75rem; font-weight:700;">+ Insert CMS Feed</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= IN-APP CREATE PAGE MODAL ================= -->
+  <div id="createPageModal" class="studio-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:99999; justify-content:center; align-items:center;">
+    <div class="studio-modal-card" style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:16px; width:90%; max-width:520px; padding:1.5rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.9);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.3rem;">📄</span>
+          <span style="font-weight:800; font-size:1.1rem; color:#fff;">Create New Page</span>
+        </div>
+        <button onclick="closeCreatePageModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+
+      <form onsubmit="handleCreatePageSubmit(event)">
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">Page Title *</label>
+          <input id="newPageTitleInput" class="field-input" placeholder="e.g. Enterprise Pricing & Plans" required />
+        </div>
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">URL Slug (e.g. pricing, about, contact)</label>
+          <input id="newPageSlugInput" class="field-input" placeholder="pricing" />
+        </div>
+        <div class="field-group" style="margin-bottom:1.5rem;">
+          <label class="field-label">Starter Layout Preset</label>
+          <select id="newPageTemplateSelect" class="field-input">
+            <option value="blank">Blank Page (Start from scratch)</option>
+            <option value="saas_landing">SaaS Product Launch (Hero + Features + Pricing)</option>
+            <option value="agency_studio">Creative Studio (Hero + CMS Showcases + Reviews)</option>
+            <option value="consulting_lead">Executive Consulting (Hero + Metrics + Lead Form)</option>
+            <option value="minimal_docs">Product Hub & Blog (Hero + CMS Feed + FAQ)</option>
+          </select>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:0.6rem;">
+          <button type="button" onclick="closeCreatePageModal()" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); font-weight:800; padding:0.65rem 1.4rem;">🚀 Create Page</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= FORM DATABASE LINKAGE & DATA EXPORT MODAL ================= -->
+  <div id="formExportModal" class="studio-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:99999; justify-content:center; align-items:center;">
+    <div class="studio-modal-card" style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:16px; width:90%; max-width:580px; padding:1.5rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.9);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.4rem;">🗄️</span>
+          <div>
+            <span style="font-weight:800; font-size:1.1rem; color:#fff;">Form Database & Data Export Manager</span>
+            <div style="font-size:0.72rem; color:#94a3b8;">Manage internal DB table linkage & export structured form data</div>
+          </div>
+        </div>
+        <button onclick="closeFormExportModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25); border-radius:10px; padding:0.85rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.6rem;">
+        <span style="font-size:1.2rem;">📊</span>
+        <div style="font-size:0.8rem; font-weight:700; color:#a5b4fc;" id="formSubmissionsCount">Loading form records...</div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1.5rem;">
+        <div onclick="downloadFormExport('csv')" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem 1.1rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <span style="font-size:1.2rem;">📈</span>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem; color:#fff;">Export to Excel / CSV (.csv)</div>
+              <div style="font-size:0.72rem; color:#94a3b8;">Download tabular spreadsheet format for Excel, Sheets, & BI tools.</div>
+            </div>
+          </div>
+          <span class="btn btn-secondary" style="font-size:0.75rem; font-weight:700;">Download CSV</span>
+        </div>
+
+        <div onclick="downloadFormExport('sql')" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem 1.1rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <span style="font-size:1.2rem;">🗄️</span>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem; color:#fff;">Export to SQL Statements (.sql)</div>
+              <div style="font-size:0.72rem; color:#94a3b8;">Generates PostgreSQL/MySQL INSERT INTO table queries for database migration.</div>
+            </div>
+          </div>
+          <span class="btn btn-secondary" style="font-size:0.75rem; font-weight:700;">Download SQL</span>
+        </div>
+
+        <div onclick="downloadFormExport('json')" style="background:#131d31; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.85rem 1.1rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <span style="font-size:1.2rem;">📄</span>
+            <div>
+              <div style="font-weight:700; font-size:0.88rem; color:#fff;">Export to JSON Data (.json)</div>
+              <div style="font-size:0.72rem; color:#94a3b8;">Structured JSON payload array for REST API & webhooks integration.</div>
+            </div>
+          </div>
+          <span class="btn btn-secondary" style="font-size:0.75rem; font-weight:700;">View JSON</span>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closeFormExportModal()" class="btn btn-secondary">Close Window</button>
       </div>
     </div>
   </div>
