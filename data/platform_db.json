@@ -7,7 +7,7 @@
       "slug": "default",
       "domain": "ethenengine.com",
       "status": "active",
-      "createdAt": "2026-08-20T16:33:23.101Z"
+      "createdAt": "2026-08-20T16:48:52.165Z"
     },
     {
       "id": "tenant_lioramedia",
@@ -16,7 +16,7 @@
       "slug": "lioramedia",
       "domain": "lioramedia.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T16:33:23.211Z"
+      "createdAt": "2026-08-20T16:48:52.275Z"
     }
   ],
   "pages": [
@@ -121,7 +121,7 @@
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787243603263",
+      "contentTypeId": "ct_1787244532328",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -130,12 +130,12 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787243603263",
-      "updatedAt": "2026-08-20T16:33:23.263Z"
+      "id": "entry_1787244532328",
+      "updatedAt": "2026-08-20T16:48:52.328Z"
     },
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787243603315",
+      "contentTypeId": "ct_1787244532379",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -144,8 +144,8 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787243603315",
-      "updatedAt": "2026-08-20T16:33:23.315Z"
+      "id": "entry_1787244532380",
+      "updatedAt": "2026-08-20T16:48:52.380Z"
     }
   ],
   "products": [
@@ -157,7 +157,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787243603263"
+      "id": "prod_1787244532328"
     },
     {
       "tenantId": "tenant_lioramedia",
@@ -167,7 +167,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787243603315"
+      "id": "prod_1787244532380"
     }
   ],
   "leads": [
@@ -178,8 +178,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787243603263",
-      "createdAt": "2026-08-20T16:33:23.263Z"
+      "id": "lead_1787244532328",
+      "createdAt": "2026-08-20T16:48:52.328Z"
     },
     {
       "tenantId": "tenant_lioramedia",
@@ -188,8 +188,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787243603315",
-      "createdAt": "2026-08-20T16:33:23.315Z"
+      "id": "lead_1787244532380",
+      "createdAt": "2026-08-20T16:48:52.380Z"
     }
   ]
 }

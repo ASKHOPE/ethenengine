@@ -211,8 +211,48 @@ app.get('/login', (c) => {
 app.get('/editor', requireAuth, (c) => {
   const tenant = c.get('tenant' as any) as any;
   const pageId = c.req.query('pageId');
-  const pages = websiteBuilder.listPages(tenant.id);
-  const page = pageId ? pages.find(p => p.id === pageId) || pages[0] : pages[0];
+  let pages = websiteBuilder.listPages(tenant.id);
+
+  // If a newly created tenant has no pages yet, auto-provision default starter home page
+  if (pages.length === 0) {
+    const defaultPage = websiteBuilder.createPage({
+      tenantId: tenant.id,
+      title: 'Home',
+      slug: 'home',
+      isPublished: true,
+      seo: {
+        title: `${tenant.name} — Home`,
+        description: `Official digital storefront and portal for ${tenant.name}.`,
+      },
+      blocks: [
+        {
+          id: `blk_hero_${Date.now()}`,
+          type: 'hero',
+          settings: {
+            title: `Welcome to ${tenant.name}`,
+            subtitle: 'Crafting exceptional digital experiences powered by ETHENENGINE.',
+            ctaText: 'Explore Platform ↗',
+            ctaUrl: '#features',
+          },
+        },
+        {
+          id: `blk_features_${Date.now()}`,
+          type: 'features',
+          settings: {
+            title: 'Enterprise Platform Capabilities',
+            items: [
+              { name: 'Ultra-Fast Performance', desc: 'Sub-millisecond edge execution powered by Bun.' },
+              { name: 'Zero-Knowledge Security', desc: 'PBKDF2 AES-256-GCM tenant cryptographic isolation.' },
+              { name: 'Dynamic Theme Harmonizer', desc: 'Design tokens and automated color science palettes.' },
+            ],
+          },
+        },
+      ],
+    });
+    pages = [defaultPage];
+  }
+
+  const page = pageId ? pages.find((p) => p.id === pageId) || pages[0] : pages[0];
   const theme = themeEngine.getThemeForTenant(tenant.id);
   return c.html(renderEditorView({ tenantSlug: tenant.slug, page, pages, theme }));
 });

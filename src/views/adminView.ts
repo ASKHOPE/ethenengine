@@ -333,13 +333,76 @@ export function renderAdminView(options: AdminViewOptions): string {
         : activeView === 'tenants'
         ? `
       <div class="card">
-        <h2>Multi-Tenant Hierarchy & Subscriptions</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+          <div>
+            <h2 style="margin:0; font-size:1.15rem; color:#fff;">🏢 Multi-Tenant Hierarchy & Isolated Environments</h2>
+            <p style="color:#94a3b8; font-size:0.82rem; margin-top:0.25rem;">Manage platform organizations, sub-tenants, custom domains, and PBKDF2 encryption isolation.</p>
+          </div>
+          <button onclick="openNewTenantModal()" class="btn" style="padding:0.5rem 1rem; font-size:0.85rem; font-weight:700; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none; border-radius:6px; cursor:pointer; display:flex; align-items:center; gap:0.4rem;">
+            <span>+</span> Provision New Tenant
+          </button>
+        </div>
+
         <table>
-          <thead><tr><th>Tenant ID</th><th>Tenant Name</th><th>Slug</th><th>Custom Domain</th><th>Encryption Isolation</th><th>Status</th></tr></thead>
+          <thead><tr><th>Tenant ID</th><th>Tenant Name</th><th>Slug / Workspace</th><th>Custom Domain</th><th>Encryption Isolation</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>
-            ${tenants.map((t) => `<tr><td style="font-family:monospace; color:#818cf8;">${escapeHtml(t.id)}</td><td style="font-weight:600; color:#fff;">${escapeHtml(t.name)}</td><td>${escapeHtml(t.slug)}</td><td>${escapeHtml(t.domain)}</td><td><span class="badge badge-purple">AES-256-GCM (PBKDF2)</span></td><td><span class="badge">${escapeHtml(t.status.toUpperCase())}</span></td></tr>`).join('')}
+            ${tenants.map((t) => `<tr>
+              <td style="font-family:monospace; color:#818cf8; font-weight:600;">${escapeHtml(t.id)}</td>
+              <td style="font-weight:600; color:#fff;">${escapeHtml(t.name)}</td>
+              <td><span style="background:rgba(99,102,241,0.1); padding:2px 8px; border-radius:4px; font-family:monospace; font-size:0.8rem; color:#a5b4fc;">${escapeHtml(t.slug)}</span></td>
+              <td style="color:#cbd5e1;">${escapeHtml(t.domain || '—')}</td>
+              <td><span class="badge badge-purple">AES-256-GCM (PBKDF2)</span></td>
+              <td><span class="badge">${escapeHtml(t.status.toUpperCase())}</span></td>
+              <td>
+                <a href="/admin?tenant=${escapeHtml(t.slug)}" class="btn btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.75rem; text-decoration:none; color:#38bdf8; background:#1e293b; border-radius:4px;">Switch Context ↗</a>
+              </td>
+            </tr>`).join('')}
           </tbody>
         </table>
+      </div>
+
+      <!-- PROVISION NEW TENANT MODAL -->
+      <div id="newTenantModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); z-index:10000; place-content:center; padding:1.5rem;">
+        <div style="background:#111827; border:1px solid #374151; border-radius:14px; width:100%; max-width:480px; padding:1.75rem; box-shadow:0 25px 50px -12px rgba(0,0,0,0.8);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:1.2rem;">🏢</span>
+              <h3 style="font-size:1.1rem; font-weight:800; color:#fff; margin:0;">Provision New Tenant</h3>
+            </div>
+            <button onclick="closeNewTenantModal()" style="background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer;">✕</button>
+          </div>
+
+          <form onsubmit="handleProvisionTenant(event)" style="display:flex; flex-direction:column; gap:1rem;">
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:0.35rem;">Organization</label>
+              <input id="tenantOrgId" type="text" value="org_enterprise" required style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.55rem 0.75rem; color:#fff; font-size:0.85rem; outline:none;" />
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:0.35rem;">Tenant / Business Name</label>
+              <input id="tenantNameInput" type="text" placeholder="e.g. Nexus Media Group" required style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.55rem 0.75rem; color:#fff; font-size:0.85rem; outline:none;" />
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:0.35rem;">Slug (Subdomain Identifier)</label>
+              <input id="tenantSlugInput" type="text" placeholder="e.g. nexusmedia" required style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.55rem 0.75rem; color:#fff; font-size:0.85rem; outline:none;" />
+            </div>
+
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; text-transform:uppercase; margin-bottom:0.35rem;">Custom Domain (Optional)</label>
+              <input id="tenantDomainInput" type="text" placeholder="e.g. nexusmedia.localhost or nexus.io" style="width:100%; background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.55rem 0.75rem; color:#fff; font-size:0.85rem; outline:none;" />
+            </div>
+
+            <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25); border-radius:8px; padding:0.75rem; font-size:0.75rem; color:#cbd5e1;">
+              🔒 <strong>Automatic Security Isolation:</strong> A dedicated PBKDF2 cryptographic key will be derived for zero-knowledge field encryption.
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:0.5rem;">
+              <button type="button" onclick="closeNewTenantModal()" class="btn btn-secondary" style="padding:0.55rem 1rem; font-size:0.85rem; font-weight:600; background:#1e293b; border:1px solid #334155; color:#fff; border-radius:6px; cursor:pointer;">Cancel</button>
+              <button type="submit" id="provisionSubmitBtn" class="btn" style="padding:0.55rem 1.25rem; font-size:0.85rem; font-weight:700; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none; border-radius:6px; cursor:pointer;">⚡ Provision Tenant</button>
+            </div>
+          </form>
+        </div>
       </div>
     `
         : activeView === 'support'
@@ -907,6 +970,67 @@ export function renderAdminView(options: AdminViewOptions): string {
     function resetToDefault() {
       quickColor('#0284c7', '#38bdf8');
       showAdminToast('↩ Colors reset to system defaults.');
+    }
+
+    function openNewTenantModal() {
+      const modal = document.getElementById('newTenantModal');
+      if (modal) {
+        modal.style.display = 'grid';
+        document.getElementById('tenantNameInput')?.focus();
+      }
+    }
+
+    function closeNewTenantModal() {
+      const modal = document.getElementById('newTenantModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function handleProvisionTenant(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('provisionSubmitBtn');
+      const orgId = document.getElementById('tenantOrgId')?.value || 'org_enterprise';
+      const name = document.getElementById('tenantNameInput')?.value;
+      const slug = document.getElementById('tenantSlugInput')?.value;
+      const domain = document.getElementById('tenantDomainInput')?.value || '';
+
+      if (!name || !slug) {
+        showAdminToast('⚠️ Tenant Name and Slug are required.');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Provisioning...';
+      }
+
+      try {
+        const res = await fetch('/api/core/tenants', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orgId, name, slug, domain })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          showAdminToast('🎉 Successfully provisioned tenant ' + name + '!');
+          closeNewTenantModal();
+          setTimeout(() => {
+            window.location.href = '/admin?tenant=' + encodeURIComponent(slug) + '&view=tenants';
+          }, 1000);
+        } else {
+          showAdminToast('⚠️ ' + (data.error || 'Failed to provision tenant'));
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '⚡ Provision Tenant';
+          }
+        }
+      } catch (err) {
+        showAdminToast('⚠️ Network error while provisioning tenant.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '⚡ Provision Tenant';
+        }
+      }
     }
 
     function showAdminToast(msg) {

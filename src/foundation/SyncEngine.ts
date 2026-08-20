@@ -301,25 +301,29 @@ export class SyncEngine {
       return; // Skip malformed or summary objects
     }
 
-    const [aivenResult, dockerResult] = await Promise.allSettled([
-      this.writeToTarget('aiven',  record),
-      this.writeToTarget('docker', record),
-    ]);
+    const aivenConnected = await this.aivenEngine.ensureConnected();
+    const tasks: Promise<void>[] = [];
 
+    if (aivenConnected) {
+      tasks.push(
+        this.writeToTarget('aiven', record).catch((err) => {
+          this.logger.warn(`[SyncEngine] Aiven write failed for ${record.collection}/${record.id} — queued for retry`, {});
+          this.enqueueRetry(record, 'aiven');
+        })
+      );
+    }
+
+    if (this.dockerReady) {
+      tasks.push(
+        this.writeToTarget('docker', record).catch((err) => {
+          this.logger.warn(`[SyncEngine] Docker write failed for ${record.collection}/${record.id} — queued for retry`, {});
+          this.enqueueRetry(record, 'docker');
+        })
+      );
+    }
+
+    await Promise.allSettled(tasks);
     this.stats.lastSync = new Date().toISOString();
-
-    if (aivenResult.status === 'rejected') {
-      this.logger.warn(`[SyncEngine] Aiven write failed for ${record.collection}/${record.id} — queued for retry`, {});
-      this.enqueueRetry(record, 'aiven');
-    }
-
-    if (dockerResult.status === 'rejected') {
-      // Docker is optional; only warn, no retry if it was never connected
-      if (this.dockerReady) {
-        this.logger.warn(`[SyncEngine] Docker write failed for ${record.collection}/${record.id} — queued for retry`, {});
-        this.enqueueRetry(record, 'docker');
-      }
-    }
   }
 
   // ── Sync a whole collection (called by PersistenceDriver) ───────────────
@@ -394,6 +398,18 @@ export class SyncEngine {
     this.retryQueue = this.retryQueue.filter(i => i.nextRetry > now);
 
     for (const item of due) {
+      if (item.target === 'aiven') {
+        const connected = await this.aivenEngine.ensureConnected();
+        if (!connected) {
+          this.enqueueRetry(item.record, item.target, item.attempts);
+          continue;
+        }
+      }
+      if (item.target === 'docker' && !this.dockerReady) {
+        this.enqueueRetry(item.record, item.target, item.attempts);
+        continue;
+      }
+
       try {
         await this.writeToTarget(item.target, item.record);
         this.stats.retrySuccess++;
@@ -413,7 +429,7 @@ export class SyncEngine {
 
   private persistFailure(item: RetryItem) {
     try {
-      const failDir = path.resolve(process.cwd(), 'data', 'sync-failures');
+      const failDir = path.resolve('data/failed_syncs');
       if (!fs.existsSync(failDir)) fs.mkdirSync(failDir, { recursive: true });
       const file = path.join(failDir, `fail_${Date.now()}_${item.record.id}.json`);
       fs.writeFileSync(file, JSON.stringify({ ...item, failedAt: new Date().toISOString() }, null, 2));

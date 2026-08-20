@@ -10,29 +10,33 @@ export interface EditorViewOptions {
 }
 
 export function renderEditorView(options: EditorViewOptions): string {
-  const { tenantSlug, page, pages, theme } = options;
+  const { tenantSlug } = options;
+  const page = options.page || { id: 'page_home', title: 'Home', slug: 'home', blocks: [], isPublished: true, seo: { title: 'Home', description: '' } };
+  const pages = options.pages && options.pages.length > 0 ? options.pages : [page];
+  const theme = options.theme || { tokens: { primaryColor: '#6366f1', secondaryColor: '#a855f7', backgroundColor: '#070a12', cardBg: '#0f172a', textColor: '#f8fafc', borderRadius: '10px' } };
+
   const holidayDesigner = HolidayDesigner.getInstance();
-  const holidayCss = theme.tokens.holidayEffect ? holidayDesigner.compileHolidayCSS(theme.tokens.holidayEffect) : '';
+  const holidayCss = theme.tokens?.holidayEffect ? holidayDesigner.compileHolidayCSS(theme.tokens.holidayEffect) : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studio Builder — ${escapeHtml(page.title)} (${escapeHtml(tenantSlug)})</title>
+  <title>Studio Builder — ${escapeHtml(page.title || 'Home')} (${escapeHtml(tenantSlug || 'default')})</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/blocks.css">
   <link rel="stylesheet" href="/animations.css">
   <link rel="stylesheet" href="/editor.css">
   <style>
     :root {
-      --primary: ${theme.tokens.primaryColor || '#6366f1'};
-      --secondary: ${theme.tokens.secondaryColor || '#a855f7'};
-      --bg: ${theme.tokens.backgroundColor || '#070a12'};
-      --card-bg: ${theme.tokens.cardBg || '#0f172a'};
-      --glow: ${theme.tokens.accentGlow || 'rgba(99,102,241,0.25)'};
-      --text: ${theme.tokens.textColor || '#f8fafc'};
-      --radius: ${theme.tokens.borderRadius || '10px'};
+      --primary: ${theme.tokens?.primaryColor || '#6366f1'};
+      --secondary: ${theme.tokens?.secondaryColor || '#a855f7'};
+      --bg: ${theme.tokens?.backgroundColor || '#070a12'};
+      --card-bg: ${theme.tokens?.cardBg || '#0f172a'};
+      --glow: ${theme.tokens?.accentGlow || 'rgba(99,102,241,0.25)'};
+      --text: ${theme.tokens?.textColor || '#f8fafc'};
+      --radius: ${theme.tokens?.borderRadius || '10px'};
     }
   </style>
   <style id="dynamicHolidayStyle">

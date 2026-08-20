@@ -242,10 +242,9 @@ export function renderPreviewView(options: PreviewViewOptions): string {
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/blocks.css">
   <link rel="stylesheet" href="/animations.css">
-  <link rel="stylesheet" href="/editor.css">
   <style>
     ${cssVariables}
-    body { background-color: var(--color-bg, #030712); color: var(--color-text, #f9fafb); margin: 0; min-height: 100vh; font-family: var(--font-family, system-ui); }
+    html, body { background-color: var(--color-bg, #030712); color: var(--color-text, #f9fafb); margin: 0; min-height: 100vh; overflow-y: auto; overflow-x: hidden; font-family: var(--font-family, system-ui); }
     .navbar { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; max-width: 1200px; margin: 0 auto; }
     .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--color-primary, #6366f1); text-decoration: none; display: flex; align-items: center; gap: 0.6rem; }
     .nav-links { display: flex; align-items: center; gap: 1.5rem; }
@@ -286,10 +285,9 @@ export function renderPreviewView(options: PreviewViewOptions): string {
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/blocks.css">
   <link rel="stylesheet" href="/animations.css">
-  <link rel="stylesheet" href="/editor.css">
   <style>
     ${cssVariables}
-    body { background-color: var(--color-bg, #070a12); color: var(--color-text, #f8fafc); margin: 0; min-height: 100vh; }
+    html, body { background-color: var(--color-bg, #070a12); color: var(--color-text, #f8fafc); margin: 0; min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
   </style>
 </head>
 <body>
