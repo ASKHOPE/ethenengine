@@ -404,6 +404,7 @@ export class SyncEngine {
         this.logger.warn(`[SyncEngine] Heartbeat: ${this.retryQueue.length} item(s) pending retry`, {});
       }
     }, intervalMs);
+    (this.heartbeatTimer as any)?.unref?.();
   }
 
   // ── Public API ───────────────────────────────────────────────────────────

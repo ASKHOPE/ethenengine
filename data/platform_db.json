@@ -7,7 +7,7 @@
       "slug": "default",
       "domain": "ethenengine.com",
       "status": "active",
-      "createdAt": "2026-08-17T18:15:20.771Z"
+      "createdAt": "2026-08-20T16:23:16.991Z"
     },
     {
       "id": "tenant_lioramedia",
@@ -16,7 +16,7 @@
       "slug": "lioramedia",
       "domain": "lioramedia.localhost",
       "status": "active",
-      "createdAt": "2026-08-17T18:15:20.953Z"
+      "createdAt": "2026-08-20T16:23:17.107Z"
     }
   ],
   "pages": [
@@ -121,7 +121,7 @@
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1786990521015",
+      "contentTypeId": "ct_1787242997161",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -130,8 +130,36 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1786990521015",
-      "updatedAt": "2026-08-17T18:15:21.015Z"
+      "id": "entry_1787242997161",
+      "updatedAt": "2026-08-20T16:23:17.161Z"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "contentTypeId": "ct_1787242997213",
+      "slug": "warner-bros-virtual-stage",
+      "data": {
+        "title": "Warner Bros Sci-Fi Feature Virtual Production Stage",
+        "content": "Operated 120-panel LED volume stage with real-time camera tracking, reducing post-production VFX timelines by 40%.",
+        "author": "VFX Supervisor",
+        "client": "Warner Bros Discovery"
+      },
+      "status": "published",
+      "id": "entry_1787242997213",
+      "updatedAt": "2026-08-20T16:23:17.213Z"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "contentTypeId": "ct_1787242997213",
+      "slug": "ai-commercial-pipeline",
+      "data": {
+        "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
+        "content": "Generated 500 localized 4K commercial variations in 2 hours using custom trained Flux video diffusion models.",
+        "author": "AI Tech Lead",
+        "client": "Porsche Digital"
+      },
+      "status": "published",
+      "id": "entry_1787242997214",
+      "updatedAt": "2026-08-20T16:23:17.214Z"
     }
   ],
   "products": [
@@ -143,7 +171,17 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1786990521015"
+      "id": "prod_1787242997161"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "name": "Monthly AI Commercial Ad Retainer",
+      "sku": "LIO-AI-RETAINER",
+      "price": 4500,
+      "currency": "USD",
+      "stock": 50,
+      "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
+      "id": "prod_1787242997214"
     }
   ],
   "leads": [
@@ -154,8 +192,18 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1786990521015",
-      "createdAt": "2026-08-17T18:15:21.015Z"
+      "id": "lead_1787242997161",
+      "createdAt": "2026-08-20T16:23:17.161Z"
+    },
+    {
+      "tenantId": "tenant_lioramedia",
+      "contactName": "Felix Baum",
+      "email": "fbaum@redbull.com",
+      "company": "Red Bull Media House",
+      "dealValue": 45000,
+      "stage": "contacted",
+      "id": "lead_1787242997214",
+      "createdAt": "2026-08-20T16:23:17.214Z"
     }
   ]
 }

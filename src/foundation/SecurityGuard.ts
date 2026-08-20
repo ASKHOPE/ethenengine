@@ -15,7 +15,8 @@ class RateLimiter {
 
   private constructor() {
     // Periodic garbage collection for expired rate limit buckets
-    setInterval(() => this.cleanup(), 60000);
+    const timer = setInterval(() => this.cleanup(), 60000);
+    timer.unref?.();
   }
 
   public static getInstance(): RateLimiter {

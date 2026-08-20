@@ -29,7 +29,7 @@ export class CollaborationEngine {
 
   private constructor() {
     // Cleanup inactive collaborators periodically
-    setInterval(() => {
+    const timer = setInterval(() => {
       const now = Date.now();
       for (const [id, collab] of this.collaborators.entries()) {
         if (now - collab.lastActive > 60000) { // 60s timeout
@@ -37,6 +37,7 @@ export class CollaborationEngine {
         }
       }
     }, 15000);
+    timer.unref?.();
   }
 
   public static getInstance(): CollaborationEngine {
