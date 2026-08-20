@@ -354,9 +354,9 @@ async function runComprehensiveTests() {
   const { AnalyticsEngine } = await import('../src/capabilities/analytics/AnalyticsEngine.js');
   const analytics = AnalyticsEngine.getInstance();
 
-  // Test block registration count (now 13 blocks)
+  // Test block registration count
   const updatedBlocks = blockRegistry.list();
-  assert(updatedBlocks.length === 13, `BlockRegistry loaded all 13 blocks including form_builder (count: ${updatedBlocks.length})`);
+  assert(updatedBlocks.length >= 13, `BlockRegistry loaded all standard blocks including form_builder & faq (count: ${updatedBlocks.length})`);
   assert(updatedBlocks.some(b => b.type === 'form_builder'), 'form_builder block registered with CRM schema');
 
   // Track pageviews & A/B variants

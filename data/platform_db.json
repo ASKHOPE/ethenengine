@@ -362,7 +362,7 @@
       },
       "blocks": [
         {
-          "id": "blk_hero_1787245001444",
+          "id": "blk_hero_1787245490189",
           "type": "hero",
           "settings": {
             "title": "Welcome to Amnex Tech",
@@ -372,7 +372,7 @@
           }
         },
         {
-          "id": "blk_features_1787245001444",
+          "id": "blk_features_1787245490189",
           "type": "features",
           "settings": {
             "title": "Enterprise Platform Capabilities",
@@ -393,13 +393,13 @@
           }
         }
       ],
-      "id": "page_1787245001444_7e1u"
+      "id": "page_1787245490189_alwo"
     }
   ],
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787244962160",
+      "contentTypeId": "ct_1787245374489",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -408,8 +408,8 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787244962160",
-      "updatedAt": "2026-08-20T16:56:02.160Z"
+      "id": "entry_1787245374489",
+      "updatedAt": "2026-08-20T17:02:54.489Z"
     }
   ],
   "products": [
@@ -421,7 +421,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787244962160"
+      "id": "prod_1787245374489"
     }
   ],
   "leads": [
@@ -432,8 +432,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787244962160",
-      "createdAt": "2026-08-20T16:56:02.160Z"
+      "id": "lead_1787245374489",
+      "createdAt": "2026-08-20T17:02:54.489Z"
     }
   ]
 }

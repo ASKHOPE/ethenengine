@@ -282,53 +282,250 @@ export class BlockRegistry {
     // 7. PRICING TIERS
     this.register({
       type: 'pricing',
-      name: 'Pricing Plans',
+      name: 'Pricing Plans & Comparison',
       category: 'commerce',
       icon: '💎',
-      description: 'Transparent recurring tier cards with highlighted feature lists.',
+      description: 'Multi-tier pricing comparison cards with feature checkmarks, badges, and CTA buttons.',
       defaultSettings: {
-        title: 'Predictable Cloud Pricing',
-        planName: 'Enterprise Cloud',
-        price: '149',
+        title: 'Simple, Transparent Enterprise Pricing',
+        subtitle: 'Scale smoothly with predictable pricing. No hidden fees or lock-ins.',
+        currency: '$',
+        billingPeriod: '/month',
+        tiers: [
+          {
+            name: 'Starter Tier',
+            price: '29',
+            period: '/mo',
+            badge: '',
+            description: 'Essential tools for indie builders and creators.',
+            features: ['Single Tenant Workspace', 'Up to 10 Pages & Blocks', 'Standard Analytics Feed', 'Community Support'],
+            ctaText: 'Start Free Trial',
+            ctaUrl: '/login',
+            isHighlighted: false,
+          },
+          {
+            name: 'Professional Business',
+            price: '99',
+            period: '/mo',
+            badge: 'MOST POPULAR',
+            description: 'Powerful multi-org capabilities for fast-scaling companies.',
+            features: ['Up to 5 Multi-Org Workspaces', 'Unlimited Dynamic Blocks & CMS', 'Zero-Knowledge Security Vault', 'Real-Time Collab Sync', 'Priority 24/7 Support'],
+            ctaText: 'Deploy Pro Tier',
+            ctaUrl: '/login',
+            isHighlighted: true,
+          },
+          {
+            name: 'Enterprise Sovereign',
+            price: '299',
+            period: '/mo',
+            badge: 'BEST VALUE',
+            description: 'Dedicated infrastructure, custom SLAs, and infinite multi-tenancy.',
+            features: ['Infinite Tenant Provisioning', 'Multi-Warehouse ERP Logistics', 'Custom Domain & SSL Gateway', 'Sentinel Auto-Healing Watchdog', 'Dedicated Account Architect'],
+            ctaText: 'Talk to Solutions Team',
+            ctaUrl: '/login',
+            isHighlighted: false,
+          },
+        ],
       },
       fields: [
         { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Pricing Plans' },
-        { name: 'planName', label: 'Plan Name', type: 'text', defaultValue: 'Enterprise Cloud' },
-        { name: 'price', label: 'Monthly Price ($)', type: 'text', defaultValue: '149' },
+        { name: 'subtitle', label: 'Section Subtitle', type: 'textarea', defaultValue: 'Predictable pricing for every business scale.' },
+        { name: 'currency', label: 'Currency Symbol', type: 'text', defaultValue: '$' },
+        { name: 'billingPeriod', label: 'Billing Cycle Text', type: 'text', defaultValue: '/month' },
       ],
-      renderHtml: (s) => `
-        <section class="block-pricing">
-          <h2 class="block-pricing__title">${escapeHtml(s.title)}</h2>
-          <div class="block-pricing__card">
-            <div class="block-pricing__plan-name">${escapeHtml(s.planName)}</div>
-            <div class="block-pricing__price">$${escapeHtml(s.price)}<span class="block-pricing__frequency">/mo</span></div>
-            <a href="/login" class="btn" style="display:block; width:100%; box-sizing:border-box;">Select Enterprise Tier</a>
-          </div>
-        </section>
-      `,
+      renderHtml: (s) => {
+        const currency = s.currency || '$';
+        const tiers = Array.isArray(s.tiers) && s.tiers.length > 0 ? s.tiers : [
+          {
+            name: s.planName || 'Enterprise Cloud',
+            price: s.price || '99',
+            period: s.billingPeriod || '/mo',
+            badge: 'POPULAR',
+            description: 'Unified multi-tenant operating system.',
+            features: ['Zero-Knowledge Cryptography', 'Visual Website Builder', 'CRM & Commerce Sync'],
+            ctaText: 'Select Plan',
+            ctaUrl: '/login',
+            isHighlighted: true,
+          }
+        ];
+
+        return `
+          <section class="block-pricing" style="padding:clamp(2.5rem,5vw,4.5rem) 1.5rem; max-width:1160px; margin:0 auto;">
+            <div style="text-align:center; margin-bottom:2.5rem;">
+              <h2 class="block-pricing__title" style="font-size:clamp(1.6rem,3.2vw,2.4rem); font-weight:900; color:#fff; margin:0 0 0.5rem; letter-spacing:-0.02em;">${escapeHtml(s.title || 'Transparent Pricing')}</h2>
+              <p style="color:#94a3b8; font-size:clamp(0.9rem,1.2vw,1.05rem); max-width:620px; margin:0 auto; line-height:1.5;">${escapeHtml(s.subtitle || '')}</p>
+            </div>
+            
+            <div class="block-pricing__grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.75rem; align-items:stretch;">
+              ${tiers.map((t: any) => {
+                const isHigh = Boolean(t.isHighlighted);
+                const feats = Array.isArray(t.features) ? t.features : String(t.features || '').split('\n').filter(Boolean);
+                return `
+                  <div class="block-pricing__card glass-panel" style="background:${isHigh ? 'linear-gradient(180deg,rgba(99,102,241,0.14),rgba(15,23,42,0.85))' : 'rgba(15,23,42,0.6)'}; border:${isHigh ? '2px solid var(--color-primary,#6366f1)' : '1px solid rgba(255,255,255,0.08)'}; border-radius:var(--radius, 14px); padding:2rem 1.75rem; display:flex; flex-direction:column; justify-content:space-between; position:relative; box-shadow:${isHigh ? '0 20px 40px -10px rgba(99,102,241,0.3)' : '0 10px 25px -5px rgba(0,0,0,0.5)'};">
+                    ${t.badge ? `<div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--color-primary,#6366f1),var(--color-secondary,#a855f7)); color:#fff; font-size:0.68rem; font-weight:800; padding:0.2rem 0.75rem; border-radius:999px; letter-spacing:0.05em; text-transform:uppercase; box-shadow:0 4px 12px rgba(99,102,241,0.4);">${escapeHtml(t.badge)}</div>` : ''}
+                    <div>
+                      <div style="font-size:1.15rem; font-weight:800; color:#fff; margin-bottom:0.35rem;">${escapeHtml(t.name || 'Tier Plan')}</div>
+                      <p style="color:#94a3b8; font-size:0.8rem; line-height:1.4; margin-bottom:1.25rem; min-height:2.4em;">${escapeHtml(t.description || '')}</p>
+                      <div style="display:flex; align-items:baseline; gap:0.25rem; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:1.25rem;">
+                        <span style="font-size:1.4rem; font-weight:700; color:#94a3b8;">${escapeHtml(currency)}</span>
+                        <span style="font-size:2.8rem; font-weight:900; color:#34d399; letter-spacing:-0.03em;">${escapeHtml(String(t.price || '0'))}</span>
+                        <span style="font-size:0.85rem; color:#94a3b8; font-weight:500;">${escapeHtml(t.period || s.billingPeriod || '/mo')}</span>
+                      </div>
+                      <ul style="list-style:none; padding:0; margin:0 0 1.5rem; display:flex; flex-direction:column; gap:0.65rem;">
+                        ${feats.map((f: string) => `
+                          <li style="display:flex; align-items:flex-start; gap:0.6rem; font-size:0.85rem; color:#e2e8f0; line-height:1.4;">
+                            <span style="color:#34d399; font-weight:900; font-size:0.95rem; line-height:1.2;">✓</span>
+                            <span>${escapeHtml(String(f).trim())}</span>
+                          </li>
+                        `).join('')}
+                      </ul>
+                    </div>
+                    <a href="${escapeHtml(t.ctaUrl || '/login')}" class="btn" style="width:100%; box-sizing:border-box; padding:0.75rem; text-align:center; font-weight:800; font-size:0.9rem; background:${isHigh ? 'linear-gradient(135deg,var(--color-primary,#6366f1),var(--color-secondary,#a855f7))' : 'rgba(255,255,255,0.08)'}; border:${isHigh ? 'none' : '1px solid rgba(255,255,255,0.15)'}; border-radius:var(--radius, 8px);">
+                      ${escapeHtml(t.ctaText || 'Get Started')}
+                    </a>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </section>
+        `;
+      },
     });
 
-    // 8. TESTIMONIALS
+    // 8. TESTIMONIALS & SOCIAL PROOF
     this.register({
       type: 'testimonials',
-      name: 'Testimonials',
+      name: 'Testimonials & Reviews',
       category: 'social_proof',
       icon: '💬',
-      description: 'Client reviews, executive quotes, and endorsements.',
+      description: 'Client reviews, ratings, executive quotes, and endorsements.',
       defaultSettings: {
-        quote: 'ETHENENGINE completely transformed our digital architecture with zero-knowledge data privacy.',
-        author: 'Lead Architect, Fortune 500 Enterprise',
+        title: 'Trusted by Industry Leaders Worldwide',
+        subtitle: 'Hear how fast-moving organizations scale their operations with ETHENENGINE.',
+        testimonials: [
+          {
+            quote: 'ETHENENGINE completely transformed our digital architecture with per-tenant zero-knowledge cryptography.',
+            author: 'Elena Rostova',
+            role: 'VP of Technology',
+            company: 'Nexus Media Labs',
+            rating: 5,
+            avatarEmoji: '👩‍💼',
+          },
+          {
+            quote: 'The sub-5ms Bun execution and multi-warehouse logistics gave our enterprise an undeniable competitive edge.',
+            author: 'Marcus Vance',
+            role: 'Chief Technology Officer',
+            company: 'HyperScale Systems',
+            rating: 5,
+            avatarEmoji: '👨‍💻',
+          },
+          {
+            quote: 'Provisioning isolated multi-tenant workspaces in seconds with real-time live preview is pure magic.',
+            author: 'Sarah Lin',
+            role: 'Lead Solutions Architect',
+            company: 'Vertex Digital Agency',
+            rating: 5,
+            avatarEmoji: '🚀',
+          },
+        ],
       },
       fields: [
-        { name: 'quote', label: 'Quote Body', type: 'textarea', defaultValue: 'Best platform architecture.' },
-        { name: 'author', label: 'Author & Credential', type: 'text', defaultValue: 'CTO, Global SaaS' },
+        { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Trusted by Leaders' },
+        { name: 'subtitle', label: 'Section Subtitle', type: 'textarea', defaultValue: 'Verified customer feedback.' },
       ],
-      renderHtml: (s) => `
-        <section class="block-testimonial">
-          <blockquote class="block-testimonial__quote">"${escapeHtml(s.quote)}"</blockquote>
-          <div class="block-testimonial__author">— ${escapeHtml(s.author)}</div>
-        </section>
-      `,
+      renderHtml: (s) => {
+        const list = Array.isArray(s.testimonials) && s.testimonials.length > 0 ? s.testimonials : [
+          {
+            quote: s.quote || 'ETHENENGINE completely transformed our digital architecture.',
+            author: s.author || 'Lead Architect',
+            role: 'Enterprise Client',
+            company: 'Global SaaS',
+            rating: 5,
+            avatarEmoji: '⭐',
+          }
+        ];
+
+        return `
+          <section class="block-testimonial" style="padding:clamp(2.5rem,5vw,4.5rem) 1.5rem; max-width:1160px; margin:0 auto;">
+            <div style="text-align:center; margin-bottom:2.5rem;">
+              <h2 style="font-size:clamp(1.6rem,3.2vw,2.4rem); font-weight:900; color:#fff; margin:0 0 0.5rem; letter-spacing:-0.02em;">${escapeHtml(s.title || 'Client Testimonials')}</h2>
+              <p style="color:#94a3b8; font-size:clamp(0.9rem,1.2vw,1.05rem); max-width:600px; margin:0 auto; line-height:1.5;">${escapeHtml(s.subtitle || '')}</p>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:1.5rem;">
+              ${list.map((t: any) => `
+                <div class="glass-panel" style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius, 12px); padding:1.75rem; display:flex; flex-direction:column; justify-content:space-between;">
+                  <div>
+                    <div style="color:#fbbf24; font-size:1.1rem; margin-bottom:0.75rem; letter-spacing:2px;">${'★'.repeat(Number(t.rating) || 5)}</div>
+                    <blockquote style="font-size:0.95rem; color:#e2e8f0; font-style:italic; line-height:1.6; margin:0 0 1.25rem;">"${escapeHtml(t.quote || '')}"</blockquote>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:0.75rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:0.85rem;">
+                    <div style="font-size:1.6rem; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.05); display:grid; place-content:center; flex-shrink:0;">${escapeHtml(t.avatarEmoji || '👤')}</div>
+                    <div>
+                      <div style="font-weight:800; font-size:0.9rem; color:#fff;">${escapeHtml(t.author || 'Anonymous')}</div>
+                      <div style="font-size:0.75rem; color:#94a3b8;">${escapeHtml([t.role, t.company].filter(Boolean).join(' · '))}</div>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      },
+    });
+
+    // 9. FAQ ACCORDION COMPONENT
+    this.register({
+      type: 'faq',
+      name: 'FAQ Accordion',
+      category: 'content',
+      icon: '❓',
+      description: 'Frequently asked questions with expandable question cards.',
+      defaultSettings: {
+        title: 'Frequently Asked Questions',
+        subtitle: 'Everything you need to know about our multi-tenant platform.',
+        faqs: [
+          {
+            question: 'How does per-tenant zero-knowledge cryptography work?',
+            answer: 'Every tenant has an isolated PBKDF2 encryption key derived with SHA-256 and AES-256-GCM. Database records are encrypted at the field level before persistence.',
+          },
+          {
+            question: 'Can I connect custom domains and white-label the storefront?',
+            answer: 'Yes, ETHENENGINE supports full custom CNAME routing with automated SSL certificates and dynamic theme token injection per domain.',
+          },
+          {
+            question: 'How does live preview and side-by-side editing sync?',
+            answer: 'The studio builder communicates via real-time WebSocket state synchronizers, rendering live changes with sub-millisecond edge latency.',
+          },
+        ],
+      },
+      fields: [
+        { name: 'title', label: 'Section Title', type: 'text', defaultValue: 'Frequently Asked Questions' },
+        { name: 'subtitle', label: 'Section Subtitle', type: 'textarea', defaultValue: 'Find answers to common inquiries.' },
+      ],
+      renderHtml: (s) => {
+        const faqs = Array.isArray(s.faqs) && s.faqs.length > 0 ? s.faqs : [];
+        return `
+          <section class="block-faq" style="padding:clamp(2.5rem,5vw,4.5rem) 1.5rem; max-width:860px; margin:0 auto;">
+            <div style="text-align:center; margin-bottom:2.25rem;">
+              <h2 style="font-size:clamp(1.6rem,3.2vw,2.4rem); font-weight:900; color:#fff; margin:0 0 0.5rem; letter-spacing:-0.02em;">${escapeHtml(s.title || 'FAQ')}</h2>
+              <p style="color:#94a3b8; font-size:clamp(0.9rem,1.2vw,1.05rem); max-width:580px; margin:0 auto; line-height:1.5;">${escapeHtml(s.subtitle || '')}</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.85rem;">
+              ${faqs.map((f: any, idx: number) => `
+                <details class="glass-panel" style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius, 10px); padding:1rem 1.25rem; cursor:pointer;" ${idx === 0 ? 'open' : ''}>
+                  <summary style="font-weight:700; font-size:1rem; color:#fff; list-style:none; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${escapeHtml(f.question || 'Question')}</span>
+                    <span style="color:var(--color-primary,#6366f1); font-weight:900; font-size:1.1rem; margin-left:0.5rem;">▾</span>
+                  </summary>
+                  <p style="margin-top:0.75rem; font-size:0.9rem; color:#94a3b8; line-height:1.6; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.75rem;">
+                    ${escapeHtml(f.answer || '')}
+                  </p>
+                </details>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      },
     });
 
     // 9. CMS FEED

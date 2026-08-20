@@ -38,6 +38,113 @@ export function renderEditorView(options: EditorViewOptions): string {
       --text: ${theme.tokens?.textColor || '#f8fafc'};
       --radius: ${theme.tokens?.borderRadius || '10px'};
     }
+    
+    /* Studio Layout & Split View */
+    .editor-layout {
+      display: flex;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+      background: #070a14;
+    }
+
+    .workspace-viewport {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      background: #05070e;
+    }
+
+    .canvas-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-viewport {
+      flex: 1;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      background: #060913;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .preview-frame-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow: auto;
+      padding: 1rem;
+      background: radial-gradient(circle at 50% 30%, rgba(99,102,241,0.05), transparent 70%), #04060a;
+    }
+
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      background: #070a12;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transition: width 0.25s ease, height 0.25s ease;
+    }
+
+    /* Inspector Sub-Item Cards */
+    .inspector-item-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.85rem;
+      margin-bottom: 0.85rem;
+      position: relative;
+    }
+    .inspector-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #94a3b8;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .inspector-del-btn {
+      background: transparent;
+      border: none;
+      color: #f87171;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .inspector-del-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .inspector-add-btn {
+      width: 100%;
+      padding: 0.55rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-top: 0.4rem;
+    }
+    .inspector-add-btn:hover {
+      background: rgba(99, 102, 241, 0.25);
+      color: #fff;
+    }
   </style>
   <style id="dynamicHolidayStyle">
     ${holidayCss}
@@ -45,7 +152,7 @@ export function renderEditorView(options: EditorViewOptions): string {
 </head>
 <body>
   <!-- TOP STUDIO TOOLBAR -->
-  <div class="editor-toolbar" style="height:54px; background:#070a14; border-bottom:1px solid rgba(255,255,255,0.08); padding:0 1.25rem; display:flex; align-items:center; justify-content:space-between;">
+  <div class="editor-toolbar" style="height:54px; background:#070a14; border-bottom:1px solid rgba(255,255,255,0.08); padding:0 1.25rem; display:flex; align-items:center; justify-content:space-between; z-index:100;">
     <div style="display:flex; align-items:center; gap:0.85rem;">
       <div class="toolbar-brand" style="font-weight:900; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem;">
         <div class="brand-icon" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); width:28px; height:28px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900; font-size:0.85rem; position:relative;">E</div>
@@ -53,16 +160,26 @@ export function renderEditorView(options: EditorViewOptions): string {
       </div>
       <a href="/admin?tenant=${escapeHtml(tenantSlug)}&view=website" class="btn btn-secondary" style="padding:0.3rem 0.65rem; font-size:0.75rem;">← Admin</a>
       
-      <select onchange="window.location.href='/editor?tenant=${escapeHtml(tenantSlug)}&pageId=' + this.value" class="field-input" style="width:210px; padding:0.35rem 0.65rem; font-size:0.8rem;">
+      <select onchange="window.location.href='/editor?tenant=${escapeHtml(tenantSlug)}&pageId=' + this.value" class="field-input" style="width:200px; padding:0.35rem 0.65rem; font-size:0.8rem;">
         ${pages.map(p => `<option value="${escapeHtml(p.id)}" ${p.id === page.id ? 'selected' : ''}>${escapeHtml(p.title)} (/${escapeHtml(p.slug)})</option>`).join('')}
       </select>
     </div>
 
-    <!-- RESPONSIVE BREAKPOINT SWITCHER -->
-    <div style="display:flex; align-items:center; background:#101524; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:2px;">
-      <button class="btn btn-secondary" id="btnDesktop" onclick="setDevice('desktop')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:rgba(99,102,241,0.2); color:#fff;">🖥️ Desktop</button>
-      <button class="btn btn-secondary" id="btnTablet" onclick="setDevice('tablet')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;">📱 Tablet</button>
-      <button class="btn btn-secondary" id="btnMobile" onclick="setDevice('mobile')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;">📲 Mobile</button>
+    <!-- VIEW MODE SWITCHER & RESPONSIVE BREAKPOINT SWITCHER -->
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <!-- STUDIO VIEW MODES: CANVAS ONLY | SIDE-BY-SIDE SPLIT | FULL PREVIEW -->
+      <div style="display:flex; align-items:center; background:#101524; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:2px;">
+        <button class="btn btn-secondary" id="btnModeCanvas" onclick="setStudioViewMode('canvas')" style="padding:0.3rem 0.65rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;" title="Focus on canvas editing">🛠️ Canvas</button>
+        <button class="btn btn-secondary" id="btnModeSplit" onclick="setStudioViewMode('split')" style="padding:0.3rem 0.65rem; font-size:0.75rem; border:none; background:rgba(99,102,241,0.25); color:#fff; font-weight:700;" title="Edit and watch live preview simultaneously">🪟 Side-by-Side</button>
+        <button class="btn btn-secondary" id="btnModePreview" onclick="setStudioViewMode('preview')" style="padding:0.3rem 0.65rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;" title="Full storefront preview">🌐 Preview</button>
+      </div>
+
+      <!-- DEVICE BREAKPOINTS -->
+      <div style="display:flex; align-items:center; background:#101524; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:2px;">
+        <button class="btn btn-secondary" id="btnDesktop" onclick="setDevice('desktop')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:rgba(99,102,241,0.2); color:#fff;">🖥️ Desktop</button>
+        <button class="btn btn-secondary" id="btnTablet" onclick="setDevice('tablet')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;">📱 Tablet</button>
+        <button class="btn btn-secondary" id="btnMobile" onclick="setDevice('mobile')" style="padding:0.3rem 0.6rem; font-size:0.75rem; border:none; background:transparent; color:#94a3b8;">📲 Mobile</button>
+      </div>
     </div>
 
     <!-- REAL-TIME COLLABORATORS & PRESENCE BAR -->
@@ -77,13 +194,13 @@ export function renderEditorView(options: EditorViewOptions): string {
       </div>
 
       <button id="savePageBtn" class="btn" onclick="savePage()" style="background:linear-gradient(135deg,#6366f1,#4f46e5); font-weight:700; padding:0.45rem 1rem;">💾 Save Page</button>
-      <a id="livePreviewBtn" href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.45rem 0.9rem;">👁️ Preview ↗</a>
+      <a id="livePreviewBtn" href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.45rem 0.9rem;">👁️ Pop Out ↗</a>
     </div>
   </div>
 
-  <div class="editor-layout">
+  <div class="editor-layout" id="editorLayout">
     <!-- LEFT DRAWER: TABS FOR BLOCKS, PAGES, MEDIA & THEME -->
-    <div class="component-drawer">
+    <div class="component-drawer" id="componentDrawer">
       <div class="drawer-tabs">
         <button class="drawer-tab-btn active" id="tabBlocksBtn" onclick="switchDrawerTab('blocks')">📦 Blocks</button>
         <button class="drawer-tab-btn" id="tabPagesBtn" onclick="switchDrawerTab('pages')">📄 Pages</button>
@@ -122,7 +239,7 @@ export function renderEditorView(options: EditorViewOptions): string {
             <div style="background:${p.id === page.id ? 'rgba(99,102,241,0.18)' : '#101524'}; border:1px solid ${p.id === page.id ? '#6366f1' : 'rgba(255,255,255,0.06)'}; border-radius:8px; padding:0.65rem 0.85rem; display:flex; justify-content:space-between; align-items:center;">
               <div style="cursor:pointer;" onclick="window.location.href='/editor?tenant=${escapeHtml(tenantSlug)}&pageId=${escapeHtml(p.id)}'">
                 <div style="font-weight:700; font-size:0.85rem; color:#fff;">${escapeHtml(p.title)}</div>
-                <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">/${escapeHtml(p.slug)} · ${p.blocks.length} blocks</div>
+                <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">/${escapeHtml(p.slug)} · ${(p.blocks || []).length} blocks</div>
               </div>
               <div style="display:flex; gap:0.3rem;">
                 <a href="/preview/${escapeHtml(p.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.7rem;">👁️</a>
@@ -134,7 +251,7 @@ export function renderEditorView(options: EditorViewOptions): string {
 
       <!-- 1-CLICK STARTER TEMPLATES TAB -->
       <div class="drawer-content" id="drawerTemplatesTab" style="display:none;">
-        <p style="font-size:0.75rem; color:#94a3b8; line-height:1.4; margin-bottom:0.25rem;">
+        <p style="font-size:0.75rem; color:#94a3b8; line-height:1.4; margin-bottom:0.75rem;">
           Select a pre-built industry template to instantly scaffold a high-converting website layout:
         </p>
 
@@ -164,11 +281,11 @@ export function renderEditorView(options: EditorViewOptions): string {
         <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:0.75rem;">Navigation & Announcement</h4>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'navbar')" onclick="addBlock('navbar')">
           <div class="block-card-icon">🧭</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Navigation Bar</div><div style="font-size:0.72rem; color:#94a3b8;">Brand logo, navigation links & CTA</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Navigation Bar</div><div style="font-size:0.72rem; color:#94a3b8;">Brand logo, menu links & CTA</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'announcement_bar')" onclick="addBlock('announcement_bar')">
           <div class="block-card-icon">📢</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Announcement Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Top sale announcement bar</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Announcement Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Top sale announcement ticker</div></div>
         </div>
 
         <h4 style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:1.25rem 0 0.75rem;">Core Sections</h4>
@@ -178,39 +295,43 @@ export function renderEditorView(options: EditorViewOptions): string {
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'stats')" onclick="addBlock('stats')">
           <div class="block-card-icon">📊</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Key Metrics / Stats</div><div style="font-size:0.72rem; color:#94a3b8;">3-column proof & SLA metrics</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Key Metrics / Stats</div><div style="font-size:0.72rem; color:#94a3b8;">Multi-column metrics & proof</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'features')" onclick="addBlock('features')">
           <div class="block-card-icon">✨</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Features Grid</div><div style="font-size:0.72rem; color:#94a3b8;">Multi-column capability cards</div></div>
-        </div>
-        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'product_grid')" onclick="addBlock('product_grid')">
-          <div class="block-card-icon">🛍️</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Products / Merch Grid</div><div style="font-size:0.72rem; color:#94a3b8;">Live inventory merchandise items</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Features Grid</div><div style="font-size:0.72rem; color:#94a3b8;">Configurable cards with icons</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'pricing')" onclick="addBlock('pricing')">
-          <div class="block-card-icon">💳</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Pricing Table</div><div style="font-size:0.72rem; color:#94a3b8;">Tiered subscription plans</div></div>
+          <div class="block-card-icon">💎</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Pricing Comparison</div><div style="font-size:0.72rem; color:#94a3b8;">Multi-tier comparison tables</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'testimonials')" onclick="addBlock('testimonials')">
           <div class="block-card-icon">💬</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Customer Quotes</div><div style="font-size:0.72rem; color:#94a3b8;">Testimonial proof review</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Customer Reviews</div><div style="font-size:0.72rem; color:#94a3b8;">Ratings & client quotes</div></div>
+        </div>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'faq')" onclick="addBlock('faq')">
+          <div class="block-card-icon">❓</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">FAQ Accordion</div><div style="font-size:0.72rem; color:#94a3b8;">Expandable Q&A accordion cards</div></div>
+        </div>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'product_grid')" onclick="addBlock('product_grid')">
+          <div class="block-card-icon">🛍️</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Store Showcase</div><div style="font-size:0.72rem; color:#94a3b8;">Product merchandise catalog</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'cms_feed')" onclick="addBlock('cms_feed')">
           <div class="block-card-icon">📝</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Headless CMS Feed</div><div style="font-size:0.72rem; color:#94a3b8;">Dynamic case studies / articles</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Headless CMS Feed</div><div style="font-size:0.72rem; color:#94a3b8;">Dynamic articles & releases</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'cta')" onclick="addBlock('cta')">
           <div class="block-card-icon">🎯</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">CTA Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Conversion gradient callout</div></div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">CTA Callout Banner</div><div style="font-size:0.72rem; color:#94a3b8;">Gradient conversion block</div></div>
+        </div>
+        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'form_builder')" onclick="addBlock('form_builder')">
+          <div class="block-card-icon">📋</div>
+          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Lead Capture Form</div><div style="font-size:0.72rem; color:#94a3b8;">Inquiry form with CRM pipeline</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'pagination')" onclick="addBlock('pagination')">
           <div class="block-card-icon">🔢</div>
           <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Pagination Controls</div><div style="font-size:0.72rem; color:#94a3b8;">Numbered page buttons & next/prev</div></div>
-        </div>
-        <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'form_builder')" onclick="addBlock('form_builder')">
-          <div class="block-card-icon">📋</div>
-          <div><div style="font-weight:600; font-size:0.85rem; color:#fff;">Lead Capture Form</div><div style="font-size:0.72rem; color:#94a3b8;">Inquiry form synced with CRM</div></div>
         </div>
         <div class="block-card" draggable="true" ondragstart="onDrawerDragStart(event, 'footer')" onclick="addBlock('footer')">
           <div class="block-card-icon">⚓</div>
@@ -224,7 +345,7 @@ export function renderEditorView(options: EditorViewOptions): string {
         <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:0.75rem; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <div style="font-size:0.8rem; font-weight:700; color:#fff;">🌗 Day / Night Mode</div>
           <div style="display:flex; gap:0.35rem;">
-            <button onclick="applyDayMode()" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" title="Clean Sunlight / Light mode">☀️ Day</button>
+            <button onclick="applyDayMode()" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" title="Clean Sunlight mode">☀️ Day</button>
             <button onclick="applyNightMode()" class="btn btn-secondary" style="padding:0.25rem 0.55rem; font-size:0.75rem;" title="Midnight Dark Slate">🌙 Night</button>
           </div>
         </div>
@@ -298,18 +419,39 @@ export function renderEditorView(options: EditorViewOptions): string {
       </div>
     </div>
 
-    <!-- CANVAS VIEWPORT -->
-    <div class="canvas-viewport">
-      <div class="canvas-container" id="canvasContainer">
-        <!-- Rendered dynamically via renderCanvas() -->
+    <!-- CENTER WORKSPACE: CANVAS VIEWPORT & SIDE-BY-SIDE LIVE PREVIEW -->
+    <div class="workspace-viewport" id="workspaceViewport">
+      <!-- 1. INTERACTIVE VISUAL CANVAS -->
+      <div class="canvas-viewport" id="canvasViewport">
+        <div class="canvas-container" id="canvasContainer" style="width:100%; max-width:860px;">
+          <!-- Rendered dynamically via renderCanvas() -->
+        </div>
+      </div>
+
+      <!-- 2. SIDE-BY-SIDE LIVE STOREFRONT PREVIEW -->
+      <div class="preview-viewport" id="previewViewport">
+        <div style="height:38px; background:#0c101d; border-bottom:1px solid rgba(255,255,255,0.06); padding:0 0.85rem; display:flex; align-items:center; justify-content:space-between; font-size:0.75rem; color:#94a3b8;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+            <span style="font-weight:700; color:#fff;">Live Storefront Mirror</span>
+            <span style="font-size:0.7rem; color:#64748b; font-family:monospace;">/preview/${escapeHtml(page.slug)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <button onclick="refreshPreviewIframe()" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;" title="Refresh live preview">🔄 Sync</button>
+            <a href="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}" target="_blank" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem;" title="Open in new tab">↗ Pop Out</a>
+          </div>
+        </div>
+        <div class="preview-frame-container" id="previewFrameContainer">
+          <iframe id="livePreviewIframe" class="preview-frame" src="/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}"></iframe>
+        </div>
       </div>
     </div>
 
     <!-- RIGHT INSPECTOR DRAWER -->
-    <div class="property-inspector">
+    <div class="property-inspector" id="propertyInspector" style="width:340px; min-width:300px; max-width:380px; background:#0b0f19; border-left:1px solid rgba(255,255,255,0.08); padding:1rem; overflow-y:auto;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:0.75rem;">
-        <span style="font-weight:700; font-size:0.85rem; color:#fff;">Inspector</span>
-        <span class="inspector-badge" id="inspectorBadge">SELECT BLOCK</span>
+        <span style="font-weight:800; font-size:0.85rem; color:#fff; letter-spacing:0.5px;">INSPECTOR</span>
+        <span class="inspector-badge" id="inspectorBadge" style="background:rgba(99,102,241,0.2); color:#818cf8; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.7rem; font-weight:800;">SELECT BLOCK</span>
       </div>
 
       <div id="inspectorContent">
@@ -325,19 +467,79 @@ export function renderEditorView(options: EditorViewOptions): string {
     let selectedBlockIndex = 0;
     let draggedCanvasBlockIdx = null;
     let draggedBlockType = null;
+    let studioViewMode = 'split'; // 'canvas' | 'split' | 'preview'
+    let currentDevice = 'desktop';
+
+    function setStudioViewMode(mode) {
+      studioViewMode = mode;
+      const canvasView = document.getElementById('canvasViewport');
+      const previewView = document.getElementById('previewViewport');
+      const btnC = document.getElementById('btnModeCanvas');
+      const btnS = document.getElementById('btnModeSplit');
+      const btnP = document.getElementById('btnModePreview');
+
+      [btnC, btnS, btnP].forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = '#94a3b8';
+        b.style.fontWeight = 'normal';
+      });
+
+      if (mode === 'canvas') {
+        canvasView.style.display = 'flex';
+        canvasView.style.flex = '1';
+        previewView.style.display = 'none';
+        btnC.style.background = 'rgba(99,102,241,0.25)';
+        btnC.style.color = '#fff';
+        btnC.style.fontWeight = '700';
+      } else if (mode === 'preview') {
+        canvasView.style.display = 'none';
+        previewView.style.display = 'flex';
+        previewView.style.flex = '1';
+        btnP.style.background = 'rgba(99,102,241,0.25)';
+        btnP.style.color = '#fff';
+        btnP.style.fontWeight = '700';
+        refreshPreviewIframe();
+      } else { // 'split'
+        canvasView.style.display = 'flex';
+        canvasView.style.flex = '1';
+        previewView.style.display = 'flex';
+        previewView.style.flex = '1';
+        btnS.style.background = 'rgba(99,102,241,0.25)';
+        btnS.style.color = '#fff';
+        btnS.style.fontWeight = '700';
+      }
+    }
 
     function setDevice(device) {
-      const container = document.getElementById('canvasContainer');
+      currentDevice = device;
+      const canvasContainer = document.getElementById('canvasContainer');
+      const previewIframe = document.getElementById('livePreviewIframe');
       const btnD = document.getElementById('btnDesktop');
       const btnT = document.getElementById('btnTablet');
       const btnM = document.getElementById('btnMobile');
 
-      container.className = 'canvas-container ' + (device === 'desktop' ? '' : device + '-mode');
       [btnD, btnT, btnM].forEach(b => { b.style.background = 'transparent'; b.style.color = '#94a3b8'; });
-      
       const activeBtn = device === 'desktop' ? btnD : device === 'tablet' ? btnT : btnM;
       activeBtn.style.background = 'rgba(99,102,241,0.2)';
       activeBtn.style.color = '#fff';
+
+      if (device === 'mobile') {
+        canvasContainer.style.maxWidth = '390px';
+        if (previewIframe) { previewIframe.style.width = '390px'; previewIframe.style.height = '844px'; }
+      } else if (device === 'tablet') {
+        canvasContainer.style.maxWidth = '768px';
+        if (previewIframe) { previewIframe.style.width = '768px'; previewIframe.style.height = '1024px'; }
+      } else {
+        canvasContainer.style.maxWidth = '860px';
+        if (previewIframe) { previewIframe.style.width = '100%'; previewIframe.style.height = '100%'; }
+      }
+    }
+
+    function refreshPreviewIframe() {
+      const iframe = document.getElementById('livePreviewIframe');
+      if (iframe) {
+        iframe.src = '/preview/${escapeHtml(page.slug)}?tenant=${escapeHtml(tenantSlug)}&t=' + Date.now();
+      }
     }
 
     function switchDrawerTab(tab) {
@@ -436,29 +638,31 @@ export function renderEditorView(options: EditorViewOptions): string {
       if (templateKey === 'saas_landing') {
         pageData.blocks = [
           { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'CYBERCLOUD', logoInitial: 'C', ctaText: 'Launch App' } },
-          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Enterprise Intelligence Distributed to the Edge', subtitle: 'Real-time multi-tenant runtime engine with zero-knowledge cryptographic isolation.', ctaText: 'Get Started' } },
+          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Enterprise Intelligence Distributed to the Edge', subtitle: 'Real-time multi-tenant runtime engine with zero-knowledge cryptographic isolation.', badgeText: '⚡ NEXT-GEN V2.0', ctaText: 'Get Started', ctaUrl: '#pricing' } },
           { id: 'blk_' + Date.now() + '_3', type: 'stats', settings: { stat1Val: '99.999%', stat1Label: 'SLA Availability', stat2Val: '< 2.4ms', stat2Label: 'Edge Latency', stat3Val: '100%', stat3Label: 'Zero-Knowledge' } },
-          { id: 'blk_' + Date.now() + '_4', type: 'pricing', settings: { title: 'Scalable Platform Tiers', planName: 'Enterprise Cloud', price: '199' } },
-          { id: 'blk_' + Date.now() + '_5', type: 'cta', settings: { headline: 'Ready to Deploy in Seconds?', buttonText: 'Create Your Workspace' } },
-          { id: 'blk_' + Date.now() + '_6', type: 'footer', settings: { brandName: 'CYBERCLOUD', copyrightText: '© 2026 CYBERCLOUD INC. All rights reserved.' } }
+          { id: 'blk_' + Date.now() + '_4', type: 'features', settings: { title: 'Architected for High Scale', items: [{ icon: '⚡', name: 'Ultra-Fast Performance', desc: 'Sub-5ms execution latency powered by Bun runtime.' }, { icon: '🔒', name: 'Zero-Knowledge Security', desc: 'PBKDF2 AES-256-GCM field encryption isolation.' }, { icon: '🌐', name: 'Infinite Multi-Tenancy', desc: 'Provision enterprise organizations in milliseconds.' }] } },
+          { id: 'blk_' + Date.now() + '_5', type: 'pricing', settings: { title: 'Scalable Platform Tiers', currency: '$', billingPeriod: '/month', tiers: [ { name: 'Starter', price: '29', period: '/mo', badge: '', description: 'For creators and solo developers.', features: ['1 Tenant Org', '10 Dynamic Pages', 'Community Support'], ctaText: 'Start Free', ctaUrl: '/login', isHighlighted: false }, { name: 'Pro Business', price: '99', period: '/mo', badge: 'MOST POPULAR', description: 'For fast scaling enterprises.', features: ['Unlimited Workspaces', 'Zero-Knowledge Cryptography', 'Real-Time Sync', '24/7 Priority Support'], ctaText: 'Upgrade to Pro', ctaUrl: '/login', isHighlighted: true }, { name: 'Enterprise', price: '299', period: '/mo', badge: 'SOVEREIGN', description: 'Dedicated enterprise infrastructure.', features: ['Custom CNAME & SSL', 'Sentinel Watchdog DR', 'Dedicated Account Manager'], ctaText: 'Contact Sales', ctaUrl: '/login', isHighlighted: false } ] } },
+          { id: 'blk_' + Date.now() + '_6', type: 'faq', settings: { title: 'Frequently Asked Questions', faqs: [{ question: 'How is data isolated between tenants?', answer: 'Each tenant has independent encryption keys with zero cross-tenant leakage.' }, { question: 'Can I map custom domains?', answer: 'Yes, full custom CNAME routing with automated SSL.' }] } },
+          { id: 'blk_' + Date.now() + '_7', type: 'cta', settings: { headline: 'Ready to Deploy in Seconds?', buttonText: 'Create Your Workspace', buttonUrl: '/login' } },
+          { id: 'blk_' + Date.now() + '_8', type: 'footer', settings: { brandName: 'CYBERCLOUD', copyrightText: '© 2026 CYBERCLOUD INC. All rights reserved.' } }
         ];
         showToast('Scaffolded SaaS Product Launch Template!', true);
       } else if (templateKey === 'agency_studio') {
         pageData.blocks = [
-          { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'LIORAMEDIA', logoInitial: 'L', ctaText: 'Client Portal' } },
-          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Virtual Production & Cinematic VFX Studio', subtitle: 'Leading the future of procedural CGI, LED volume stages, and high-impact digital storytelling.', ctaText: 'Explore Productions' } },
+          { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'LIORAMEDIA', logoInitial: 'L', ctaText: 'Client Portal', ctaUrl: '/login' } },
+          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Virtual Production & Cinematic VFX Studio', subtitle: 'Leading the future of procedural CGI, LED volume stages, and high-impact digital storytelling.', badgeText: '🎬 8K VOLUME STAGES', ctaText: 'Explore Productions', ctaUrl: '#cms' } },
           { id: 'blk_' + Date.now() + '_3', type: 'cms_feed', settings: { title: 'Featured Cinematic Productions & Releases', contentTypeSlug: 'blog-article' } },
-          { id: 'blk_' + Date.now() + '_4', type: 'testimonials', settings: { quote: 'LIORAMEDIA produced the visual campaign of the decade for our brand.', author: 'Creative Director, Universal Arts' } },
-          { id: 'blk_' + Date.now() + '_5', type: 'cta', settings: { headline: 'Produce Your Next Campaign with Us', buttonText: 'Book Studio Time' } },
+          { id: 'blk_' + Date.now() + '_4', type: 'testimonials', settings: { title: 'Client Reviews & Endorsements', testimonials: [{ quote: 'LIORAMEDIA produced the visual campaign of the decade for our brand.', author: 'Creative Director, Universal Arts', role: 'Executive Producer', company: 'Universal Studios', rating: 5, avatarEmoji: '🎬' }] } },
+          { id: 'blk_' + Date.now() + '_5', type: 'cta', settings: { headline: 'Produce Your Next Campaign with Us', buttonText: 'Book Studio Time', buttonUrl: '/login' } },
           { id: 'blk_' + Date.now() + '_6', type: 'footer', settings: { brandName: 'LIORAMEDIA', copyrightText: '© 2026 LIORAMEDIA VFX STUDIO. All rights reserved.' } }
         ];
         showToast('Scaffolded Creative Studio Template!', true);
       } else if (templateKey === 'consulting_lead') {
         pageData.blocks = [
-          { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'VERTEX ADVISORY', logoInitial: 'V', ctaText: 'Schedule Call' } },
-          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Strategic Architecture for Global Enterprises', subtitle: 'We help Fortune 500 engineering organizations streamline their multi-cloud data infrastructure.', ctaText: 'Request Consultation' } },
-          { id: 'blk_' + Date.now() + '_3', type: 'stats', settings: { stat1Val: '$4.2B+', stat1Label: 'Assets Managed', stat2Val: '45+', stat2Label: 'Global Enterprise Clients', stat3Val: '14 Days', stat3Label: 'Avg Setup' } },
-          { id: 'blk_' + Date.now() + '_4', type: 'form_builder', settings: { title: 'Request Executive Consultation', subtitle: 'Connect directly with our senior partners.' } },
+          { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'VERTEX ADVISORY', logoInitial: 'V', ctaText: 'Schedule Call', ctaUrl: '#contact' } },
+          { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'Strategic Architecture for Global Enterprises', subtitle: 'We help Fortune 500 engineering organizations streamline their multi-cloud data infrastructure.', badgeText: '💼 EXECUTIVE CONSULTING', ctaText: 'Request Consultation', ctaUrl: '#contact' } },
+          { id: 'blk_' + Date.now() + '_3', type: 'stats', settings: { stat1Val: '$4.2B+', stat1Label: 'Assets Managed', stat2Val: '45+', stat2Label: 'Enterprise Clients', stat3Val: '14 Days', stat3Label: 'Avg Setup' } },
+          { id: 'blk_' + Date.now() + '_4', type: 'form_builder', settings: { title: 'Request Executive Consultation', subtitle: 'Connect directly with our senior partners.', buttonText: 'Submit Consultation Request' } },
           { id: 'blk_' + Date.now() + '_5', type: 'footer', settings: { brandName: 'VERTEX ADVISORY', copyrightText: '© 2026 VERTEX ADVISORY GROUP. All rights reserved.' } }
         ];
         showToast('Scaffolded Executive Consulting Template!', true);
@@ -467,7 +671,7 @@ export function renderEditorView(options: EditorViewOptions): string {
           { id: 'blk_' + Date.now() + '_1', type: 'navbar', settings: { brandName: 'DOCS HUB', logoInitial: 'D', ctaText: 'API Specs' } },
           { id: 'blk_' + Date.now() + '_2', type: 'hero', settings: { title: 'ETHENENGINE Developer Documentation', subtitle: 'Guides, architectural blueprints, and REST API references.', ctaText: 'Explore APIs' } },
           { id: 'blk_' + Date.now() + '_3', type: 'cms_feed', settings: { title: 'Engineering Guides & Release Notes', contentTypeSlug: 'blog-article' } },
-          { id: 'blk_' + Date.now() + '_4', type: 'pagination', settings: { totalPages: 4, currentPage: 1 } },
+          { id: 'blk_' + Date.now() + '_4', type: 'faq', settings: { title: 'Documentation FAQ', faqs: [{ question: 'Where is the OpenAPI schema?', answer: 'Available at /api/openapi.json and interactive Swagger at /docs' }] } },
           { id: 'blk_' + Date.now() + '_5', type: 'footer', settings: { brandName: 'DOCS HUB', copyrightText: '© 2026 ETHENENGINE Open Documentation.' } }
         ];
         showToast('Scaffolded Product Hub Template!', true);
@@ -487,13 +691,17 @@ export function renderEditorView(options: EditorViewOptions): string {
       container.innerHTML = pageData.blocks.map((block, idx) => {
         let previewHtml = '';
         if (block.type === 'hero') {
-          previewHtml = \`<div style="text-align:center; padding:1.5rem 0;">
+          previewHtml = \`<div style="text-align:\${block.settings.align === 'left' ? 'left' : 'center'}; padding:1.5rem 0;">
+            \${block.settings.badgeText ? \`<div style="display:inline-block; background:rgba(99,102,241,0.2); border:1px solid rgba(99,102,241,0.4); color:#a5b4fc; font-size:0.72rem; font-weight:800; padding:0.2rem 0.65rem; border-radius:999px; margin-bottom:0.75rem;">\${escapeText(block.settings.badgeText)}</div>\` : ''}
             <h1 style="font-size:1.85rem; font-weight:900; color:#fff; margin-bottom:0.75rem; letter-spacing:-0.02em;">\${escapeText(block.settings.title || 'Hero Headline')}</h1>
-            <p style="color:#94a3b8; font-size:0.95rem; max-width:600px; margin:0 auto 1.25rem; line-height:1.5;">\${escapeText(block.settings.subtitle || 'Subtitle content')}</p>
-            <span class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); padding:0.6rem 1.4rem; font-weight:700;">\${escapeText(block.settings.ctaText || 'Get Started')}</span>
+            <p style="color:#94a3b8; font-size:0.95rem; max-width:600px; margin:\${block.settings.align === 'left' ? '0 0 1.25rem' : '0 auto 1.25rem'}; line-height:1.5;">\${escapeText(block.settings.subtitle || 'Subtitle content')}</p>
+            <div style="display:flex; gap:0.6rem; justify-content:\${block.settings.align === 'left' ? 'flex-start' : 'center'}; flex-wrap:wrap;">
+              <span class="btn" style="background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); padding:0.6rem 1.4rem; font-weight:700;">\${escapeText(block.settings.ctaText || 'Get Started')}</span>
+              \${block.settings.secondaryCtaText ? \`<span class="btn btn-secondary" style="border-radius:var(--radius); padding:0.6rem 1.2rem; font-weight:700;">\${escapeText(block.settings.secondaryCtaText)}</span>\` : ''}
+            </div>
           </div>\`;
         } else if (block.type === 'stats') {
-          previewHtml = \`<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; text-align:center; padding:1rem 0;">
+          previewHtml = \`<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; text-align:center; padding:1rem 0;">
             <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:1rem; border-radius:var(--radius);">
               <div style="font-size:1.5rem; font-weight:900; color:var(--primary);">\${escapeText(block.settings.stat1Val || '99.9%')}</div>
               <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase; margin-top:0.25rem;">\${escapeText(block.settings.stat1Label || 'Metric 1')}</div>
@@ -508,36 +716,89 @@ export function renderEditorView(options: EditorViewOptions): string {
             </div>
           </div>\`;
         } else if (block.type === 'features') {
+          const items = Array.isArray(block.settings.items) && block.settings.items.length > 0 ? block.settings.items : [
+            { icon: '⚡', name: 'Ultra Fast Performance', desc: 'Sub-5ms Bun execution with verified low latency.' },
+            { icon: '🔒', name: 'Zero-Knowledge Security', desc: 'AES-256-GCM PBKDF2 field level security isolation.' }
+          ];
           previewHtml = \`<div>
             <h3 style="text-align:center; font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:1.25rem;">\${escapeText(block.settings.title || 'Key Features')}</h3>
             <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem;">
-              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:1.25rem;">
-                <div style="font-size:1.3rem; margin-bottom:0.4rem;">⚡</div>
-                <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:0.3rem;">Ultra Fast Performance</div>
-                <div style="color:#94a3b8; font-size:0.8rem; line-height:1.4;">Sub-5ms Bun execution with verified low latency.</div>
-              </div>
-              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:1.25rem;">
-                <div style="font-size:1.3rem; margin-bottom:0.4rem;">🔒</div>
-                <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:0.3rem;">Zero-Knowledge Cryptography</div>
-                <div style="color:#94a3b8; font-size:0.8rem; line-height:1.4;">AES-256-GCM PBKDF2 field level security isolation.</div>
-              </div>
+              \${items.map(item => \`
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:1.25rem;">
+                  <div style="font-size:1.4rem; margin-bottom:0.4rem;">\${escapeText(item.icon || '⚡')}</div>
+                  <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:0.3rem;">\${escapeText(item.name || 'Feature')}</div>
+                  <div style="color:#94a3b8; font-size:0.8rem; line-height:1.4;">\${escapeText(item.desc || '')}</div>
+                </div>
+              \`).join('')}
             </div>
           </div>\`;
         } else if (block.type === 'pricing') {
-          previewHtml = \`<div style="text-align:center;">
-            <h3 style="font-size:1.35rem; color:#fff; margin-bottom:1.2rem; font-weight:800;">\${escapeText(block.settings.title || 'Enterprise Pricing')}</h3>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem;">
-              <div style="background:#111827; border:1px solid var(--primary); border-radius:var(--radius); padding:1.5rem; box-shadow:0 10px 25px -5px rgba(0,0,0,0.5);">
-                <div style="font-size:1.1rem; font-weight:800; color:#fff;">\${escapeText(block.settings.planName || 'Enterprise Tier')}</div>
-                <div style="font-size:1.8rem; font-weight:900; color:#34d399; margin:0.4rem 0;">$\${escapeText(block.settings.price || '99')}<span style="font-size:0.85rem; color:#94a3b8; font-weight:400;">/mo</span></div>
-                <button class="btn" style="width:100%; margin-top:0.75rem; background:linear-gradient(135deg,var(--primary),var(--secondary)); border-radius:var(--radius); font-weight:700;">Select Plan</button>
-              </div>
+          const currency = block.settings.currency || '$';
+          const tiers = Array.isArray(block.settings.tiers) && block.settings.tiers.length > 0 ? block.settings.tiers : [
+            { name: block.settings.planName || 'Enterprise Plan', price: block.settings.price || '99', period: '/mo', badge: 'POPULAR', description: 'Complete platform suite', features: ['Zero-Knowledge Cryptography', 'Visual Website Builder', 'Multi-Warehouse Inventory'], ctaText: 'Select Plan', isHighlighted: true }
+          ];
+          previewHtml = \`<div>
+            <div style="text-align:center; margin-bottom:1.5rem;">
+              <h3 style="font-size:1.35rem; color:#fff; margin:0 0 0.3rem; font-weight:800;">\${escapeText(block.settings.title || 'Enterprise Pricing')}</h3>
+              <p style="color:#94a3b8; font-size:0.85rem; margin:0;">\${escapeText(block.settings.subtitle || '')}</p>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem;">
+              \${tiers.map(t => {
+                const isHigh = Boolean(t.isHighlighted);
+                const feats = Array.isArray(t.features) ? t.features : String(t.features || '').split('\\n').filter(Boolean);
+                return \`
+                  <div style="background:\${isHigh ? 'linear-gradient(180deg,rgba(99,102,241,0.15),#111827)' : '#111827'}; border:\${isHigh ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.08)'}; border-radius:var(--radius); padding:1.25rem; position:relative; display:flex; flex-direction:column; justify-content:space-between;">
+                    \${t.badge ? \`<div style="position:absolute; top:-9px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; font-size:0.6rem; font-weight:800; padding:0.15rem 0.5rem; border-radius:999px;">\${escapeText(t.badge)}</div>\` : ''}
+                    <div>
+                      <div style="font-size:1rem; font-weight:800; color:#fff;">\${escapeText(t.name || 'Tier')}</div>
+                      <div style="font-size:1.6rem; font-weight:900; color:#34d399; margin:0.3rem 0;">\${escapeText(currency)}\${escapeText(String(t.price || '0'))}<span style="font-size:0.75rem; color:#94a3b8; font-weight:400;">\${escapeText(t.period || '/mo')}</span></div>
+                      <p style="color:#94a3b8; font-size:0.75rem; margin-bottom:0.75rem;">\${escapeText(t.description || '')}</p>
+                      <ul style="list-style:none; padding:0; margin:0 0 1rem; display:flex; flex-direction:column; gap:0.35rem; font-size:0.75rem; color:#e2e8f0;">
+                        \${feats.map(f => \`<li style="display:flex; gap:0.4rem; align-items:center;"><span style="color:#34d399; font-weight:900;">✓</span>\${escapeText(f)}</li>\`).join('')}
+                      </ul>
+                    </div>
+                    <button class="btn" style="width:100%; padding:0.5rem; font-size:0.8rem; background:\${isHigh ? 'linear-gradient(135deg,var(--primary),var(--secondary))' : 'rgba(255,255,255,0.08)'}; border-radius:var(--radius); font-weight:700;">\${escapeText(t.ctaText || 'Select Plan')}</button>
+                  </div>
+                \`;
+              }).join('')}
             </div>
           </div>\`;
         } else if (block.type === 'testimonials') {
-          previewHtml = \`<div style="text-align:center; padding:1rem 0;">
-            <blockquote style="font-size:1.1rem; color:#e2e8f0; font-style:italic; line-height:1.55; max-width:650px; margin:0 auto;">"\${escapeText(block.settings.quote || 'ETHENENGINE completely transformed our digital architecture.')}"</blockquote>
-            <div style="margin-top:0.75rem; font-weight:700; color:var(--primary); font-size:0.88rem;">— \${escapeText(block.settings.author || 'CTO, Fortune 500')}</div>
+          const list = Array.isArray(block.settings.testimonials) && block.settings.testimonials.length > 0 ? block.settings.testimonials : [
+            { quote: block.settings.quote || 'ETHENENGINE completely transformed our digital architecture.', author: block.settings.author || 'Lead Architect', rating: 5, avatarEmoji: '⭐' }
+          ];
+          previewHtml = \`<div>
+            <h3 style="text-align:center; font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:1.25rem;">\${escapeText(block.settings.title || 'Client Reviews')}</h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem;">
+              \${list.map(t => \`
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:1.25rem;">
+                  <div style="color:#fbbf24; font-size:0.9rem; margin-bottom:0.4rem;">\${'★'.repeat(Number(t.rating) || 5)}</div>
+                  <blockquote style="font-size:0.85rem; color:#e2e8f0; font-style:italic; line-height:1.5; margin:0 0 0.75rem;">"\${escapeText(t.quote || '')}"</blockquote>
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <div style="font-size:1.2rem;">\${escapeText(t.avatarEmoji || '👤')}</div>
+                    <div>
+                      <div style="font-weight:700; font-size:0.8rem; color:#fff;">\${escapeText(t.author || 'Anonymous')}</div>
+                      <div style="font-size:0.7rem; color:#94a3b8;">\${escapeText(t.role || t.company || '')}</div>
+                    </div>
+                  </div>
+                </div>
+              \`).join('')}
+            </div>
+          </div>\`;
+        } else if (block.type === 'faq') {
+          const faqs = Array.isArray(block.settings.faqs) && block.settings.faqs.length > 0 ? block.settings.faqs : [
+            { question: 'How is data secured?', answer: 'Zero-knowledge AES-256-GCM tenant encryption.' }
+          ];
+          previewHtml = \`<div>
+            <h3 style="text-align:center; font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:1rem;">\${escapeText(block.settings.title || 'FAQ')}</h3>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+              \${faqs.map(f => \`
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:0.85rem 1rem;">
+                  <div style="font-weight:700; font-size:0.9rem; color:#fff;">\${escapeText(f.question || 'Question')}</div>
+                  <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.35rem;">\${escapeText(f.answer || '')}</div>
+                </div>
+              \`).join('')}
+            </div>
           </div>\`;
         } else if (block.type === 'cta') {
           previewHtml = \`<div style="background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.18)); border:1px solid rgba(255,255,255,0.12); border-radius:var(--radius); padding:2rem; text-align:center;">
@@ -578,14 +839,6 @@ export function renderEditorView(options: EditorViewOptions): string {
                 <div style="color:#34d399; font-weight:900; margin-top:0.35rem;">$249</div>
               </div>
             </div>
-          </div>\`;
-        } else if (block.type === 'pagination') {
-          previewHtml = \`<div style="display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem 0;">
-            <span class="btn btn-secondary" style="padding:0.35rem 0.75rem; font-size:0.78rem;">\${escapeText(block.settings.prevText || '← Previous')}</span>
-            <span class="btn" style="width:30px; height:30px; padding:0; display:grid; place-content:center; font-size:0.82rem; font-weight:700;">1</span>
-            <span class="btn btn-secondary" style="width:30px; height:30px; padding:0; display:grid; place-content:center; font-size:0.82rem; font-weight:700;">2</span>
-            <span class="btn btn-secondary" style="width:30px; height:30px; padding:0; display:grid; place-content:center; font-size:0.82rem; font-weight:700;">3</span>
-            <span class="btn btn-secondary" style="padding:0.35rem 0.75rem; font-size:0.78rem;">\${escapeText(block.settings.nextText || 'Next →')}</span>
           </div>\`;
         } else if (block.type === 'form_builder') {
           previewHtml = \`<div style="max-width:550px; margin:0 auto; padding:1.5rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius);">
@@ -683,17 +936,18 @@ export function renderEditorView(options: EditorViewOptions): string {
         id: 'blk_' + Date.now(),
         type,
         settings: type === 'navbar' ? { brandName: 'LIORAMEDIA', logoInitial: 'L', ctaText: 'Client Portal', ctaUrl: '/login' }
-                : type === 'announcement_bar' ? { message: '🎉 Limited Time Offer: 20% off all production packages!', badgeText: 'SALE', linkText: 'View Deals', linkUrl: '#pricing' }
-                : type === 'product_grid' ? { title: 'Merchandise & Virtual Passes', subtitle: 'Shipped from multi-warehouse inventory.', price: 199 }
+                : type === 'announcement_bar' ? { message: '🎉 Limited Time Offer: 20% off all packages!', badgeText: 'SALE', linkText: 'View Deals', linkUrl: '#pricing' }
+                : type === 'product_grid' ? { title: 'Merchandise & Virtual Passes', subtitle: 'Shipped from multi-warehouse inventory.', items: [{ name: 'Virtual Pass', price: 199, tag: 'IN STOCK', image: '🎬' }, { name: 'VFX Plugin', price: 99, tag: 'DIGITAL', image: '💎' }] }
                 : type === 'pagination' ? { totalPages: 5, currentPage: 1, prevText: '← Previous', nextText: 'Next →' }
                 : type === 'footer' ? { brandName: 'LIORAMEDIA', copyrightText: '© 2026 ETHENENGINE All rights reserved.' }
-                : type === 'hero' ? { title: 'New Hero Headline', subtitle: 'Describe your high-impact value proposition here.', ctaText: 'Get Started', ctaUrl: '/' }
-                : type === 'features' ? { title: 'Core Features', items: [{ name: 'High Speed', desc: 'Sub-5ms execution runtime' }, { name: 'Secure Isolation', desc: 'Zero knowledge cryptographic privacy' }] }
+                : type === 'hero' ? { title: 'New Hero Headline', subtitle: 'Describe your high-impact value proposition here.', badgeText: '⚡ NEXT-GEN', ctaText: 'Get Started', ctaUrl: '/' }
+                : type === 'features' ? { title: 'Core Features', items: [{ icon: '⚡', name: 'High Speed', desc: 'Sub-5ms execution runtime' }, { icon: '🔒', name: 'Secure Isolation', desc: 'Zero knowledge cryptographic privacy' }] }
                 : type === 'stats' ? { stat1Val: '99.99%', stat1Label: 'SLA Uptime', stat2Val: '< 5ms', stat2Label: 'Edge Latency', stat3Val: '100%', stat3Label: 'Zero-Knowledge' }
                 : type === 'cms_feed' ? { title: 'Latest Case Studies & News', contentTypeSlug: 'blog-article', limit: 3 }
-                : type === 'pricing' ? { title: 'Pricing & Plans', planName: 'Professional', price: '49' }
-                : type === 'testimonials' ? { quote: 'Best platform architecture we have ever deployed.', author: 'Lead Architect' }
-                : type === 'cta' ? { headline: 'Start Your Free Enterprise Trial', buttonText: 'Get Started Today' }
+                : type === 'pricing' ? { title: 'Pricing & Plans', subtitle: 'Transparent tiers for every business scale.', currency: '$', billingPeriod: '/month', tiers: [{ name: 'Starter', price: '29', period: '/mo', badge: '', description: 'For individuals and creators', features: ['1 Tenant Org', 'Standard Analytics'], ctaText: 'Start Free', ctaUrl: '/login', isHighlighted: false }, { name: 'Pro Business', price: '99', period: '/mo', badge: 'POPULAR', description: 'For growing companies', features: ['Unlimited Workspaces', 'Zero-Knowledge Security', '24/7 Priority Support'], ctaText: 'Upgrade to Pro', ctaUrl: '/login', isHighlighted: true }] }
+                : type === 'testimonials' ? { title: 'Client Reviews', testimonials: [{ quote: 'Best platform architecture we have ever deployed.', author: 'Lead Architect', role: 'Enterprise CTO', rating: 5, avatarEmoji: '⭐' }] }
+                : type === 'faq' ? { title: 'Frequently Asked Questions', faqs: [{ question: 'How is data encrypted?', answer: 'Per-tenant PBKDF2 AES-256-GCM zero-knowledge keys.' }] }
+                : type === 'cta' ? { headline: 'Start Your Free Enterprise Trial', buttonText: 'Get Started Today', buttonUrl: '/login' }
                 : type === 'form_builder' ? { title: 'Request Enterprise Demo & Consultation', subtitle: 'Connect directly with our solutions team.', buttonText: 'Submit Inquiry' }
                 : {}
       };
@@ -748,157 +1002,117 @@ export function renderEditorView(options: EditorViewOptions): string {
       e.dataTransfer.dropEffect = 'move';
       const el = document.getElementById('canvasBlock_' + idx);
       if (!el) return;
-
-      const rect = el.getBoundingClientRect();
-      const midY = rect.top + rect.height / 2;
-      if (e.clientY < midY) {
-        el.classList.add('drag-over-top');
-        el.classList.remove('drag-over-bottom');
-      } else {
-        el.classList.add('drag-over-bottom');
-        el.classList.remove('drag-over-top');
-      }
+      el.classList.add('drag-over-target');
     }
 
     function onCanvasBlockDragLeave(e, idx) {
       const el = document.getElementById('canvasBlock_' + idx);
-      if (el) {
-        el.classList.remove('drag-over-top', 'drag-over-bottom');
-      }
+      if (el) el.classList.remove('drag-over-target');
     }
 
     function onCanvasBlockDrop(e, targetIdx) {
       e.preventDefault();
-      const el = document.getElementById('canvasBlock_' + targetIdx);
-      const isTop = el ? el.classList.contains('drag-over-top') : true;
-      if (el) el.classList.remove('drag-over-top', 'drag-over-bottom');
+      document.querySelectorAll('.canvas-block').forEach(el => {
+        el.classList.remove('drag-over-target');
+        el.classList.remove('dragging-item');
+      });
 
-      try {
-        const data = JSON.parse(e.dataTransfer.getData('text/plain') || '{}');
+      if (draggedBlockType) {
+        addBlock(draggedBlockType);
+        draggedBlockType = null;
+      } else if (draggedCanvasBlockIdx !== null && draggedCanvasBlockIdx !== targetIdx) {
         undoHistory = JSON.parse(JSON.stringify(pageData.blocks));
-
-        if (data.source === 'drawer' && data.type) {
-          const newBlock = {
-            id: 'blk_' + Date.now(),
-            type: data.type,
-            settings: data.type === 'navbar' ? { brandName: 'LIORAMEDIA', logoInitial: 'L', ctaText: 'Client Portal', ctaUrl: '/login' }
-                    : data.type === 'hero' ? { title: 'New Hero Headline', subtitle: 'High impact value proposition.', ctaText: 'Get Started', ctaUrl: '/' }
-                    : data.type === 'features' ? { title: 'Core Features', items: [{ name: 'High Speed', desc: 'Sub-5ms execution runtime' }] }
-                    : data.type === 'product_grid' ? { title: 'Merchandise Showcase', subtitle: 'Shipped from inventory.', price: 199 }
-                    : data.type === 'pricing' ? { title: 'Pricing Plans', planName: 'Pro Tier', price: '49' }
-                    : data.type === 'testimonials' ? { quote: 'Superb architecture.', author: 'Lead Architect' }
-                    : data.type === 'cta' ? { headline: 'Start Your Enterprise Trial', buttonText: 'Get Started' }
-                    : data.type === 'form_builder' ? { title: 'Request Enterprise Demo & Consultation', subtitle: 'Connect directly with our solutions team.', buttonText: 'Submit Inquiry' }
-                    : {}
-          };
-          const insertPos = isTop ? targetIdx : targetIdx + 1;
-          pageData.blocks.splice(insertPos, 0, newBlock);
-          selectedBlockIndex = insertPos;
-          renderCanvas();
-          showToast(\`Inserted '\${data.type}' via Drag & Drop!\`, true);
-        } else if (data.source === 'canvas' && typeof data.index === 'number') {
-          const sourceIdx = data.index;
-          if (sourceIdx === targetIdx) return;
-          const [moved] = pageData.blocks.splice(sourceIdx, 1);
-          let newTarget = isTop ? targetIdx : targetIdx + 1;
-          if (sourceIdx < newTarget) newTarget -= 1;
-          pageData.blocks.splice(newTarget, 0, moved);
-          selectedBlockIndex = newTarget;
-          renderCanvas();
-          showToast('Block position reordered!', true);
-        }
-      } catch (err) {
-        console.error('Drop error:', err);
+        const movedItem = pageData.blocks.splice(draggedCanvasBlockIdx, 1)[0];
+        pageData.blocks.splice(targetIdx, 0, movedItem);
+        selectedBlockIndex = targetIdx;
+        renderCanvas();
+        showToast('Block reordered successfully!', true);
       }
+      draggedCanvasBlockIdx = null;
     }
 
-    /* WCAG 2.2 Luminance & Contrast Ratio Calculator */
-    function getLuminance(hex) {
-      const rgb = parseInt(hex.replace('#', ''), 16);
+    function applyHolidayEffect(effectId) {
+      const tokens = { holidayEffect: effectId === 'none' ? null : effectId };
+      const styleEl = document.getElementById('dynamicHolidayStyle');
+      
+      if (effectId === 'none') {
+        if (styleEl) styleEl.innerHTML = '';
+      } else if (effectId === 'snow') {
+        if (styleEl) styleEl.innerHTML = '.canvas-container::before { content:"❄ ❅ ❆ ❄ ❅"; position:fixed; top:0; left:0; width:100%; pointer-events:none; font-size:1.5rem; color:rgba(255,255,255,0.7); animation: snowfall 10s linear infinite; }';
+      } else if (effectId === 'fireworks') {
+        if (styleEl) styleEl.innerHTML = '.canvas-container::before { content:"✨ 🎆 ✨ 🎇"; position:fixed; top:10px; right:20px; pointer-events:none; font-size:1.8rem; animation: pulse 2s ease-in-out infinite; }';
+      } else if (effectId === 'cyber_sale') {
+        if (styleEl) styleEl.innerHTML = '.canvas-container { border:2px solid #22d3ee; box-shadow:0 0 30px rgba(34,211,238,0.3); }';
+      }
+
+      fetch('/api/theme', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') },
+        body: JSON.stringify({ tokens })
+      });
+      showToast('Holiday effect applied!');
+    }
+
+    function calculateLuminance(hex) {
+      const c = hex.replace('#', '');
+      const rgb = parseInt(c, 16);
       const r = (rgb >> 16) & 0xff;
       const g = (rgb >> 8) & 0xff;
-      const b = rgb & 0xff;
-      const [rs, gs, bs] = [r, g, b].map(c => {
-        c /= 255;
-        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      });
-      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-    }
-
-    function calculateContrastRatio(hex1, hex2) {
-      const l1 = getLuminance(hex1);
-      const l2 = getLuminance(hex2);
-      const lighter = Math.max(l1, l2);
-      const darker = Math.min(l1, l2);
-      return (lighter + 0.05) / (darker + 0.05);
+      const b = (rgb >> 0) & 0xff;
+      return 0.2126 * (r/255) + 0.7152 * (g/255) + 0.0722 * (b/255);
     }
 
     function updateWcagBadges() {
       const primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#6366f1';
       const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#070a12';
-      const ratio = calculateContrastRatio(primary, bg).toFixed(1);
+      
+      const l1 = calculateLuminance(primary);
+      const l2 = calculateLuminance(bg);
+      const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 
       const badge = document.getElementById('wcagBadge');
       if (!badge) return;
 
       if (ratio >= 7.0) {
         badge.className = 'wcag-badge wcag-pass';
-        badge.innerText = \`✓ AAA Pass (\${ratio}:1)\`;
+        badge.innerText = '✓ AAA Pass (' + ratio.toFixed(1) + ':1)';
       } else if (ratio >= 4.5) {
         badge.className = 'wcag-badge wcag-pass';
-        badge.innerText = \`✓ AA Pass (\${ratio}:1)\`;
+        badge.innerText = '✓ AA Pass (' + ratio.toFixed(1) + ':1)';
       } else {
-        badge.className = 'wcag-badge wcag-fail';
-        badge.innerText = \`✕ Fail (\${ratio}:1)\`;
-      }
-    }
-
-    async function applyPreset(presetKey) {
-      try {
-        const res = await fetch('/api/theme/presets/' + presetKey, {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') }
-        });
-        const data = await res.json();
-        if (res.ok) {
-          applyThemeTokensLocally(data.theme.tokens);
-          showToast('Applied ' + presetKey + ' theme preset!');
-        }
-      } catch (e) {
-        alert('Failed to apply preset.');
-      }
-    }
-
-    async function applyHolidayEffect(effKey) {
-      try {
-        const res = await fetch('/api/theme', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') },
-          body: JSON.stringify({ tokens: { holidayEffect: effKey === 'none' ? undefined : effKey } })
-        });
-        if (res.ok) {
-          window.location.reload();
-        }
-      } catch (e) {
-        alert('Failed to update holiday overlay.');
+        badge.className = 'wcag-badge wcag-warn';
+        badge.innerText = '⚠️ Low Contrast (' + ratio.toFixed(1) + ':1)';
       }
     }
 
     function applyDayMode() {
-      applyPreset('day_clean');
+      updateThemeToken('backgroundColor', '#f8fafc');
+      updateThemeToken('cardBg', '#ffffff');
+      updateThemeToken('primaryColor', '#4f46e5');
+      document.documentElement.style.setProperty('--text', '#0f172a');
+      showToast('☀️ Clean Day Mode applied!');
     }
 
     function applyNightMode() {
-      applyPreset('midnight_slate');
+      updateThemeToken('backgroundColor', '#070a12');
+      updateThemeToken('cardBg', '#0f172a');
+      updateThemeToken('primaryColor', '#6366f1');
+      document.documentElement.style.setProperty('--text', '#f8fafc');
+      showToast('🌙 Midnight Slate Night Mode applied!');
     }
 
-    function applyThemeTokensLocally(tokens) {
-      if (tokens.primaryColor) document.documentElement.style.setProperty('--primary', tokens.primaryColor);
-      if (tokens.secondaryColor) document.documentElement.style.setProperty('--secondary', tokens.secondaryColor);
-      if (tokens.backgroundColor) document.documentElement.style.setProperty('--bg', tokens.backgroundColor);
-      if (tokens.cardBg) document.documentElement.style.setProperty('--card-bg', tokens.cardBg);
+    function applyPreset(presetKey) {
+      const presets = ${JSON.stringify(THEME_PRESETS)};
+      const p = presets[presetKey];
+      if (!p) return;
+      const tokens = p.tokens;
+      if (tokens.primaryColor) updateThemeToken('primaryColor', tokens.primaryColor);
+      if (tokens.secondaryColor) updateThemeToken('secondaryColor', tokens.secondaryColor);
+      if (tokens.backgroundColor) updateThemeToken('backgroundColor', tokens.backgroundColor);
+      if (tokens.cardBg) updateThemeToken('cardBg', tokens.cardBg);
       if (tokens.borderRadius) document.documentElement.style.setProperty('--radius', tokens.borderRadius);
       updateWcagBadges();
+      showToast('Preset "' + p.name + '" applied!');
     }
 
     async function updateThemeToken(tokenKey, value) {
@@ -964,6 +1178,7 @@ export function renderEditorView(options: EditorViewOptions): string {
       showToast('🎲 Palette harmonized & updated!');
     }
 
+    /* Deep Inspector Form Engine for All Components */
     function renderInspector() {
       const block = pageData.blocks[selectedBlockIndex];
       const inspector = document.getElementById('inspectorContent');
@@ -975,9 +1190,277 @@ export function renderEditorView(options: EditorViewOptions): string {
       }
 
       if (badge) badge.innerText = block.type.toUpperCase();
-      let fieldsHtml = \`<div style="font-weight:800; color:#38bdf8; margin-bottom:0.75rem; font-size:0.85rem;">\${block.type.toUpperCase()} SETTINGS</div>\`;
+      let fieldsHtml = \`<div style="font-weight:800; color:#38bdf8; margin-bottom:0.85rem; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center;">
+        <span>\${block.type.toUpperCase()} CONFIGURATION</span>
+        <span style="color:#64748b; font-size:0.7rem; font-family:monospace;">#\${selectedBlockIndex + 1}</span>
+      </div>\`;
 
-      if (block.type === 'navbar') {
+      if (block.type === 'pricing') {
+        const currency = block.settings.currency || '$';
+        const billingPeriod = block.settings.billingPeriod || '/month';
+        const tiers = Array.isArray(block.settings.tiers) ? block.settings.tiers : [];
+
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Section Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Section Subtitle</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <div class="field-group">
+              <label class="field-label">Currency</label>
+              <input class="field-input" value="\${escapeText(currency)}" oninput="updateSetting('currency', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Billing Cycle</label>
+              <input class="field-input" value="\${escapeText(billingPeriod)}" oninput="updateSetting('billingPeriod', this.value)" />
+            </div>
+          </div>
+
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Pricing Tiers (\${tiers.length})</div>
+            \${tiers.map((t, tIdx) => {
+              const featsText = Array.isArray(t.features) ? t.features.join('\\n') : String(t.features || '');
+              return \`
+                <div class="inspector-item-card">
+                  <div class="inspector-item-header">
+                    <span>Tier \${tIdx + 1}: \${escapeText(t.name || 'Plan')}</span>
+                    <button class="inspector-del-btn" onclick="removeArrayItem('tiers', \${tIdx})">✕ Delete</button>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Tier Name</label>
+                    <input class="field-input" value="\${escapeText(t.name || '')}" oninput="updateArrayItem('tiers', \${tIdx}, 'name', this.value)" />
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+                    <div class="field-group">
+                      <label class="field-label">Price Amount</label>
+                      <input class="field-input" value="\${escapeText(String(t.price || ''))}" oninput="updateArrayItem('tiers', \${tIdx}, 'price', this.value)" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Badge Ribbon</label>
+                      <input class="field-input" placeholder="POPULAR" value="\${escapeText(t.badge || '')}" oninput="updateArrayItem('tiers', \${tIdx}, 'badge', this.value)" />
+                    </div>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Short Description</label>
+                    <input class="field-input" value="\${escapeText(t.description || '')}" oninput="updateArrayItem('tiers', \${tIdx}, 'description', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Features (1 per line)</label>
+                    <textarea class="field-input" rows="3" oninput="updateArrayItem('tiers', \${tIdx}, 'features', this.value.split('\\n'))">\${escapeText(featsText)}</textarea>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+                    <div class="field-group">
+                      <label class="field-label">Button Text</label>
+                      <input class="field-input" value="\${escapeText(t.ctaText || 'Get Started')}" oninput="updateArrayItem('tiers', \${tIdx}, 'ctaText', this.value)" />
+                    </div>
+                    <div class="field-group">
+                      <label class="field-label">Button Link</label>
+                      <input class="field-input" value="\${escapeText(t.ctaUrl || '/login')}" oninput="updateArrayItem('tiers', \${tIdx}, 'ctaUrl', this.value)" />
+                    </div>
+                  </div>
+                  <div style="margin-top:0.4rem; display:flex; align-items:center; gap:0.4rem;">
+                    <input type="checkbox" id="tierHigh_\${tIdx}" \${t.isHighlighted ? 'checked' : ''} onchange="updateArrayItem('tiers', \${tIdx}, 'isHighlighted', this.checked)" />
+                    <label for="tierHigh_\${tIdx}" style="font-size:0.75rem; color:#fff; font-weight:700; cursor:pointer;">⭐ Highlight as Most Popular / Featured</label>
+                  </div>
+                </div>
+              \`;
+            }).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('tiers', { name: 'New Tier', price: '49', period: '/mo', badge: '', description: 'Tier description', features: ['Feature 1', 'Feature 2'], ctaText: 'Select Plan', ctaUrl: '/login', isHighlighted: false })">+ Add Pricing Tier</button>
+          </div>
+        \`;
+      } else if (block.type === 'features') {
+        const items = Array.isArray(block.settings.items) ? block.settings.items : [];
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Section Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Section Subtitle</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Feature Cards (\${items.length})</div>
+            \${items.map((it, iIdx) => \`
+              <div class="inspector-item-card">
+                <div class="inspector-item-header">
+                  <span>Card \${iIdx + 1}</span>
+                  <button class="inspector-del-btn" onclick="removeArrayItem('items', \${iIdx})">✕ Delete</button>
+                </div>
+                <div style="display:grid; grid-template-columns:50px 1fr; gap:0.4rem;">
+                  <div class="field-group">
+                    <label class="field-label">Icon</label>
+                    <input class="field-input" value="\${escapeText(it.icon || '⚡')}" oninput="updateArrayItem('items', \${iIdx}, 'icon', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Feature Name</label>
+                    <input class="field-input" value="\${escapeText(it.name || '')}" oninput="updateArrayItem('items', \${iIdx}, 'name', this.value)" />
+                  </div>
+                </div>
+                <div class="field-group" style="margin-top:0.4rem;">
+                  <label class="field-label">Description</label>
+                  <textarea class="field-input" rows="2" oninput="updateArrayItem('items', \${iIdx}, 'desc', this.value)">\${escapeText(it.desc || '')}</textarea>
+                </div>
+              </div>
+            \`).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('items', { icon: '✨', name: 'New Capability', desc: 'Detailed explanation of feature benefit.' })">+ Add Feature Card</button>
+          </div>
+        \`;
+      } else if (block.type === 'testimonials') {
+        const list = Array.isArray(block.settings.testimonials) ? block.settings.testimonials : [];
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Section Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Section Subtitle</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Customer Reviews (\${list.length})</div>
+            \${list.map((t, tIdx) => \`
+              <div class="inspector-item-card">
+                <div class="inspector-item-header">
+                  <span>Review \${tIdx + 1}</span>
+                  <button class="inspector-del-btn" onclick="removeArrayItem('testimonials', \${tIdx})">✕ Delete</button>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Quote Body</label>
+                  <textarea class="field-input" rows="2" oninput="updateArrayItem('testimonials', \${tIdx}, 'quote', this.value)">\${escapeText(t.quote || '')}</textarea>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+                  <div class="field-group">
+                    <label class="field-label">Author Name</label>
+                    <input class="field-input" value="\${escapeText(t.author || '')}" oninput="updateArrayItem('testimonials', \${tIdx}, 'author', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Role / Company</label>
+                    <input class="field-input" value="\${escapeText(t.role || t.company || '')}" oninput="updateArrayItem('testimonials', \${tIdx}, 'role', this.value)" />
+                  </div>
+                </div>
+                <div style="display:grid; grid-template-columns:60px 1fr; gap:0.4rem; margin-top:0.4rem;">
+                  <div class="field-group">
+                    <label class="field-label">Avatar</label>
+                    <input class="field-input" value="\${escapeText(t.avatarEmoji || '⭐')}" oninput="updateArrayItem('testimonials', \${tIdx}, 'avatarEmoji', this.value)" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Rating Stars</label>
+                    <select class="field-input" onchange="updateArrayItem('testimonials', \${tIdx}, 'rating', parseInt(this.value, 10))">
+                      <option value="5" \${t.rating === 5 ? 'selected' : ''}>★★★★★ (5 Stars)</option>
+                      <option value="4" \${t.rating === 4 ? 'selected' : ''}>★★★★☆ (4 Stars)</option>
+                      <option value="3" \${t.rating === 3 ? 'selected' : ''}>★★★☆☆ (3 Stars)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            \`).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('testimonials', { quote: 'Incredible platform that scaled our operations.', author: 'Alex Morgan', role: 'VP of Engineering', rating: 5, avatarEmoji: '👤' })">+ Add Testimonial</button>
+          </div>
+        \`;
+      } else if (block.type === 'faq') {
+        const faqs = Array.isArray(block.settings.faqs) ? block.settings.faqs : [];
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Section Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Section Subtitle</label>
+            <textarea class="field-input" rows="2" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div style="margin-top:1rem; border-top:1px solid rgba(255,255,255,0.08); padding-top:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:800; color:#fff; text-transform:uppercase; margin-bottom:0.6rem;">Questions & Answers (\${faqs.length})</div>
+            \${faqs.map((f, fIdx) => \`
+              <div class="inspector-item-card">
+                <div class="inspector-item-header">
+                  <span>Q\${fIdx + 1}</span>
+                  <button class="inspector-del-btn" onclick="removeArrayItem('faqs', \${fIdx})">✕ Delete</button>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Question</label>
+                  <input class="field-input" value="\${escapeText(f.question || '')}" oninput="updateArrayItem('faqs', \${fIdx}, 'question', this.value)" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Answer</label>
+                  <textarea class="field-input" rows="2" oninput="updateArrayItem('faqs', \${fIdx}, 'answer', this.value)">\${escapeText(f.answer || '')}</textarea>
+                </div>
+              </div>
+            \`).join('')}
+            <button class="inspector-add-btn" onclick="addArrayItem('faqs', { question: 'New Question?', answer: 'Detailed response here.' })">+ Add Question</button>
+          </div>
+        \`;
+      } else if (block.type === 'hero') {
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Badge / Eyebrow Text</label>
+            <input class="field-input" placeholder="⚡ NEXT-GEN PLATFORM" value="\${escapeText(block.settings.badgeText || '')}" oninput="updateSetting('badgeText', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Headline Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Subtitle</label>
+            <textarea class="field-input" rows="3" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Primary CTA Text</label>
+              <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Primary CTA URL</label>
+              <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '/')}" oninput="updateSetting('ctaUrl', this.value)" />
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.4rem;">
+            <div class="field-group">
+              <label class="field-label">Secondary CTA Text</label>
+              <input class="field-input" placeholder="Learn More" value="\${escapeText(block.settings.secondaryCtaText || '')}" oninput="updateSetting('secondaryCtaText', this.value)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Alignment</label>
+              <select class="field-input" onchange="updateSetting('align', this.value)">
+                <option value="center" \${block.settings.align !== 'left' ? 'selected' : ''}>Center</option>
+                <option value="left" \${block.settings.align === 'left' ? 'selected' : ''}>Left</option>
+              </select>
+            </div>
+          </div>
+        \`;
+      } else if (block.type === 'stats') {
+        fieldsHtml += \`
+          <div class="field-group">
+            <label class="field-label">Section Title</label>
+            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stat 1 (Value / Label)</label>
+            <div style="display:flex; gap:0.4rem;">
+              <input class="field-input" placeholder="99.9%" value="\${escapeText(block.settings.stat1Val || '')}" oninput="updateSetting('stat1Val', this.value)" />
+              <input class="field-input" placeholder="Uptime SLA" value="\${escapeText(block.settings.stat1Label || '')}" oninput="updateSetting('stat1Label', this.value)" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stat 2 (Value / Label)</label>
+            <div style="display:flex; gap:0.4rem;">
+              <input class="field-input" placeholder="< 5ms" value="\${escapeText(block.settings.stat2Val || '')}" oninput="updateSetting('stat2Val', this.value)" />
+              <input class="field-input" placeholder="Edge Latency" value="\${escapeText(block.settings.stat2Label || '')}" oninput="updateSetting('stat2Label', this.value)" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stat 3 (Value / Label)</label>
+            <div style="display:flex; gap:0.4rem;">
+              <input class="field-input" placeholder="100%" value="\${escapeText(block.settings.stat3Val || '')}" oninput="updateSetting('stat3Val', this.value)" />
+              <input class="field-input" placeholder="Zero-Knowledge" value="\${escapeText(block.settings.stat3Label || '')}" oninput="updateSetting('stat3Label', this.value)" />
+            </div>
+          </div>
+        \`;
+      } else if (block.type === 'navbar') {
         fieldsHtml += \`
           <div class="field-group">
             <label class="field-label">Brand Logo Text</label>
@@ -991,6 +1474,10 @@ export function renderEditorView(options: EditorViewOptions): string {
             <label class="field-label">CTA Button Text</label>
             <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
           </div>
+          <div class="field-group">
+            <label class="field-label">CTA Button Link</label>
+            <input class="field-input" value="\${escapeText(block.settings.ctaUrl || '/login')}" oninput="updateSetting('ctaUrl', this.value)" />
+          </div>
         \`;
       } else if (block.type === 'announcement_bar') {
         fieldsHtml += \`
@@ -1003,34 +1490,19 @@ export function renderEditorView(options: EditorViewOptions): string {
             <input class="field-input" value="\${escapeText(block.settings.badgeText || '')}" oninput="updateSetting('badgeText', this.value)" />
           </div>
         \`;
-      } else if (block.type === 'product_grid') {
+      } else if (block.type === 'cta') {
         fieldsHtml += \`
           <div class="field-group">
-            <label class="field-label">Catalog Headline</label>
-            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
+            <label class="field-label">Banner Headline</label>
+            <input class="field-input" value="\${escapeText(block.settings.headline || '')}" oninput="updateSetting('headline', this.value)" />
           </div>
           <div class="field-group">
-            <label class="field-label">Catalog Subtitle</label>
-            <input class="field-input" value="\${escapeText(block.settings.subtitle || '')}" oninput="updateSetting('subtitle', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'pagination') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Total Pages Count</label>
-            <input type="number" class="field-input" value="\${escapeText(block.settings.totalPages || 5)}" oninput="updateSetting('totalPages', this.value)" />
+            <label class="field-label">Button Label</label>
+            <input class="field-input" value="\${escapeText(block.settings.buttonText || '')}" oninput="updateSetting('buttonText', this.value)" />
           </div>
           <div class="field-group">
-            <label class="field-label">Current Active Page</label>
-            <input type="number" class="field-input" value="\${escapeText(block.settings.currentPage || 1)}" oninput="updateSetting('currentPage', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Previous Button Text</label>
-            <input class="field-input" value="\${escapeText(block.settings.prevText || '← Previous')}" oninput="updateSetting('prevText', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Next Button Text</label>
-            <input class="field-input" value="\${escapeText(block.settings.nextText || 'Next →')}" oninput="updateSetting('nextText', this.value)" />
+            <label class="field-label">Button Link URL</label>
+            <input class="field-input" value="\${escapeText(block.settings.buttonUrl || '/login')}" oninput="updateSetting('buttonUrl', this.value)" />
           </div>
         \`;
       } else if (block.type === 'footer') {
@@ -1042,82 +1514,6 @@ export function renderEditorView(options: EditorViewOptions): string {
           <div class="field-group">
             <label class="field-label">Copyright Notice</label>
             <input class="field-input" value="\${escapeText(block.settings.copyrightText || '')}" oninput="updateSetting('copyrightText', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'hero') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Headline Title</label>
-            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Subtitle</label>
-            <textarea class="field-input" rows="3" oninput="updateSetting('subtitle', this.value)">\${escapeText(block.settings.subtitle || '')}</textarea>
-          </div>
-          <div class="field-group">
-            <label class="field-label">Button CTA Text</label>
-            <input class="field-input" value="\${escapeText(block.settings.ctaText || '')}" oninput="updateSetting('ctaText', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'stats') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Stat 1 (Value / Label)</label>
-            <div style="display:flex; gap:0.5rem;">
-              <input class="field-input" placeholder="99.9%" value="\${escapeText(block.settings.stat1Val || '')}" oninput="updateSetting('stat1Label', this.value)" />
-              <input class="field-input" placeholder="Uptime" value="\${escapeText(block.settings.stat1Label || '')}" oninput="updateSetting('stat1Label', this.value)" />
-            </div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">Stat 2 (Value / Label)</label>
-            <div style="display:flex; gap:0.5rem;">
-              <input class="field-input" placeholder="< 5ms" value="\${escapeText(block.settings.stat2Val || '')}" oninput="updateSetting('stat2Val', this.value)" />
-              <input class="field-input" placeholder="Latency" value="\${escapeText(block.settings.stat2Label || '')}" oninput="updateSetting('stat2Label', this.value)" />
-            </div>
-          </div>
-        \`;
-      } else if (block.type === 'cta') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Banner Headline</label>
-            <input class="field-input" value="\${escapeText(block.settings.headline || '')}" oninput="updateSetting('headline', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Button Label</label>
-            <input class="field-input" value="\${escapeText(block.settings.buttonText || '')}" oninput="updateSetting('buttonText', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'pricing') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Plan Name</label>
-            <input class="field-input" value="\${escapeText(block.settings.planName || '')}" oninput="updateSetting('planName', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Monthly Price ($)</label>
-            <input class="field-input" value="\${escapeText(block.settings.price || '')}" oninput="updateSetting('price', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'testimonials') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Quote Text</label>
-            <textarea class="field-input" rows="3" oninput="updateSetting('quote', this.value)">\${escapeText(block.settings.quote || '')}</textarea>
-          </div>
-          <div class="field-group">
-            <label class="field-label">Author / Role</label>
-            <input class="field-input" value="\${escapeText(block.settings.author || '')}" oninput="updateSetting('author', this.value)" />
-          </div>
-        \`;
-      } else if (block.type === 'cms_feed') {
-        fieldsHtml += \`
-          <div class="field-group">
-            <label class="field-label">Feed Title</label>
-            <input class="field-input" value="\${escapeText(block.settings.title || '')}" oninput="updateSetting('title', this.value)" />
-          </div>
-          <div class="field-group">
-            <label class="field-label">Content Type Slug</label>
-            <input class="field-input" value="\${escapeText(block.settings.contentTypeSlug || 'blog-article')}" oninput="updateSetting('contentTypeSlug', this.value)" />
           </div>
         \`;
       } else if (block.type === 'form_builder') {
@@ -1150,7 +1546,34 @@ export function renderEditorView(options: EditorViewOptions): string {
     function updateSetting(key, val) {
       if (!pageData.blocks || !pageData.blocks[selectedBlockIndex]) return;
       pageData.blocks[selectedBlockIndex].settings[key] = val;
-      renderCanvas(false); // Update canvas visual preview without blowing away the active focused input!
+      renderCanvas(false);
+    }
+
+    function updateArrayItem(arrayKey, itemIdx, field, val) {
+      if (!pageData.blocks || !pageData.blocks[selectedBlockIndex]) return;
+      const settings = pageData.blocks[selectedBlockIndex].settings;
+      if (!Array.isArray(settings[arrayKey])) settings[arrayKey] = [];
+      if (!settings[arrayKey][itemIdx]) settings[arrayKey][itemIdx] = {};
+      settings[arrayKey][itemIdx][field] = val;
+      renderCanvas(false);
+    }
+
+    function addArrayItem(arrayKey, defaultItem) {
+      if (!pageData.blocks || !pageData.blocks[selectedBlockIndex]) return;
+      const settings = pageData.blocks[selectedBlockIndex].settings;
+      if (!Array.isArray(settings[arrayKey])) settings[arrayKey] = [];
+      settings[arrayKey].push(defaultItem);
+      renderCanvas(true);
+      showToast('Item added!');
+    }
+
+    function removeArrayItem(arrayKey, itemIdx) {
+      if (!pageData.blocks || !pageData.blocks[selectedBlockIndex]) return;
+      const settings = pageData.blocks[selectedBlockIndex].settings;
+      if (!Array.isArray(settings[arrayKey])) return;
+      settings[arrayKey].splice(itemIdx, 1);
+      renderCanvas(true);
+      showToast('Item removed!');
     }
 
     async function savePage() {
@@ -1173,6 +1596,7 @@ export function renderEditorView(options: EditorViewOptions): string {
         const data = await res.json();
         if (res.ok) {
           showToast('✅ Page saved successfully!');
+          refreshPreviewIframe();
         } else {
           showToast('⚠️ ' + (data.error || 'Failed to save page.'));
         }
@@ -1187,16 +1611,16 @@ export function renderEditorView(options: EditorViewOptions): string {
     }
 
     function escapeText(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     // Real-Time Collaboration & Presence Client Sync Engine
     const collabUser = {
       id: 'usr_' + Math.random().toString(36).slice(2, 9),
       name: localStorage.getItem('collab_username') || ('Designer ' + Math.floor(100 + Math.random() * 900)),
-      avatarColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#38bdf8', '#a855f7'][Math.floor(Math.random() * 6)],
+      avatarColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6'][Math.floor(Math.random() * 6)],
       cursor: { x: 0, y: 0 },
-      lastOperationTimestamp: 0
+      lastOperationTimestamp: Date.now()
     };
 
     const canvasContainer = document.getElementById('canvasContainer');
@@ -1226,7 +1650,6 @@ export function renderEditorView(options: EditorViewOptions): string {
         const data = await res.json();
         if (data.collaborators) {
           renderCollaboratorAvatars(data.collaborators);
-          renderRemoteCursors(data.collaborators.filter(c => c.id !== collabUser.id));
         }
       } catch (e) {
         // Silent presence reconnect
@@ -1236,7 +1659,7 @@ export function renderEditorView(options: EditorViewOptions): string {
     function renderCollaboratorAvatars(collaborators) {
       const stack = document.getElementById('collaboratorAvatarStack');
       const countEl = document.getElementById('presenceCountText');
-      if (countEl) countEl.innerText = collaborators.length + (collaborators.length === 1 ? ' Live' : ' Live');
+      if (countEl) countEl.innerText = collaborators.length + ' Live';
       if (!stack) return;
 
       stack.innerHTML = collaborators.map(c => \`
@@ -1246,52 +1669,15 @@ export function renderEditorView(options: EditorViewOptions): string {
       \`).join('');
     }
 
-    function renderRemoteCursors(remoteUsers) {
-      const container = document.getElementById('canvasContainer');
-      if (!container) return;
-
-      // Remove existing remote cursors
-      document.querySelectorAll('.remote-cursor').forEach(el => el.remove());
-      document.querySelectorAll('.canvas-block').forEach(el => {
-        el.classList.remove('co-editing');
-        el.removeAttribute('data-co-editor');
-      });
-
-      remoteUsers.forEach(user => {
-        if (user.cursor && (user.cursor.x > 0 || user.cursor.y > 0)) {
-          const cursorEl = document.createElement('div');
-          cursorEl.className = 'remote-cursor';
-          cursorEl.style.left = user.cursor.x + 'px';
-          cursorEl.style.top = user.cursor.y + 'px';
-          cursorEl.innerHTML = \`
-            <svg class="remote-cursor-pointer" viewBox="0 0 24 24" fill="\${user.avatarColor}">
-              <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.85a.5.5 0 0 0-.85.36z"/>
-            </svg>
-            <span class="remote-cursor-label" style="background:\${user.avatarColor};">\${escapeText(user.name)}</span>
-          \`;
-          container.appendChild(cursorEl);
-        }
-
-        // Highlight block if being co-edited by remote teammate
-        if (typeof user.selectedBlockIndex === 'number') {
-          const blockEl = document.getElementById('canvasBlock_' + user.selectedBlockIndex);
-          if (blockEl) {
-            blockEl.classList.add('co-editing');
-            blockEl.setAttribute('data-co-editor', user.name + ' editing');
-            blockEl.style.setProperty('--co-edit-color', user.avatarColor);
-          }
-        }
-      });
-    }
-
     // Start Real-Time Presence Heartbeat (every 2.5 seconds)
     syncCollabPresence();
     setInterval(syncCollabPresence, 2500);
 
-    // Initial Render
+    // Initial Render & Setup Split Mode
     renderCanvas();
     renderHarmonizer();
     updateWcagBadges();
+    setStudioViewMode('split');
   </script>
 
   <!-- INTERACTIVE TOAST NOTIFICATION CONTAINER -->

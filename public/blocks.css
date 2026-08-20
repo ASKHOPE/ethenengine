@@ -458,3 +458,21 @@
   border-radius: 8px;
   text-decoration: none;
 }
+
+/* 13. FAQ ACCORDION */
+.block-faq {
+  padding: clamp(2rem, 5vw, 4rem) 1.5rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.block-faq details summary {
+  user-select: none;
+  transition: color 0.15s ease;
+}
+.block-faq details summary:hover {
+  color: var(--color-primary, #6366f1);
+}
+.block-faq details[open] summary span:last-child {
+  transform: rotate(180deg);
+}
+
