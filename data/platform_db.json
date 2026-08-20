@@ -7,7 +7,7 @@
       "slug": "default",
       "domain": "ethenengine.com",
       "status": "active",
-      "createdAt": "2026-08-20T16:23:16.991Z"
+      "createdAt": "2026-08-20T16:33:23.101Z"
     },
     {
       "id": "tenant_lioramedia",
@@ -16,7 +16,7 @@
       "slug": "lioramedia",
       "domain": "lioramedia.localhost",
       "status": "active",
-      "createdAt": "2026-08-20T16:23:17.107Z"
+      "createdAt": "2026-08-20T16:33:23.211Z"
     }
   ],
   "pages": [
@@ -121,7 +121,7 @@
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787242997161",
+      "contentTypeId": "ct_1787243603263",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -130,26 +130,12 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787242997161",
-      "updatedAt": "2026-08-20T16:23:17.161Z"
+      "id": "entry_1787243603263",
+      "updatedAt": "2026-08-20T16:33:23.263Z"
     },
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787242997213",
-      "slug": "warner-bros-virtual-stage",
-      "data": {
-        "title": "Warner Bros Sci-Fi Feature Virtual Production Stage",
-        "content": "Operated 120-panel LED volume stage with real-time camera tracking, reducing post-production VFX timelines by 40%.",
-        "author": "VFX Supervisor",
-        "client": "Warner Bros Discovery"
-      },
-      "status": "published",
-      "id": "entry_1787242997213",
-      "updatedAt": "2026-08-20T16:23:17.213Z"
-    },
-    {
-      "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787242997213",
+      "contentTypeId": "ct_1787243603315",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -158,8 +144,8 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787242997214",
-      "updatedAt": "2026-08-20T16:23:17.214Z"
+      "id": "entry_1787243603315",
+      "updatedAt": "2026-08-20T16:33:23.315Z"
     }
   ],
   "products": [
@@ -171,7 +157,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787242997161"
+      "id": "prod_1787243603263"
     },
     {
       "tenantId": "tenant_lioramedia",
@@ -181,7 +167,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787242997214"
+      "id": "prod_1787243603315"
     }
   ],
   "leads": [
@@ -192,8 +178,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787242997161",
-      "createdAt": "2026-08-20T16:23:17.161Z"
+      "id": "lead_1787243603263",
+      "createdAt": "2026-08-20T16:33:23.263Z"
     },
     {
       "tenantId": "tenant_lioramedia",
@@ -202,8 +188,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787242997214",
-      "createdAt": "2026-08-20T16:23:17.214Z"
+      "id": "lead_1787243603315",
+      "createdAt": "2026-08-20T16:33:23.315Z"
     }
   ]
 }
