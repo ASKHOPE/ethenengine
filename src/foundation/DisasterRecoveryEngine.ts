@@ -26,60 +26,52 @@ export class DisasterRecoveryEngine {
     return DisasterRecoveryEngine.instance;
   }
 
-  public async createBackup(tenantId: string): Promise<BackupMetadata> {
-    const startTime = Date.now();
-    const backupId = `bkp_${tenantId}_${Date.now()}`;
-    const now = typeof (globalThis as any).Temporal !== 'undefined'
-      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
-      : new Date().toISOString();
-
-    // Collect snapshot data
-    const snapshot = {
-      tenantId,
-      timestamp: now,
-      databaseData: this.persistenceDriver.getCollection(tenantId),
-    };
-
-    const filePath = path.join(this.backupDir, `${backupId}.json`);
-    const jsonStr = JSON.stringify(snapshot, null, 2);
-
-    if (typeof Bun !== 'undefined' && typeof Bun.write === 'function') {
-      await Bun.write(filePath, jsonStr);
-    } else {
-      fs.writeFileSync(filePath, jsonStr, 'utf-8');
+  private initDefaultProbes(): void {
+    const services = [
+      'primary_database',
+      'search_indexer',
+      'media_cdn',
+      'email_gateway',
+      'payment_processor',
+      'event_stream',
+    ];
+    for (const s of services) {
+      this.serviceProbes.set(s, {
+        serviceName: s,
+        isAvailable: true,
+        lastChecked: Date.now(),
+      });
     }
-
-    const durationMs = Date.now() - startTime;
-
-    const meta: BackupMetadata = {
-      backupId,
-      tenantId,
-      createdAt: now,
-      sizeBytes: Buffer.byteLength(jsonStr),
-      rpoSeconds: 0, // Real-time snapshot
-      rtoSeconds: Math.ceil(durationMs / 1000),
-      status: 'completed',
-    };
-
-    this.logger.info(`[DisasterRecoveryEngine] Created backup [${backupId}] for tenant [${tenantId}]`, { tenantId }, { meta });
-
-    await this.eventBus.publish('disaster.backup.created', meta, { tenantId });
-    return meta;
   }
 
-  public async restoreBackup(backupId: string): Promise<boolean> {
-    const filePath = path.join(this.backupDir, `${backupId}.json`);
-    if (!fs.existsSync(filePath)) {
-      throw new Error(`Backup archive ${backupId} not found`);
-    }
+  public isFailoverActive(): boolean {
+    return this.isFailoverModeActive;
+  }
 
-    let snapshot: any;
-    if (typeof Bun !== 'undefined' && typeof Bun.file === 'function') {
-      snapshot = await Bun.file(filePath).json();
-    } else {
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      snapshot = JSON.parse(raw);
-    }
+  public getFailoverReason(): string {
+    return this.failoverReason;
+  }
+
+  public triggerFailover(reason: string): void {
+    this.isFailoverModeActive = true;
+    this.failoverReason = reason;
+  }
+
+  public resolveFailover(): void {
+    this.isFailoverModeActive = false;
+    this.failoverReason = '';
+  }
+
+  public updateServiceHealth(service: string, available: boolean, failureReason?: string): void {
+    const current = this.serviceProbes.get(service) || {
+      serviceName: service,
+      isAvailable: available,
+      lastChecked: Date.now(),
+    };
+    current.isAvailable = available;
+    current.lastChecked = Date.now();
+    current.failureReason = failureReason;
+    this.serviceProbes.set(service, current);
 
     // Auto-trigger DR failover if primary storage goes down
     if (service === 'primary_database' && !available && !this.isFailoverModeActive) {

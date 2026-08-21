@@ -95,6 +95,9 @@ export function renderAdminView(options: AdminViewOptions): string {
       --admin-accent: #38bdf8;
       --admin-cat-active-bg: #1e1b4b;
       --admin-cat-active-color: #a5b4fc;
+      --admin-table-header-bg: #0b1320;
+      --admin-table-header-color: #94a3b8;
+      --admin-row-hover: rgba(255, 255, 255, 0.03);
     }
 
     body.day-mode {
@@ -103,72 +106,97 @@ export function renderAdminView(options: AdminViewOptions): string {
       --admin-sidebar-bg: #ffffff;
       --admin-card-bg: #ffffff;
       --admin-stat-bg: #f8fafc;
-      --admin-border: #cbd5e1;
+      --admin-border: #e2e8f0;
       --admin-text-main: #0f172a;
       --admin-text-muted: #475569;
       --admin-heading: #0f172a;
       --admin-accent: #0284c7;
-      --admin-cat-active-bg: #e0f2fe;
-      --admin-cat-active-color: #0369a1;
+      --admin-cat-active-bg: #e0e7ff;
+      --admin-cat-active-color: #4338ca;
+      --admin-cat-border: #cbd5e1;
+      --admin-table-header-bg: #f1f5f9;
+      --admin-table-header-color: #1e293b;
+      --admin-row-hover: #f8fafc;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--admin-bg); color: var(--admin-text-main); display: flex; height: 100vh; overflow: hidden; }
-    .sidebar { width: 280px; min-width: 280px; background: var(--admin-sidebar-bg); border-right: 1px solid var(--admin-border); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; }
+    .sidebar { width: 280px; min-width: 280px; background: var(--admin-sidebar-bg); border-right: 1px solid var(--admin-border); padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03); }
     .brand { font-size: 1.15rem; font-weight: 800; color: var(--admin-heading); display:flex; align-items:center; gap:0.6rem; letter-spacing: -0.02em; }
-    .nav-section-title { font-size: 0.68rem; font-weight: 700; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 0.75rem 0 0.25rem 0.5rem; }
-    .nav-item { padding: 0.55rem 0.75rem; border-radius: 6px; color: var(--admin-text-muted); text-decoration: none; font-size: 0.85rem; display:flex; align-items:center; gap:0.6rem; font-weight: 500; transition: all 0.15s; }
+    .nav-section-title { font-size: 0.68rem; font-weight: 800; color: var(--admin-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 0.75rem 0 0.25rem 0.5rem; }
+    .nav-item { padding: 0.55rem 0.75rem; border-radius: 6px; color: var(--admin-text-muted); text-decoration: none; font-size: 0.85rem; display:flex; align-items:center; gap:0.6rem; font-weight: 600; transition: all 0.15s; }
     .nav-item.active, .nav-item:hover { background: var(--admin-stat-bg); color: var(--admin-heading); }
-    .nav-item.active { background: rgba(99, 102, 241, 0.15); color: #818cf8; border-left: 3px solid #6366f1; }
+    .nav-item.active { background: rgba(99, 102, 241, 0.15); color: #4338ca; border-left: 3px solid #6366f1; }
     .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; background: var(--admin-main-bg); }
-    .card { background: var(--admin-card-bg); border: 1px solid var(--admin-border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    .card { background: var(--admin-card-bg); border: 1px solid var(--admin-border); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); color: var(--admin-text-main); }
     .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--admin-accent); display:flex; justify-content:space-between; align-items:center; }
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-    .stat-card { background: var(--admin-stat-bg); border: 1px solid var(--admin-border); border-radius: 10px; padding: 1.2rem; }
-    .stat-label { font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.35rem; }
+    .stat-card { background: var(--admin-stat-bg); border: 1px solid var(--admin-border); border-radius: 10px; padding: 1.2rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
+    .stat-label { font-size: 0.75rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.04em; margin-bottom: 0.35rem; }
     .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--admin-heading); }
-    .stat-desc { font-size: 0.8rem; color: #10b981; margin-top: 0.25rem; }
+    .stat-desc { font-size: 0.8rem; color: #10b981; margin-top: 0.25rem; font-weight: 600; }
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
     th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--admin-border); color: var(--admin-text-main); }
-    th { color: var(--admin-text-muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
-    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; background: #065f46; color: #34d399; }
+    th { background: var(--admin-table-header-bg) !important; color: var(--admin-table-header-color) !important; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    tr:hover td { background: var(--admin-row-hover); }
+    td strong, td span { color: inherit; }
+    td[style*="color:#fff"], td[style*="color: #fff"] { color: var(--admin-heading) !important; }
+    div[style*="background:#0d1322"], div[style*="background: #0d1322"] { background: var(--admin-card-bg) !important; border-color: var(--admin-border) !important; }
+    div[style*="background:#070a12"], div[style*="background: #070a12"] { background: var(--admin-stat-bg) !important; border-color: var(--admin-border) !important; }
+    div[style*="background:#111827"], div[style*="background: #111827"] { background: var(--admin-card-bg) !important; border-color: var(--admin-border) !important; }
+    h3[style*="color:#fff"], h3[style*="color: #fff"] { color: var(--admin-heading) !important; }
+    span[style*="color:#fff"], span[style*="color: #fff"] { color: var(--admin-heading) !important; }
+    .badge { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 6px; font-size: 0.72rem; font-weight: 700; background: #065f46; color: #34d399; }
+    body.day-mode .badge { background: #dcfce7; color: #166534; border: 1px solid #86efac; font-weight: 800; }
     .badge-purple { background: #581c87; color: #c084fc; }
+    body.day-mode .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; font-weight: 800; }
     .badge-amber { background: #78350f; color: #fde047; }
+    body.day-mode .badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-weight: 800; }
     .badge-blue { background: #1e3a8a; color: #60a5fa; }
+    body.day-mode .badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; font-weight: 800; }
     .lock-box { background: rgba(15, 23, 42, 0.7); border: 2px dashed rgba(99, 102, 241, 0.4); border-radius: 12px; padding: 3rem 2rem; text-align: center; }
+    body.day-mode .lock-box { background: #f8fafc; border-color: #cbd5e1; }
     .privacy-banner { background: #78350f; border: 1px solid #f59e0b; color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; }
     .cat-btn {
-      padding: 0.75rem 0.85rem;
-      border-radius: 8px;
-      color: var(--admin-text-muted);
-      font-size: 0.85rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 10px;
+      color: var(--admin-text-main);
+      font-size: 0.88rem;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      background: var(--admin-stat-bg);
+      background: var(--admin-card-bg);
       border: 1px solid var(--admin-border);
-      transition: all 0.15s ease;
+      transition: all 0.2s ease;
       text-decoration: none;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
     .cat-btn:hover {
       background: var(--admin-cat-active-bg);
       color: var(--admin-heading);
       border-color: var(--admin-accent);
+      transform: translateX(3px);
     }
     .cat-btn.active {
       background: var(--admin-cat-active-bg);
-      border-color: var(--admin-accent);
+      border-color: #6366f1;
       color: var(--admin-cat-active-color);
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+    }
+    body.day-mode .cat-btn.active {
+      background: #e0e7ff;
+      border-color: #6366f1;
+      color: #3730a3;
     }
     .media-tab-btn {
       padding: 0.45rem 0.85rem;
       border-radius: 6px;
       border: 1px solid var(--admin-border);
       background: var(--admin-stat-bg);
-      color: var(--admin-text-muted);
+      color: var(--admin-text-main);
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
@@ -177,74 +205,75 @@ export function renderAdminView(options: AdminViewOptions): string {
     }
     .media-tab-btn:hover { background: var(--admin-card-bg); color: var(--admin-heading); }
     .media-tab-btn.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .btn { background: #6366f1; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-secondary { background: var(--admin-stat-bg); border: 1px solid var(--admin-border); color: var(--admin-heading); }
   </style>
 </head>
 <body>
   <!-- SINGLE CLEAN SIDEBAR -->
   <div class="sidebar">
     <div class="brand">
-      <div style="background: #6366f1; width: 32px; height: 32px; border-radius: 8px; display: grid; place-content: center; color: white; font-weight: 900;">E</div>
+      <div style="background: linear-gradient(135deg, #6366f1, #4f46e5); width: 34px; height: 34px; border-radius: 8px; display: grid; place-content: center; color: white; font-weight: 900; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);">E</div>
       <div>
-        <div style="color:var(--admin-heading);">ETHENENGINE</div>
-        <div style="font-size:0.68rem; color:var(--admin-text-muted); font-weight:600; text-transform:uppercase;">${escapeHtml(activeTenant.name)}</div>
+        <div style="color:var(--admin-heading); font-size:1.1rem; font-weight:900;">ETHENENGINE</div>
+        <div style="font-size:0.72rem; color:var(--admin-accent); font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">${escapeHtml(activeTenant.name)}</div>
       </div>
     </div>
 
     <!-- TENANT CONTEXT SWITCHER -->
-    <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.6rem 0.75rem; border-radius: 8px; font-size: 0.75rem;">
-      <label style="color:var(--admin-text-muted); font-weight:600; display:block; margin-bottom:0.25rem;">ACTIVE TENANT</label>
-      <select onchange="window.location.href='/admin?tenant=' + this.value + '&view=${escapeHtml(activeView)}'" style="width: 100%; background: var(--admin-card-bg); border: 1px solid var(--admin-border); color: var(--admin-heading); padding: 0.35rem; border-radius: 4px; font-size: 0.8rem;">
+    <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.75rem 0.85rem; border-radius: 10px; font-size: 0.78rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+      <label style="color:var(--admin-text-muted); font-weight:800; display:block; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.05em;">Active Tenant</label>
+      <select onchange="switchTenant(this.value)" style="width: 100%; background: var(--admin-card-bg); border: 1px solid var(--admin-border); color: var(--admin-heading); padding: 0.45rem 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight:600;">
         ${tenants.map((t) => `<option value="${escapeHtml(t.slug)}" ${t.id === activeTenant.id ? 'selected' : ''}>${escapeHtml(t.name)} (${escapeHtml(t.slug)})</option>`).join('')}
       </select>
     </div>
 
     <!-- CATEGORY BUTTONS NAV -->
-    <div style="display:flex; flex-direction:column; gap:0.25rem; margin-top:0.5rem; flex:1;">
-      <div style="font-size:0.68rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem;">CATEGORIES</div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; flex:1;">
+      <div style="font-size:0.72rem; font-weight:900; color:var(--admin-text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; padding-left:0.25rem;">CATEGORIES</div>
       
       <!-- 1. OVERVIEW (DEFAULT LANDING) -->
       <a href="/admin?tenant=${activeTenant.slug}&view=dashboard" class="cat-btn ${['dashboard', 'analytics'].includes(activeView) ? 'active' : ''}">
         <span>📊 Overview</span>
-        <span style="font-size:0.65rem; background:rgba(99,102,241,0.25); color:#a5b4fc; padding:0.1rem 0.4rem; border-radius:4px;">HOME</span>
+        <span style="font-size:0.7rem; font-weight:800; background:rgba(99,102,241,0.18); color:#4f46e5; padding:0.15rem 0.5rem; border-radius:6px;">HOME</span>
       </a>
 
       <!-- 2. ENTERPRISE ENGINES -->
       <a href="/admin?tenant=${activeTenant.slug}&view=engines" class="cat-btn ${['engines', 'inventory', 'commerce', 'crm', 'erp', 'accounting', 'hr', 'comms', 'logistics', 'payments', 'affiliates', 'social', 'community', 'trades', 'travel', 'legal', 'abode'].includes(activeView) ? 'active' : ''}">
         <span>⚡ Enterprise Engines</span>
-        <span style="font-size:0.65rem; background:rgba(16,185,129,0.2); color:#34d399; padding:0.1rem 0.4rem; border-radius:4px;">16</span>
+        <span style="font-size:0.7rem; font-weight:800; background:rgba(16,185,129,0.18); color:#059669; padding:0.15rem 0.5rem; border-radius:6px;">16</span>
       </a>
 
       <!-- 3. EXPERIENCE & BUILDER -->
       <a href="/admin?tenant=${activeTenant.slug}&view=experience" class="cat-btn ${['experience', 'website', 'cms', 'marketplace', 'settings', 'forms', 'seo'].includes(activeView) ? 'active' : ''}">
         <span>🌐 Experience Builder</span>
-        <span style="font-size:0.65rem; background:rgba(234,179,8,0.2); color:#fde047; padding:0.1rem 0.4rem; border-radius:4px;">6</span>
+        <span style="font-size:0.7rem; font-weight:800; background:rgba(234,179,8,0.22); color:#b45309; padding:0.15rem 0.5rem; border-radius:6px;">6</span>
       </a>
 
       <!-- 4. SYSTEM & SECURITY -->
       <a href="/admin?tenant=${activeTenant.slug}&view=security" class="cat-btn ${['security', 'watchdog', 'tenants', 'users', 'support', 'audit', 'apikeys', 'firewall'].includes(activeView) ? 'active' : ''}">
         <span>⚙️ System Security</span>
-        <span style="font-size:0.65rem; background:rgba(239,68,68,0.2); color:#fca5a5; padding:0.1rem 0.4rem; border-radius:4px;">8</span>
+        <span style="font-size:0.7rem; font-weight:800; background:rgba(239,68,68,0.18); color:#dc2626; padding:0.15rem 0.5rem; border-radius:6px;">8</span>
       </a>
     </div>
 
     <!-- BOTTOM SIDEBAR UTILITIES IN EXACT ORDER -->
-    <div style="display:flex; flex-direction:column; gap:0.4rem; margin-top:auto; border-top:1px solid var(--admin-border); padding-top:0.75rem;">
+    <div style="display:flex; flex-direction:column; gap:0.45rem; margin-top:auto; border-top:1px solid var(--admin-border); padding-top:0.85rem;">
       <!-- 1. USER PROFILE BUTTON (ABOVE UI SELECTOR) -->
-      <button onclick="openUserProfileModal()" class="cat-btn" style="border:1px solid var(--admin-border); background:var(--admin-stat-bg); color:var(--admin-heading);">
-        <span style="display:flex; align-items:center; gap:0.4rem;">👤 <strong>User Profile</strong></span>
-        <span class="badge badge-purple" style="font-size:0.65rem;">${isSuperadmin ? 'SUPERADMIN' : 'ADMIN'}</span>
+      <button onclick="openUserProfileModal()" class="cat-btn" style="background:var(--admin-card-bg); color:var(--admin-heading); margin-bottom:0;">
+        <span style="display:flex; align-items:center; gap:0.5rem; font-weight:800;">👤 User Profile</span>
+        <span class="badge badge-purple" style="font-size:0.68rem; font-weight:800;">${isSuperadmin ? 'SUPERADMIN' : 'ADMIN'}</span>
       </button>
 
       <!-- 2. UI THEME SELECTOR (ABOVE SIGN OUT BUTTON) -->
-      <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.5rem 0.75rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.75rem; font-weight: 700; color: var(--admin-heading);">UI Theme:</span>
-        <button onclick="toggleEthenEngineAdminTheme()" id="adminUiThemeBtn" class="media-tab-btn" style="padding: 0.25rem 0.65rem; font-size: 0.72rem; border: none; background: #0284c7; color: #fff;">☀️ Day Mode</button>
+      <div style="background: var(--admin-card-bg); border: 1px solid var(--admin-border); padding: 0.6rem 0.85rem; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <span style="font-size: 0.78rem; font-weight: 800; color: var(--admin-heading);">UI Theme:</span>
+        <button onclick="toggleEthenEngineAdminTheme()" id="adminUiThemeBtn" class="media-tab-btn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; font-weight:800; border: none; background: #0284c7; color: #fff; border-radius:6px;">☀️ Day Mode</button>
       </div>
 
       <!-- 3. SIGN OUT BUTTON -->
-      <button onclick="handleLogout()" class="cat-btn" style="border:1px solid rgba(239,68,68,0.2); cursor:pointer; background:rgba(239,68,68,0.1); color:#fca5a5; margin:0;">🚪 Sign Out</button>
+      <button onclick="handleLogout()" class="cat-btn" style="border:1px solid rgba(239,68,68,0.3); cursor:pointer; background:rgba(239,68,68,0.12); color:#dc2626; font-weight:800; margin:0; justify-content:center; gap:0.5rem;">🚪 Sign Out</button>
     </div>
-  </div>
   </div>
 
   <!-- MAIN WORKSPACE CONTENT AREA (WHERE OPTIONS HUB CARDS ARE DISPLAYED) -->
@@ -327,16 +356,16 @@ export function renderAdminView(options: AdminViewOptions): string {
       <!-- RUNNING SERVICES HEALTH DIAGNOSTICS TABLE -->
       <div class="card" style="border:1px solid #10b981;">
         <h2>
-          <span style="display:flex; align-items:center; gap:0.6rem; color:#fff;">
+          <span style="display:flex; align-items:center; gap:0.6rem; color:var(--admin-heading);">
             ⚡ Platform System Health & Running Services Monitor
           </span>
           <span class="badge" style="background:#065f46; color:#34d399; font-size:0.75rem; font-weight:800;">🟢 17/17 SERVICES HEALTHY</span>
         </h2>
-        <p style="color:#94a3b8; font-size:0.85rem; margin-bottom:1.25rem;">Live health diagnostics, memory allocation, and real-time latency probes across all enterprise subsystem engines.</p>
+        <p style="color:var(--admin-text-muted); font-size:0.85rem; margin-bottom:1.25rem;">Live health diagnostics, memory allocation, and real-time latency probes across all enterprise subsystem engines.</p>
         
         <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
           <thead>
-            <tr style="background:#0b1320; text-align:left; color:#94a3b8;">
+            <tr>
               <th style="padding:0.75rem;">Service Name</th>
               <th style="padding:0.75rem;">Category</th>
               <th style="padding:0.75rem;">Health Status</th>
@@ -345,24 +374,24 @@ export function renderAdminView(options: AdminViewOptions): string {
             </tr>
           </thead>
           <tbody>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">📦 Multi-Warehouse Inventory Engine</td><td>Operations</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🛒 Commerce Catalog & Cart Engine</td><td>Commerce</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">💼 CRM Sales Leads & Pipeline Engine</td><td>Commerce</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🏭 ERP Procurement & Supply Chain</td><td>Operations</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">💰 Financial Ledger & Accounting</td><td>Operations</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">👔 HR Staff & Payroll Management</td><td>Operations</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">💬 Communications & Chat Engine</td><td>Engagement</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.09 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🚚 Logistics & Shipping Rate Engine</td><td>Operations</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">💳 Payments & Billing Gateway Engine</td><td>Commerce</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">📈 Affiliate Tracking & Commissions</td><td>Commerce</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.08 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">👥 Social & Real-Time Collaboration</td><td>Engagement</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">📢 MeidaLLM Social Publishing SaaS</td><td>Engagement</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">⛪ Community Admin & Sabbath Agenda</td><td>Engagement</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🛠️ Trades & Craftsmen Portfolio Engine</td><td>Vertical Engine</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">✈️ Travel, Mobility & Fleet Engine</td><td>Vertical Engine</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">⚖️ Legal House & Practice Engine</td><td>Vertical Engine</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🏢 Abode Property & Rental Management</td><td>Vertical Engine</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:#fff;">🌐 Public API Integration Gateway Suite</td><td>Gateway</td><td><span class="badge" style="background:#065f46; color:#34d399;">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📦 Multi-Warehouse Inventory Engine</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🛒 Commerce Catalog & Cart Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💼 CRM Sales Leads & Pipeline Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🏭 ERP Procurement & Supply Chain</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💰 Financial Ledger & Accounting</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">👔 HR Staff & Payroll Management</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💬 Communications & Chat Engine</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.09 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🚚 Logistics & Shipping Rate Engine</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💳 Payments & Billing Gateway Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📈 Affiliate Tracking & Commissions</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.08 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">👥 Social & Real-Time Collaboration</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📢 MeidaLLM Social Publishing SaaS</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">⛪ Community Admin & Sabbath Agenda</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🛠️ Trades & Craftsmen Portfolio Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">✈️ Travel, Mobility & Fleet Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">⚖️ Legal House & Practice Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🏢 Abode Property & Rental Management</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
+            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🌐 Public API Integration Gateway Suite</td><td>Gateway</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
           </tbody>
         </table>
       </div>
@@ -372,6 +401,7 @@ export function renderAdminView(options: AdminViewOptions): string {
         <div class="stat-card"><div class="stat-label">💼 CRM Pipeline Value</div><div class="stat-value">${canAccessConfidentialTenantData ? `$${leads.reduce((s, l) => s + l.dealValue, 0).toLocaleString()}` : '<span style="color:#64748b;">[ENCRYPTED]</span>'}</div><div class="stat-desc">${canAccessConfidentialTenantData ? `${leads.length} active lead(s)` : 'Zero-Knowledge Protected'}</div></div>
         <div class="stat-card"><div class="stat-label">🛡️ Platform Audit Logs</div><div class="stat-value">${auditLogs.length}</div><div class="stat-desc">Security events tracked</div></div>
       </div>
+      <div class="grid-4">
         <div class="stat-card"><div class="stat-label">👥 Team & Users</div><div class="stat-value">${identities.length}</div><div class="stat-desc">Active identities</div></div>
         <div class="stat-card"><div class="stat-label">👔 HR Staff Headcount</div><div class="stat-value">${canAccessConfidentialTenantData ? employees.length : '<span style="color:#64748b;">[ENCRYPTED]</span>'}</div><div class="stat-desc">${canAccessConfidentialTenantData ? 'Employees on record' : 'Confidential data'}</div></div>
         <div class="stat-card"><div class="stat-label">🏭 Procurement Orders</div><div class="stat-value">${canAccessConfidentialTenantData ? procurementOrders.length : '<span style="color:#64748b;">[ENCRYPTED]</span>'}</div><div class="stat-desc">${canAccessConfidentialTenantData ? 'Supply chain POs' : 'Confidential data'}</div></div>
@@ -2258,6 +2288,24 @@ export function renderAdminView(options: AdminViewOptions): string {
         if (btn) { btn.innerText = '🌙 Night Mode'; btn.style.background = '#1e293b'; }
       }
     })();
+
+    function switchTenant(tenantSlug) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentView = urlParams.get('view') || 'dashboard';
+      const token = localStorage.getItem('auth_token');
+      let target = '/admin?tenant=' + encodeURIComponent(tenantSlug) + '&view=' + encodeURIComponent(currentView);
+      if (token) target += '&token=' + encodeURIComponent(token);
+      window.location.href = target;
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (e) { }
+      localStorage.removeItem('auth_token');
+      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+      window.location.href = '/login?tenant=${escapeHtml(activeTenant.slug)}';
+    }
 
     function showAdminToast(msg) {
       let toast = document.getElementById('adminToast');

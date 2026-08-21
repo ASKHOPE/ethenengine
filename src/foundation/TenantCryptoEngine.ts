@@ -2,10 +2,7 @@
 // Each tenant receives an isolated 256-bit encryption key derived via PBKDF2 with tenant salt + master secret.
 // Superadmins cannot decrypt tenant data without active Support Access tokens.
 
-import crypto from 'crypto';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import crypto from 'node:crypto';
 
 const MASTER_ENCRYPTION_SECRET = process.env.MASTER_ENCRYPTION_SECRET || process.env.ENCRYPTION_KEY || 'platform_root_master_key_9837492837492834';
 const ALGORITHM = 'aes-256-gcm';

@@ -37,8 +37,9 @@ export class ScheduledCronEngine {
     // 1. Hourly Disaster Recovery Tenant Snapshot drill & backup
     this.registerJob('tenant_snapshot_backup', '0 * * * *', async () => {
       try {
-        const dr = DisasterRecoveryEngine.getInstance();
-        await dr.createBackup('tenant_default');
+        const { DataRecoveryEngine } = await import('./DataRecoveryEngine.js');
+        const dataRecovery = DataRecoveryEngine.getInstance();
+        dataRecovery.createSnapshot('tenant_default', 'Scheduled Hourly Snapshot');
         this.logger.info('[ScheduledCronEngine] Automated hourly disaster recovery snapshot complete');
       } catch (err: any) {
         this.logger.error(`[ScheduledCronEngine] Backup job failed: ${err.message}`);
