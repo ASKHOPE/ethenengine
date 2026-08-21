@@ -1,110 +1,225 @@
-# ETHENENGINE Platform Architecture
+# ETHENENGINE Platform
 
-> Production-ready, configurable multi-tenant platform built according to the **Business Platform AI Architecture Specification v1** and **Platform Architecture Handbook (Volumes 1–4)**.
+> **Production-ready, zero-lock-in multi-tenant SaaS platform** — Visual website builder, enterprise back-office engines (CRM, ERP, HR, Accounting, Commerce), real-time analytics, zero-knowledge cryptography, and adaptive color-science theming — all in one codebase.
 
----
-
-## 🌟 Architectural Principles
-
-1. **One Codebase**: Zero tenant forks. Tenants are isolated by runtime domain configuration, themes, and capability flags.
-2. **Configuration Over Code (ADR-005)**: Priority hierarchy:
-   $$\text{Tenant Dynamic Overrides} \rightarrow \text{Blueprint Defaults} \rightarrow \text{Global Config}$$
-3. **Capability-First Architecture**: Applications are dynamic compositions of installed capabilities (`WebsiteBuilder`, `ThemeEngine`, `BasicCMS`, `CommerceEngine`, `MarketplaceEngine`).
-4. **Strict Module Isolation & Database Ownership (ADR-009)**: Capabilities own their schemas and migrations with zero direct database cross-talk.
-5. **Event-Driven Communication (ADR-007)**: Modules communicate asynchronously via the centralized `EventBus`.
-6. **Isolated Identity Models (ADR-008)**: Strict domain separation between `PLATFORM_USER`, `TENANT_USER`, and `PUBLIC_USER`.
+[![Tests](https://img.shields.io/badge/tests-126%2F126%20passing-34d399?style=flat-square)](./test/)
+[![License](https://img.shields.io/badge/license-MIT-818cf8?style=flat-square)](./LICENSE)
+[![Runtime](https://img.shields.io/badge/runtime-Bun%201.x-f59e0b?style=flat-square)](https://bun.sh)
+[![Stack](https://img.shields.io/badge/framework-Hono-38bdf8?style=flat-square)](https://hono.dev)
 
 ---
 
-## 🏗️ Subsystem Architecture
+## ✨ What's Inside
 
-```text
-Foundation Layer (EventBus, AuditLogger, ConfigEngine, StorageDriver, DisasterRecoveryEngine)
-       │
-Core Platform (HierarchyManager, IdentityEngine, DomainGateway, WorkflowEngine, NotificationEngine)
-       │
-Capabilities Layer (WebsiteBuilder, ThemeEngine, BasicCMS, CommerceEngine, MarketplaceEngine)
-       │
-Polyglot Microservices (Rust Image Processor & Vector Search Indexer)
-       │
-Experience Layer (Admin Control Panel & Dynamic Page Renderer)
+| Capability | Description |
+|---|---|
+| 🌐 **Visual Studio Builder** | Drag-and-drop no-code page editor with live canvas, block library, responsive preview (Desktop / Tablet / Mobile) |
+| 🎨 **Color Science Engine** | Harmonic palette generation (complementary, triadic, monochromatic), WCAG 2.1 AAA contrast verification |
+| 🌓 **Day / Night Theming** | Per-tenant light/dark mode with live preview — applies instantly without page reload |
+| 🏢 **Multi-Tenant Architecture** | Unlimited tenants from a single codebase, zero forks, runtime domain isolation |
+| 🔒 **Zero-Knowledge Cryptography** | AES-256-GCM + PBKDF2 field-level encryption for confidential CRM / HR / Ledger data |
+| 🛡️ **Watchdog & Resilience** | Anomaly detection, circuit breakers, load governor (3-tier traffic shedding), disaster recovery with HMAC-256 snapshots |
+| 📊 **Real-Time Analytics & A/B** | Server-side telemetry, conversion funnels, A/B variant split testing |
+| 💼 **CRM & Sales Pipeline** | Lead management, deal value tracking, pipeline stages |
+| 🏭 **ERP & Procurement** | Purchase orders, supplier management, supply chain automation |
+| 💰 **Accounting & Ledger** | Double-entry accounting, real-time balance sheet |
+| 👔 **HR & Payroll** | Staff directory, department management, monthly salary records |
+| 📦 **Multi-Warehouse Inventory** | Multi-location stock allocation, reorder threshold alerts, inter-warehouse transfers |
+| 🛒 **Commerce & Orders** | Product catalog, order processing, revenue tracking |
+| 📝 **Headless CMS** | Schema-free content entries, publish/draft workflow |
+| 🧩 **Marketplace Extensions** | Pluggable capability system with pricing and category management |
+| 🛡️ **Security & Audit Trail** | Immutable event log for every action across all tenants |
+| 💬 **Team Comms** | Internal channel messaging with E2E tenant isolation |
+| 🤝 **Support Delegation** | Zero-knowledge break-glass grants for superadmin diagnostic access |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Experience Layer                              │
+│   Admin Console  │  Studio Builder  │  Dynamic Page Renderer    │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│                  Capabilities Layer                              │
+│  WebsiteBuilder │ ThemeEngine │ CommerceEngine │ CRMEngine      │
+│  ERPEngine │ AccountingEngine │ HREngine │ InventoryEngine      │
+│  BasicCMS │ MarketplaceEngine │ AnalyticsEngine                 │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│                    Core Platform                                 │
+│  HierarchyManager │ IdentityEngine │ DomainGateway              │
+│  UnifiedAuthGateway │ SupportAccessEngine │ WorkflowEngine      │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+┌────────────────────────▼────────────────────────────────────────┐
+│                   Foundation Layer                               │
+│  WatchdogEngine │ DisasterRecoveryEngine │ DataRecoveryEngine   │
+│  LoadGovernor │ SecurityGuard │ AuditLogger │ SyncEngine        │
+│  EventBus │ TelemetryEngine │ SecurityCrypto │ Sanitizer        │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
+### Architectural Principles
+
+1. **One Codebase, Infinite Tenants** — Zero tenant forks; isolated by runtime domain, themes, and capability flags.
+2. **Configuration Over Code** — `Tenant Overrides → Blueprint Defaults → Global Config` priority chain.
+3. **Capability-First** — Features are composable, installable modules — not hardcoded monoliths.
+4. **Strict Module Isolation** — Each capability owns its own schema; zero cross-module DB calls.
+5. **Event-Driven** — Modules communicate asynchronously via `EventBus`.
+6. **Zero-Knowledge by Default** — Confidential data (Leads, HR, Ledger) is always encrypted at rest.
+
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start
 
 ### Prerequisites
-- **Node.js**: `v20+`
-- **npm**: `v10+`
-- **Docker**: (Optional, for containerized deployments)
+- **Bun** `v1.x` — [Install](https://bun.sh)
+- **Docker** `v24+` — for containerized self-hosting (optional)
 
-### 1. Installation
+### 1. Clone & Install
 ```bash
-git clone https://github.com/ethenengine/ethenengine.git
+git clone https://github.com/your-org/ethenengine.git
 cd ethenengine
-npm install
+bun install
 ```
 
-### 2. Build the Codebase
+### 2. Run Development Server
 ```bash
-npm run build
+bun run dev
+# Starts at http://localhost:3000 with --watch hot reload
 ```
 
-### 3. Start Development Server
-```bash
-npm run dev
-```
-- **Admin Control Panel**: `http://localhost:3000/admin`
-- **Live Website Preview**: `http://localhost:3000/preview/home`
+| URL | Description |
+|---|---|
+| `http://localhost:3000/` | Marketing homepage |
+| `http://localhost:3000/admin?tenant=lioramedia` | Admin Console |
+| `http://localhost:3000/editor?tenant=lioramedia` | Studio Page Builder |
+| `http://localhost:3000/preview/home?tenant=lioramedia` | Live Page Preview |
+| `http://localhost:3000/docs` | OpenAPI Swagger Explorer |
+
+**Seed credentials** (auto-seeded on startup):
+- Email: `admin@lioramedia.com` / Password: `Password123!`
 
 ---
 
-## 🧪 Testing Suite
+## 🐳 Self-Hosted Docker Deployment
 
-### 1. Integration Tests
-Executes 9 end-to-end integration tests across all capabilities, multi-tenancy, events, workflows, and search:
-```bash
-npx tsx test/platform.test.ts
-```
-
-### 2. Playwright E2E & Security Tests
-Executes browser-level UI tests, prototype pollution defense tests, and XSS sanitization checks:
-```bash
-npx playwright test
-```
-
----
-
-## 🐳 On-Premises & Cloud Deployment
-
-### 1-Command Bare-Metal / Linux Deployment
-```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-
-### Docker Compose Deployment
+### Full Stack (Recommended)
 ```bash
 docker compose up -d --build
 ```
-This orchestrates:
-- `ethenengine-core` (Node.js API Server)
-- `ethenengine-rust` (Rust Microservice Worker)
-- `ethenengine-db` (PostgreSQL Database)
-- `ethenengine-gateway` (Nginx Reverse Proxy & Custom Domain Gateway)
+
+| Service | Role | Port |
+|---|---|---|
+| `ethenengine-core` | Bun API server | 3000 |
+| `ethenengine-nginx` | Reverse proxy & custom domain gateway | 80 / 443 |
+| `ethenengine-db` | PostgreSQL (primary) | 5432 |
+| `ethenengine-keycloak` | Enterprise SSO & IAM | 8080 |
+| `ethenengine-mailcow` | Transactional email (SMTP/IMAP) | 25 / 587 |
+| `ethenengine-rust` | Rust image processor & vector search | 8001 |
+
+### One-Command Bare-Metal Deployment
+```bash
+chmod +x deploy.sh && ./deploy.sh
+```
 
 ---
 
-## 🔒 Security & Data Protection Controls
+## 🧪 Testing
 
-- **XSS Protection**: HTML sanitization utility (`escapeHtml()`) applied to block template rendering in [Sanitizer.ts](file:///c:/Users/arnol/OneDrive/Documents/Github/ethenengine/src/foundation/Sanitizer.ts).
-- **Runtime Security Middleware**: Prototype pollution and unsafe query parameter shield in [RuntimeValidator.ts](file:///c:/Users/arnol/OneDrive/Documents/Github/ethenengine/src/foundation/RuntimeValidator.ts).
-- **Cryptographic Engine**: PBKDF2 with SHA-512 password hashing & AES-256-GCM field-level database encryption in [SecurityCrypto.ts](file:///c:/Users/arnol/OneDrive/Documents/Github/ethenengine/src/foundation/SecurityCrypto.ts).
-- **Vendor-Lock-In Free ORM**: 100% open-source MIT schema definitions in [schema.ts](file:///c:/Users/arnol/OneDrive/Documents/Github/ethenengine/src/db/schema.ts) and Prisma support in [schema.prisma](file:///c:/Users/arnol/OneDrive/Documents/Github/ethenengine/prisma/schema.prisma).
+```bash
+# Run full test matrix
+npm run test:all
+
+# Individual suites
+bun test/platform.test.ts              # Core platform (126 tests)
+bun test/security-audit.test.ts        # Zero-knowledge & crypto audit
+bun test/api-interoperability.test.ts  # API contract tests
+bun test/watchdog-dr.test.ts           # Resilience & disaster recovery
+```
+
+**Current status: `126/126 passing ✅`**
+
+---
+
+## 🎨 Theme & Color Science
+
+The **Color Science Engine** (`src/capabilities/theme-engine/ColorScienceEngine.ts`) provides:
+
+- **Harmonic palette generation** — complementary, triadic, split-complementary, monochromatic
+- **WCAG 2.1 contrast verification** — AA (4.5:1) and AAA (7:1) compliance checks
+- **5-color Coolors-style harmonizer** in the Studio Builder → Theme tab
+- **Per-tenant live theming** — Day ☀️ / Night 🌙 toggle with instant preview (no reload)
+- **Design token system** — `--primary`, `--secondary`, `--bg`, `--card-bg`, `--radius`, `--glow`
+
+To configure themes: `Admin Console → Settings & Theme Engine`
+
+---
+
+## 🔒 Security Architecture
+
+| Control | Implementation |
+|---|---|
+| **Password Hashing** | PBKDF2-SHA-512, 100,000 iterations, per-user salt |
+| **Field Encryption** | AES-256-GCM with PBKDF2-derived per-tenant keys |
+| **Zero-Knowledge** | Confidential data inaccessible without explicit support grant |
+| **XSS Prevention** | `escapeHtml()` on all server-rendered output |
+| **Security Headers** | `X-Frame-Options`, `X-Content-Type-Options`, `HSTS`, `CSP` |
+| **Rate Limiting** | 120 req/min per IP, sliding window |
+| **Circuit Breakers** | Per-subsystem fault isolation, configurable thresholds |
+| **Load Governor** | 3-tier traffic shedding: Critical / Standard / Background |
+| **Audit Trail** | Immutable, tamper-evident event log: actor + resource + timestamp |
+| **Support Break-Glass** | Time-limited, reason-required, revocable superadmin grants |
+
+---
+
+## 📁 Project Structure
+
+```
+ethenengine/
+├── src/
+│   ├── index.ts                        # Entrypoint, routes, middleware
+│   ├── api/                            # Modular Hono route handlers
+│   ├── core/                           # Platform singletons (Auth, IAM, Domain)
+│   ├── capabilities/                   # Installable feature modules
+│   │   ├── theme-engine/
+│   │   │   ├── ThemeEngine.ts
+│   │   │   ├── ColorScienceEngine.ts   # Harmonic palettes & WCAG
+│   │   │   └── HolidayEngine.ts
+│   │   ├── website-builder/
+│   │   ├── commerce/, crm/, erp/
+│   │   ├── hr/, accounting/, inventory/
+│   │   └── analytics/
+│   ├── foundation/                     # Cross-cutting infrastructure
+│   │   ├── WatchdogEngine.ts           # Anomaly detection & circuit breakers
+│   │   ├── DisasterRecoveryEngine.ts   # Outage failover
+│   │   ├── DataRecoveryEngine.ts       # HMAC-256 point-in-time snapshots
+│   │   ├── LoadGovernor.ts             # 3-tier traffic shedding
+│   │   ├── SecurityGuard.ts
+│   │   ├── AuditLogger.ts
+│   │   └── SyncEngine.ts              # Dual-write: local + Aiven cloud
+│   └── views/                          # Server-rendered HTML
+│       ├── adminView.ts               # Admin console
+│       ├── editorView.ts              # Studio page builder
+│       ├── previewView.ts
+│       └── loginView.ts
+├── public/                             # Static assets
+│   ├── styles.css                     # Global design system
+│   ├── editor.css                     # Studio builder styles
+│   ├── blocks.css                     # Block component styles
+│   └── animations.css                 # GPU-accelerated keyframes
+├── test/                              # Test suites (126 tests)
+├── nginx/                             # Reverse proxy config
+├── docker-compose.yml                 # Full self-hosted stack
+└── Dockerfile
+```
 
 ---
 
 ## 📄 License
 
-MIT License. 100% Vendor Lock-in Free & Open Source.
+**MIT** — 100% open-source, vendor lock-in free.

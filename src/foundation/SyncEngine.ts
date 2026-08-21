@@ -45,54 +45,54 @@ const UPSERT_SQL: Record<string, (item: any) => { sql: string; params: any[] }> 
           VALUES ($1,$2,$3,$4,$5)
           ON CONFLICT (id) DO UPDATE
             SET name=$3, slug=$4, domain=$5`,
-    params: [t.id, t.orgId || 'org_default', t.name, t.slug, t.domain || ''],
+    params: [t.id, t.orgId || 'org_default', t.name || '', t.slug || t.id, t.domain || ''],
   }),
   pages: (p) => ({
     sql: `INSERT INTO platform_pages (id, tenant_id, title, slug, blocks_json, is_published)
           VALUES ($1,$2,$3,$4,$5,$6)
           ON CONFLICT (id) DO UPDATE
             SET title=$3, slug=$4, blocks_json=$5, is_published=$6`,
-    params: [p.id, p.tenantId, p.title, p.slug, JSON.stringify(p.blocks || []), p.isPublished ?? true],
+    params: [p.id, p.tenantId || 'tenant_default', p.title || '', p.slug || p.id, JSON.stringify(p.blocks || []), p.isPublished ?? true],
   }),
   cms_entries: (e) => ({
     sql: `INSERT INTO platform_cms_entries (id, tenant_id, content_type_id, slug, data_json, status)
           VALUES ($1,$2,$3,$4,$5,$6)
           ON CONFLICT (id) DO UPDATE
             SET data_json=$5, status=$6`,
-    params: [e.id, e.tenantId, e.contentTypeId, e.slug, JSON.stringify(e.data || {}), e.status || 'published'],
+    params: [e.id, e.tenantId || 'tenant_default', e.contentTypeId || 'default', e.slug || e.id, JSON.stringify(e.data || {}), e.status || 'published'],
   }),
   products: (p) => ({
     sql: `INSERT INTO platform_products (id, tenant_id, name, sku, price, currency, stock, description)
           VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
           ON CONFLICT (id) DO UPDATE
             SET name=$3, price=$5, stock=$7, description=$8`,
-    params: [p.id, p.tenantId, p.name, p.sku, p.price, p.currency || 'USD', p.stock ?? 100, p.description || ''],
+    params: [p.id, p.tenantId || 'tenant_default', p.name || '', p.sku || p.id, p.price ?? 0, p.currency || 'USD', p.stock ?? 100, p.description || ''],
   }),
   orders: (o) => ({
     sql: `INSERT INTO platform_orders (id, tenant_id, user_id, items_json, total_amount, status)
           VALUES ($1,$2,$3,$4,$5,$6)
           ON CONFLICT (id) DO UPDATE
             SET status=$6, total_amount=$5`,
-    params: [o.id, o.tenantId, o.userId, JSON.stringify(o.items || []), o.totalAmount, o.status || 'pending'],
+    params: [o.id, o.tenantId || 'tenant_default', o.userId || 'guest', JSON.stringify(o.items || []), o.totalAmount ?? 0, o.status || 'pending'],
   }),
   leads: (l) => ({
     sql: `INSERT INTO platform_crm_leads (id, tenant_id, contact_name, email, company, deal_value, stage)
           VALUES ($1,$2,$3,$4,$5,$6,$7)
           ON CONFLICT (id) DO UPDATE
             SET stage=$7, deal_value=$6`,
-    params: [l.id, l.tenantId, l.contactName, l.email, l.company, l.dealValue, l.stage],
+    params: [l.id, l.tenantId || 'tenant_default', l.contactName || '', l.email || '', l.company || '', l.dealValue ?? 0, l.stage || 'lead'],
   }),
   ledger: (e) => ({
     sql: `INSERT INTO platform_ledger (id, tenant_id, account_name, type, amount, description)
           VALUES ($1,$2,$3,$4,$5,$6)
           ON CONFLICT (id) DO NOTHING`,
-    params: [e.id, e.tenantId, e.accountName, e.type, e.amount, e.description || ''],
+    params: [e.id, e.tenantId || 'tenant_default', e.accountName || '', e.type || 'DEBIT', e.amount ?? 0, e.description || ''],
   }),
   audit_logs: (a) => ({
     sql: `INSERT INTO platform_audit_logs (id, tenant_id, actor_id, action, resource, details_json)
           VALUES ($1,$2,$3,$4,$5,$6)
           ON CONFLICT (id) DO NOTHING`,
-    params: [a.id, a.tenantId, a.actorId, a.action, a.resource, JSON.stringify(a.details || {})],
+    params: [a.id, a.tenantId || 'tenant_default', a.actorId || 'system', a.action || '', a.resource || '', JSON.stringify(a.details || {})],
   }),
 };
 
@@ -236,25 +236,59 @@ export class SyncEngine {
   // ── EventBus subscriptions ───────────────────────────────────────────────
 
   private subscribeToEvents() {
-    // All write events that carry a SyncRecord in the payload
-    const writeEvents = [
-      'tenant.created',   'tenant.updated',   'tenant.deleted',
-      'page.created',     'page.updated',     'page.deleted',
-      'cms.entry.created','cms.entry.updated','cms.entry.deleted',
-      'product.created',  'product.updated',  'product.deleted',
-      'order.created',    'order.updated',
-      'lead.created',     'lead.updated',
-      'ledger.entry.created',
-      'audit.log.created',
-      // Generic batch collection save
-      'persistence.collection.saved',
-    ];
+    const eventMapping: Record<string, { collection: string; operation: 'upsert' | 'delete'; extractId?: (payload: any) => string }> = {
+      'tenant.created': { collection: 'tenants', operation: 'upsert' },
+      'tenant.updated': { collection: 'tenants', operation: 'upsert' },
+      'tenant.deleted': { collection: 'tenants', operation: 'delete', extractId: (p) => p.id || p.tenantId },
+      'page.created': { collection: 'pages', operation: 'upsert' },
+      'page.updated': { collection: 'pages', operation: 'upsert' },
+      'page.deleted': { collection: 'pages', operation: 'delete', extractId: (p) => p.pageId || p.id },
+      'website.page.created': { collection: 'pages', operation: 'upsert' },
+      'website.page.updated': { collection: 'pages', operation: 'upsert' },
+      'website.page.deleted': { collection: 'pages', operation: 'delete', extractId: (p) => p.pageId || p.id },
+      'cms.entry.created': { collection: 'cms_entries', operation: 'upsert' },
+      'cms.entry.updated': { collection: 'cms_entries', operation: 'upsert' },
+      'cms.entry.published': { collection: 'cms_entries', operation: 'upsert' },
+      'cms.entry.deleted': { collection: 'cms_entries', operation: 'delete', extractId: (p) => p.id || p.entryId },
+      'product.created': { collection: 'products', operation: 'upsert' },
+      'product.updated': { collection: 'products', operation: 'upsert' },
+      'product.deleted': { collection: 'products', operation: 'delete', extractId: (p) => p.id || p.productId },
+      'commerce.product.created': { collection: 'products', operation: 'upsert' },
+      'order.created': { collection: 'orders', operation: 'upsert' },
+      'order.updated': { collection: 'orders', operation: 'upsert' },
+      'lead.created': { collection: 'leads', operation: 'upsert' },
+      'lead.updated': { collection: 'leads', operation: 'upsert' },
+      'crm.lead.created': { collection: 'leads', operation: 'upsert' },
+      'ledger.entry.created': { collection: 'ledger', operation: 'upsert' },
+      'accounting.transaction.posted': { collection: 'ledger', operation: 'upsert' },
+      'audit.log.created': { collection: 'audit_logs', operation: 'upsert' },
+      'audit.created': { collection: 'audit_logs', operation: 'upsert' },
+    };
 
-    for (const event of writeEvents) {
-      this.eventBus.subscribe(event, (e: PlatformEvent<SyncRecord | SyncRecord[]>) => {
-        const records = Array.isArray(e.payload) ? e.payload : [e.payload];
-        for (const record of records) {
-          this.syncRecord(record);
+    for (const [eventName, config] of Object.entries(eventMapping)) {
+      this.eventBus.subscribe(eventName, (e: PlatformEvent<any>) => {
+        const payload = e.payload;
+        if (!payload) return;
+
+        // If payload is already a fully formed SyncRecord
+        if (payload.collection && payload.operation && payload.id) {
+          this.syncRecord(payload);
+          return;
+        }
+
+        const items = Array.isArray(payload) ? payload : [payload];
+        for (const item of items) {
+          const id = config.extractId ? config.extractId(item) : item.id;
+          if (!id) continue;
+
+          this.syncRecord({
+            id,
+            collection: config.collection,
+            operation: config.operation,
+            data: config.operation === 'upsert' ? item : undefined,
+            tenantId: item.tenantId || (e as any).context?.tenantId,
+            timestamp: new Date().toISOString(),
+          });
         }
       });
     }
@@ -263,25 +297,33 @@ export class SyncEngine {
   // ── Core dual-write ──────────────────────────────────────────────────────
 
   public async syncRecord(record: SyncRecord): Promise<void> {
-    const [aivenResult, dockerResult] = await Promise.allSettled([
-      this.writeToTarget('aiven',  record),
-      this.writeToTarget('docker', record),
-    ]);
+    if (!record || !record.id || !record.collection || (record.operation === 'upsert' && !record.data)) {
+      return; // Skip malformed or summary objects
+    }
 
+    const aivenConnected = await this.aivenEngine.ensureConnected();
+    const tasks: Promise<void>[] = [];
+
+    if (aivenConnected) {
+      tasks.push(
+        this.writeToTarget('aiven', record).catch((err) => {
+          this.logger.warn(`[SyncEngine] Aiven write failed for ${record.collection}/${record.id} — queued for retry`, {});
+          this.enqueueRetry(record, 'aiven');
+        })
+      );
+    }
+
+    if (this.dockerReady) {
+      tasks.push(
+        this.writeToTarget('docker', record).catch((err) => {
+          this.logger.warn(`[SyncEngine] Docker write failed for ${record.collection}/${record.id} — queued for retry`, {});
+          this.enqueueRetry(record, 'docker');
+        })
+      );
+    }
+
+    await Promise.allSettled(tasks);
     this.stats.lastSync = new Date().toISOString();
-
-    if (aivenResult.status === 'rejected') {
-      this.logger.warn(`[SyncEngine] Aiven write failed for ${record.collection}/${record.id} — queued for retry`, {});
-      this.enqueueRetry(record, 'aiven');
-    }
-
-    if (dockerResult.status === 'rejected') {
-      // Docker is optional; only warn, no retry if it was never connected
-      if (this.dockerReady) {
-        this.logger.warn(`[SyncEngine] Docker write failed for ${record.collection}/${record.id} — queued for retry`, {});
-        this.enqueueRetry(record, 'docker');
-      }
-    }
   }
 
   // ── Sync a whole collection (called by PersistenceDriver) ───────────────
@@ -356,6 +398,18 @@ export class SyncEngine {
     this.retryQueue = this.retryQueue.filter(i => i.nextRetry > now);
 
     for (const item of due) {
+      if (item.target === 'aiven') {
+        const connected = await this.aivenEngine.ensureConnected();
+        if (!connected) {
+          this.enqueueRetry(item.record, item.target, item.attempts);
+          continue;
+        }
+      }
+      if (item.target === 'docker' && !this.dockerReady) {
+        this.enqueueRetry(item.record, item.target, item.attempts);
+        continue;
+      }
+
       try {
         await this.writeToTarget(item.target, item.record);
         this.stats.retrySuccess++;
@@ -375,7 +429,7 @@ export class SyncEngine {
 
   private persistFailure(item: RetryItem) {
     try {
-      const failDir = path.resolve(process.cwd(), 'data', 'sync-failures');
+      const failDir = path.resolve('data/failed_syncs');
       if (!fs.existsSync(failDir)) fs.mkdirSync(failDir, { recursive: true });
       const file = path.join(failDir, `fail_${Date.now()}_${item.record.id}.json`);
       fs.writeFileSync(file, JSON.stringify({ ...item, failedAt: new Date().toISOString() }, null, 2));
@@ -404,6 +458,7 @@ export class SyncEngine {
         this.logger.warn(`[SyncEngine] Heartbeat: ${this.retryQueue.length} item(s) pending retry`, {});
       }
     }, intervalMs);
+    (this.heartbeatTimer as any)?.unref?.();
   }
 
   // ── Public API ───────────────────────────────────────────────────────────

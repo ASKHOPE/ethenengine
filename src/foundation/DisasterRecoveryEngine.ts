@@ -1,33 +1,22 @@
-// Foundation: Disaster Recovery & Backup Subsystem
+// Foundation: Disaster Recovery & Service Outage Failover Engine
+// High-Availability Outage Detection, Degraded Read-Only Failover & Health Probing
 
-import fs from 'fs';
-import path from 'path';
-import { EventBus } from './EventBus.js';
-import { Logger } from './Logger.js';
-import { PersistenceDriver } from './PersistenceDriver.js';
-
-export interface BackupMetadata {
-  backupId: string;
-  tenantId: string;
-  createdAt: string;
-  sizeBytes: number;
-  rpoSeconds: number;
-  rtoSeconds: number;
-  status: 'completed' | 'failed';
+export interface OutageStatus {
+  serviceName: string;
+  isAvailable: boolean;
+  lastChecked: number;
+  failureReason?: string;
 }
 
 export class DisasterRecoveryEngine {
   private static instance: DisasterRecoveryEngine;
-  private backupDir: string;
-  private eventBus = EventBus.getInstance();
-  private logger = Logger.getInstance();
-  private persistenceDriver = PersistenceDriver.getInstance();
+  private isFailoverModeActive = false;
+  private failoverReason = '';
+  private serviceProbes: Map<string, OutageStatus> = new Map();
+  private inMemoryFailoverCache: Map<string, any> = new Map();
 
   private constructor() {
-    this.backupDir = path.resolve(process.cwd(), 'backups');
-    if (!fs.existsSync(this.backupDir)) {
-      fs.mkdirSync(this.backupDir, { recursive: true });
-    }
+    this.initDefaultProbes();
   }
 
   public static getInstance(): DisasterRecoveryEngine {
@@ -92,25 +81,30 @@ export class DisasterRecoveryEngine {
       snapshot = JSON.parse(raw);
     }
 
-    // Restore collection to persistence store
-    this.persistenceDriver.saveCollection(snapshot.tenantId, snapshot.databaseData);
-
-    this.logger.info(`[DisasterRecoveryEngine] Restored tenant [${snapshot.tenantId}] from backup [${backupId}]`, {
-      tenantId: snapshot.tenantId,
-    });
-
-    await this.eventBus.publish('disaster.backup.restored', { backupId, tenantId: snapshot.tenantId });
-    return true;
+    // Auto-trigger DR failover if primary storage goes down
+    if (service === 'primary_database' && !available && !this.isFailoverModeActive) {
+      this.triggerFailover(`Automatic DR Failover triggered: Primary database unavailable (${failureReason || 'Connection timeout'})`);
+    } else if (service === 'primary_database' && available && this.isFailoverModeActive) {
+      this.resolveFailover();
+    }
   }
 
-  public async runDrill(tenantId: string): Promise<{ rpo: string; rto: string; pass: boolean }> {
-    const backup = await this.createBackup(tenantId);
-    const restored = await this.restoreBackup(backup.backupId);
+  public listServiceHealth(): OutageStatus[] {
+    return Array.from(this.serviceProbes.values());
+  }
 
-    return {
-      rpo: `${backup.rpoSeconds}s`,
-      rto: `${backup.rtoSeconds}s`,
-      pass: restored && backup.status === 'completed',
-    };
+  // ============================================================
+  // In-Memory Failover Cache (Graceful Read-Only Degradation)
+  // ============================================================
+  public cacheSnapshot(key: string, data: any): void {
+    this.inMemoryFailoverCache.set(key, {
+      data,
+      cachedAt: Date.now(),
+    });
+  }
+
+  public getCachedFallback(key: string): any {
+    const entry = this.inMemoryFailoverCache.get(key);
+    return entry ? entry.data : null;
   }
 }

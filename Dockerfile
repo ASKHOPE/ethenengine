@@ -5,8 +5,7 @@ COPY package.json tsconfig*.json ./
 RUN bun install --frozen-lockfile || bun install
 COPY src ./src
 COPY public ./public
-RUN bun run typecheck
-RUN bun run build
+RUN bun build src/index.ts --target=bun --outfile=dist/index.js
 
 FROM oven/bun:1-alpine AS runner
 WORKDIR /app

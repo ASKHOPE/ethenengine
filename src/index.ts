@@ -1,24 +1,84 @@
+// ETHENENGINE: Enterprise Multi-Tenant Platform Core Entrypoint
+// Architecture: Clean Modular Bootstrap with Hono, Zero-Knowledge Crypto, and Subsystem Routers
+
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
-import { EventBus } from './foundation/EventBus.js';
-import { AuditLogger } from './foundation/AuditLogger.js';
+
+declare const Bun: any;
 import { CorePlatformManager } from './core/CorePlatformManager.js';
-import { CapabilityRegistry } from './capability-sdk/CapabilityRegistry.js';
-import { FutureCapabilitiesMap } from './capability-sdk/FutureCapabilities.js';
+import { CapabilityRegistry, FutureCapabilitiesMap } from './capability-sdk/CapabilityRegistry.js';
 import { ThemeEngine } from './capabilities/theme-engine/ThemeEngine.js';
 import { BasicCMS } from './capabilities/basic-cms/BasicCMS.js';
 import { WebsiteBuilder } from './capabilities/website-builder/WebsiteBuilder.js';
-import { escapeHtml } from './foundation/Sanitizer.js';
-
-import { IdentityEngine } from './core/IdentityEngine.js';
-import { AuthTokenEngine } from './core/AuthTokenEngine.js';
+import { AuditLogger } from './foundation/AuditLogger.js';
+import { EventBus } from './foundation/EventBus.js';
+import { SyncEngine } from './foundation/SyncEngine.js';
+import { OpenAPIGenerator } from './foundation/OpenAPIGenerator.js';
+import { SecurityGuard } from './foundation/SecurityGuard.js';
+import { WatchdogEngine } from './foundation/WatchdogEngine.js';
+import { watchdogMiddleware } from './foundation/WatchdogMiddleware.js';
+import { LoadGovernor } from './foundation/LoadGovernor.js';
+import { DisasterRecoveryEngine } from './foundation/DisasterRecoveryEngine.js';
+import { DataRecoveryEngine } from './foundation/DataRecoveryEngine.js';
 import { UnifiedAuthGateway } from './core/UnifiedAuthGateway.js';
+import { SupportAccessEngine } from './core/SupportAccessEngine.js';
+import { escapeHtml } from './foundation/Sanitizer.js';
+import { seedLioramediaTenant } from './seed/seedLioramedia.js';
+
+// Modular Subsystem Routers
+import { authRouter } from './api/auth.routes.js';
+import { coreRouter } from './api/core.routes.js';
+import { cmsRouter } from './api/cms.routes.js';
+import { websiteRouter, themeRouter } from './api/website.routes.js';
+import { commerceRouter } from './api/commerce.routes.js';
+import { inventoryRouter } from './api/inventory.routes.js';
+import { watchdogRouter } from './api/watchdog.routes.js';
+import {
+  crmRouter,
+  erpRouter,
+  accountingRouter,
+  hrRouter,
+  commsRouter,
+  marketplaceRouter,
+  supportRouter,
+  mediaRouter,
+  collabRouter,
+  analyticsRouter,
+  formsRouter,
+  searchRouter,
+  mediaPublisherRouter,
+  communityAdminRouter,
+  tradesCraftRouter,
+  travelFleetRouter,
+  legalHouseRouter,
+  abodePropertyRouter,
+  reservationsRouter,
+  taxCurrencyRouter,
+  publicApiRouter
+} from './api/subsystems.routes.js';
+
+// Modular HTML View Controllers
+import { renderLoginView } from './views/loginView.js';
+import { renderEditorView } from './views/editorView.js';
+import { renderAdminView } from './views/adminView.js';
+import { renderPreviewView } from './views/previewView.js';
+import { renderMeidaLLMView } from './views/meidallmView.js';
+import { renderCommunityAdminView } from './views/communityAdminView.js';
+import { renderTradesView } from './views/tradesView.js';
+import { renderTravelView } from './views/travelView.js';
+import { renderLegalView } from './views/legalView.js';
+import { renderAbodeView } from './views/abodeView.js';
+
+// Capabilities for Views
 import { CommerceEngine } from './capabilities/commerce/CommerceEngine.js';
 import { CRMEngine } from './capabilities/crm/CRMEngine.js';
+import { ERPEngine } from './capabilities/erp/ERPEngine.js';
 import { AccountingEngine } from './capabilities/accounting/AccountingEngine.js';
 import { HREngine } from './capabilities/hr/HREngine.js';
 import { CommunicationEngine } from './capabilities/communication/CommunicationEngine.js';
-import { seedLioramediaTenant } from './seed/seedLioramedia.js';
+import { MarketplaceEngine } from './capabilities/marketplace/MarketplaceEngine.js';
+import { InventoryEngine } from './capabilities/inventory/InventoryEngine.js';
+import { IdentityEngine } from './core/IdentityEngine.js';
 import { TelemetryEngine } from './foundation/TelemetryEngine.js';
 import { runtimeInputValidator } from './foundation/RuntimeValidator.js';
 import { OpenAPIGenerator } from './foundation/OpenAPIGenerator.js';
@@ -46,23 +106,27 @@ if (typeof process !== 'undefined' && typeof process.on === 'function') {
   });
 }
 
-// Serve Static Assets via Bun (Using Bun File API)
-app.use('/*', serveStatic({ root: './public' }));
+// Global Security, Watchdog & Load Defense Pipeline
+app.use('*', SecurityGuard.securityMiddleware());
+app.use('*', watchdogMiddleware());
+app.use('*', LoadGovernor.middleware());
+app.use('/public/*', serveStatic({ root: './' }));
+// Direct CSS/JS asset serving — serveStatic root resolution fix for Bun
+const servePublicFile = (filename: string, contentType: string) => async (c: any) => {
+  const file = Bun.file(`./public/${filename}`);
+  const content = await file.text();
+  return c.text(content, 200, { 'Content-Type': contentType });
+};
+app.get('/styles.css', servePublicFile('styles.css', 'text/css'));
+app.get('/editor.css', servePublicFile('editor.css', 'text/css'));
+app.get('/blocks.css', servePublicFile('blocks.css', 'text/css'));
+app.get('/animations.css', servePublicFile('animations.css', 'text/css'));
 
-// Global Security & Telemetry Middleware
-app.use('*', runtimeInputValidator);
-app.use('*', async (c, next) => {
-  TelemetryEngine.getInstance().incrementRequestCount();
-  await next();
-});
 
-// OpenAPI Spec Endpoint
-app.get('/api/openapi.json', (c) => {
-  return c.json(OpenAPIGenerator.generateSpec());
-});
-
+// OpenAPI Spec & Swagger UI
+app.get('/api/openapi.json', (c) => c.json(OpenAPIGenerator.generateSpec()));
 app.get('/docs', (c) => {
-  const html = `<!DOCTYPE html>
+  return c.html(`<!DOCTYPE html>
   <html>
   <head>
     <title>ETHENENGINE Platform API Explorer</title>
@@ -75,10 +139,10 @@ app.get('/docs', (c) => {
       SwaggerUIBundle({ url: '/api/openapi.json', dom_id: '#swagger-ui' });
     </script>
   </body>
-  </html>`;
-  return c.html(html);
+  </html>`);
 });
 
+// Singletons & Initialization
 const core = CorePlatformManager.getInstance();
 const capabilityRegistry = CapabilityRegistry.getInstance();
 const themeEngine = ThemeEngine.getInstance();
@@ -87,23 +151,8 @@ const websiteBuilder = WebsiteBuilder.getInstance();
 const mediaEngine = MediaEngine.getInstance();
 const auditLogger = AuditLogger.getInstance();
 const eventBus = EventBus.getInstance();
-
-// Boot SyncEngine — dual-write safety layer (Docker + Aiven)
 const syncEngine = SyncEngine.getInstance();
 
-// Sync Status Endpoint
-app.get('/api/sync/status', (c) => {
-  const stats = syncEngine.getStats();
-  return c.json({
-    status: 'ok',
-    syncEngine: {
-      ...stats,
-      description: 'Dual-write engine: every mutation is written to both Docker PostgreSQL and Aiven Cloud PostgreSQL concurrently.',
-    },
-  });
-});
-
-// Seed Initial Datasets & Capabilities
 seedLioramediaTenant();
 capabilityRegistry.registerCapability({
   id: 'capability_website_builder',
@@ -112,7 +161,7 @@ capabilityRegistry.registerCapability({
   description: 'Drag & drop block renderer and site builder engine',
   category: 'experience',
   enabled: true,
-  initialize: () => {},
+  initialize: () => { },
 });
 
 capabilityRegistry.registerCapability({
@@ -122,7 +171,7 @@ capabilityRegistry.registerCapability({
   description: 'Design token compiler and custom css theme renderer',
   category: 'experience',
   enabled: true,
-  initialize: () => {},
+  initialize: () => { },
 });
 
 capabilityRegistry.registerCapability({
@@ -132,17 +181,7 @@ capabilityRegistry.registerCapability({
   description: 'Headless structured content type and entry management engine',
   category: 'business',
   enabled: true,
-  initialize: () => {},
-});
-
-capabilityRegistry.registerCapability({
-  id: 'capability_media_engine',
-  name: 'Native Media & Image Engine',
-  version: '1.4.0',
-  description: 'Zero-dependency Bun.Image SIMD transformer & WebP optimization pipeline',
-  category: 'experience',
-  enabled: true,
-  initialize: () => {},
+  initialize: () => { },
 });
 
 // Context Middleware: Multi-Tenant & Context Resolver
@@ -157,18 +196,32 @@ app.use('*', async (c, next) => {
   }
 
   const tenant = core.getTenantByDomainOrSlug(tenantParam || 'default') || core.getTenantByDomainOrSlug('tenant_default');
-  c.set('tenant', tenant);
+  c.set('tenant' as any, tenant);
+
+  const authHeader = c.req.header('authorization');
+  const tokenFromHeader = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
+  const cookieHeader = c.req.header('cookie');
+  const tokenFromCookie = cookieHeader ? cookieHeader.split('; ').find((row: string) => row.startsWith('auth_token='))?.split('=')[1] : null;
+  const token = tokenFromHeader || tokenFromCookie;
+
+  if (token) {
+    const context = UnifiedAuthGateway.getInstance().verifyTokenAndResolveContext(token);
+    if (context) c.set('userContext' as any, context);
+  }
+
   await next();
 });
 
-// Middleware: Strict Authenticated Route Protection
+// Auth Guard Middleware for Admin & Protected Views
 const requireAuth = async (c: any, next: any) => {
+  const userContext = c.get('userContext');
+  if (userContext) return await next();
+
+  const tokenFromQuery = c.req.query('token');
   const authHeader = c.req.header('authorization');
   const tokenFromHeader = authHeader && authHeader.startsWith('Bearer ') ? authHeader.substring(7) : null;
-  const tokenFromQuery = c.req.query('token') || c.req.query('session_state');
   const cookieHeader = c.req.header('cookie');
   const tokenFromCookie = cookieHeader ? cookieHeader.split('; ').find((row: string) => row.startsWith('auth_token='))?.split('=')[1] : null;
-
   const token = tokenFromHeader || tokenFromCookie || tokenFromQuery;
 
   if (token) {
@@ -189,159 +242,67 @@ const requireAuth = async (c: any, next: any) => {
 };
 
 // ============================================================
-// Visual Login & Authentication Portal Page
-// GET /login
+// MOUNT MODULAR API ROUTERS
+// ============================================================
+app.route('/api/auth', authRouter);
+app.route('/api/core', coreRouter);
+app.route('/api/cms', cmsRouter);
+app.route('/api/website', websiteRouter);
+app.route('/api/theme', themeRouter);
+app.route('/api/commerce', commerceRouter);
+app.route('/api/inventory', inventoryRouter);
+app.route('/api/watchdog', watchdogRouter);
+app.route('/api/crm', crmRouter);
+app.route('/api/erp', erpRouter);
+app.route('/api/accounting', accountingRouter);
+app.route('/api/hr', hrRouter);
+app.route('/api/comms', commsRouter);
+app.route('/api/marketplace', marketplaceRouter);
+app.route('/api/support', supportRouter);
+app.route('/api/media', mediaRouter);
+app.route('/api/collab', collabRouter);
+app.route('/api/analytics', analyticsRouter);
+app.route('/api/forms', formsRouter);
+app.route('/api/search', searchRouter);
+app.route('/api/media-publisher', mediaPublisherRouter);
+app.route('/api/community-admin', communityAdminRouter);
+app.route('/api/trades', tradesCraftRouter);
+app.route('/api/travel', travelFleetRouter);
+app.route('/api/legal', legalHouseRouter);
+import { SystemHealthEngine } from './capabilities/health/SystemHealthEngine.js';
+
+app.route('/api/abode', abodePropertyRouter);
+app.route('/api/reservations', reservationsRouter);
+app.route('/api/tax-currency', taxCurrencyRouter);
+app.route('/api/public-apis', publicApiRouter);
+
+app.get('/api/core/health-status', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const health = await SystemHealthEngine.getInstance().runSystemHealthCheck(tenant?.id || 'tenant_lioramedia');
+  return c.json({ health });
+});
+
+app.get('/api/identities', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ identities: IdentityEngine.getInstance().listIdentities(tenant.id) });
+});
+
+// ============================================================
+// MOUNT HTML VIEW CONTROLLERS
 // ============================================================
 app.get('/login', (c) => {
   const tenantSlug = c.req.query('tenant') || 'lioramedia';
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — ETHENENGINE Enterprise Platform</title>
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/animations.css" />
-  <style>
-    body {
-      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 50%, #020617 100%);
-      font-family: system-ui, -apple-system, sans-serif; color: #f8fafc;
-    }
-    .login-card {
-      width: 100%; max-width: 440px; padding: 2.5rem; background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-    .brand-header { text-align: center; margin-bottom: 2rem; }
-    .brand-logo {
-      width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, #a855f7);
-      border-radius: 12px; display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1.5rem; color: white; margin: 0 auto 1rem;
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-    }
-    .input-group { margin-bottom: 1.25rem; }
-    .input-group label { display: block; font-size: 0.85rem; font-weight: 500; color: #94a3b8; margin-bottom: 0.5rem; }
-    .input-control {
-      width: 100%; padding: 0.75rem 1rem; background: rgba(2, 6, 23, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: white;
-      font-size: 0.95rem; box-sizing: border-box; transition: all 0.2s;
-    }
-    .input-control:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-    .btn-submit {
-      width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #6366f1, #4f46e5);
-      border: none; border-radius: 0.5rem; color: white; font-weight: 600; font-size: 1rem;
-      cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: transform 0.1s, box-shadow 0.2s;
-    }
-    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
-    .sso-divider { display: flex; align-items: center; margin: 1.5rem 0; color: #64748b; font-size: 0.8rem; }
-    .sso-divider::before, .sso-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
-    .sso-divider span { padding: 0 0.75rem; }
-    .btn-keycloak {
-      width: 100%; padding: 0.85rem; background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 0.5rem; color: #e2e8f0;
-      font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center;
-      justify-content: center; gap: 0.75rem; transition: background 0.2s; text-decoration: none; box-sizing: border-box;
-    }
-    .btn-keycloak:hover { background: rgba(255, 255, 255, 0.1); }
-    .alert-msg { padding: 0.75rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1.25rem; display: none; }
-    .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
-    .alert-success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac; }
-  </style>
-</head>
-<body>
-  <div class="login-card animate-fade-in">
-    <div class="brand-header">
-      <div class="brand-logo">E</div>
-      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">ETHENENGINE</h2>
-      <p style="margin: 0.4rem 0 0; color: #94a3b8; font-size: 0.85rem;">Enterprise Multi-Tenant Platform</p>
-    </div>
-
-    <div id="alertBox" class="alert-msg"></div>
-
-    <form id="loginForm" onsubmit="handleLogin(event)">
-      <div class="input-group">
-        <label>Email Address</label>
-        <input type="email" id="email" class="input-control" placeholder="john.doe@enterprise.com" required value="admin@lioramedia.com" />
-      </div>
-
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="password" class="input-control" placeholder="••••••••" required value="Password123!" />
-      </div>
-
-      <button type="submit" class="btn-submit">Sign In</button>
-    </form>
-
-    <div class="sso-divider">
-      <span>OR ENTERPRISE SSO</span>
-    </div>
-
-    <a href="http://localhost:8080/realms/ethenengine/protocol/openid-connect/auth?client_id=ethenengine-app&response_type=code&redirect_uri=http://localhost:3000/admin" class="btn-keycloak">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-      </svg>
-      Continue with Keycloak SSO
-    </a>
-  </div>
-
-  <script>
-    async function handleLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const alertBox = document.getElementById('alertBox');
-
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-tenant-id': '${escapeHtml(tenantSlug)}' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          alertBox.className = 'alert-msg alert-success';
-          alertBox.style.display = 'block';
-          alertBox.innerText = 'Login successful! Redirecting...';
-          localStorage.setItem('auth_token', data.token);
-          document.cookie = 'auth_token=' + data.token + '; path=/; SameSite=Lax';
-          setTimeout(() => { window.location.href = '/admin?tenant=${escapeHtml(tenantSlug)}'; }, 1000);
-        } else {
-          alertBox.className = 'alert-msg alert-error';
-          alertBox.style.display = 'block';
-          alertBox.innerText = data.error || 'Authentication failed';
-        }
-      } catch (err) {
-        alertBox.className = 'alert-msg alert-error';
-        alertBox.style.display = 'block';
-        alertBox.innerText = 'Network error during login.';
-      }
-    }
-  </script>
-</body>
-</html>`;
-  return c.html(html);
+  return c.html(renderLoginView(tenantSlug));
 });
 
-// API Routes
-app.post('/api/auth/register', async (c) => {
-  const body = await c.req.json();
-  const { email, name, password, securityQuestions, type } = body;
-  const tenant = c.get('tenant') as any;
+app.get('/editor', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const pageId = c.req.query('pageId');
+  let pages = websiteBuilder.listPages(tenant.id);
 
-  if (!email || !name || !password) {
-    return c.json({ error: 'Missing required fields: email, name, password' }, 400);
-  }
-
-  try {
-    const identityEngine = IdentityEngine.getInstance();
-    const user = identityEngine.registerUser({
-      email,
-      name,
-      password,
-      securityQuestions,
-      type: type || 'PUBLIC_USER',
+  // If a newly created tenant has no pages yet, auto-provision default starter home page
+  if (pages.length === 0) {
+    const defaultPage = websiteBuilder.createPage({
       tenantId: tenant.id,
     });
 
@@ -509,45 +470,6 @@ app.post('/api/cms/entries', async (c) => {
   return c.json({ entry }, 201);
 });
 
-// Native Bun.Image Processing Endpoints
-app.post('/api/media/process', async (c) => {
-  const tenant = c.get('tenant') as any;
-  const body = await c.req.parseBody();
-  const file = body['file'];
-  const width = body['width'] ? parseInt(body['width'] as string, 10) : 800;
-  const format = (body['format'] as any) || 'webp';
-  const quality = body['quality'] ? parseInt(body['quality'] as string, 10) : 85;
-
-  if (!file || !(file instanceof Blob)) {
-    // Generate an in-memory sample 1x1 PNG if no file provided
-    const samplePng = new Uint8Array([
-      0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-      0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-      0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-      0x42, 0x60, 0x82,
-    ]);
-    const meta = await mediaEngine.processAndStore(tenant.id, 'sample.png', samplePng, { width, format, quality });
-    return c.json({ status: 'ok', engine: 'Bun.Image (SIMD)', ...meta }, 201);
-  }
-
-  const arrayBuffer = await file.arrayBuffer();
-  const meta = await mediaEngine.processAndStore(tenant.id, (file as any).name || 'upload.png', arrayBuffer, {
-    width,
-    format,
-    quality,
-  });
-  return c.json({ status: 'ok', engine: 'Bun.Image (SIMD)', ...meta }, 201);
-});
-
-app.get('/api/media/cron/status', (c) => {
-  return c.json({
-    status: 'ok',
-    engine: 'Bun.cron',
-    jobs: ScheduledCronEngine.getInstance().getJobStatuses(),
-  });
-});
-
 app.get('/api/theme', (c) => {
   const tenant = c.get('tenant') as any;
   const theme = themeEngine.getThemeForTenant(tenant.id);
@@ -607,7 +529,7 @@ app.put('/api/website/pages/:id', async (c) => {
   const id = c.req.param('id');
   const body = await c.req.json();
   const { title, slug, isPublished, seoTitle, seoDescription, heroTitle, heroSubtitle, ctaText, ctaUrl } = body;
-  
+
   try {
     const page = websiteBuilder.listPages(tenant.id).find(p => p.id === id || p.slug === id) || websiteBuilder.getPageBySlug(tenant.id, id);
     if (!page) return c.json({ error: 'Page not found' }, 404);
@@ -669,260 +591,154 @@ app.get('/editor', (c) => {
   const tenants = core.listTenants();
   const tenant = tenants.find((t) => t.slug === tenantSlug) || tenants.find((t) => t.slug === 'default')!;
   const theme = themeEngine.getThemeForTenant(tenant.id);
-  const pages = websiteBuilder.listPages(tenant.id);
-  const page = pageId ? pages.find((p) => p.id === pageId || p.slug === pageId) : pages[0];
-
-  if (!page) {
-    return c.html('<h1>Page not found</h1><a href="/admin?tenant=' + tenantSlug + '">← Back to Admin</a>', 404);
-  }
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Visual Editor — ${escapeHtml(page.title)} | ETHENENGINE Studio</title>
-  <link rel="stylesheet" href="/editor.css" />
-</head>
-<body>
-<div class="editor-toolbar" id="editorToolbar">
-  <div style="display:flex; align-items:center; gap:0.75rem;">
-    <div class="toolbar-brand"><div class="toolbar-brand-icon">E</div><span style="color:#6366f1;">STUDIO</span></div>
-    <a href="/admin?tenant=${escapeHtml(tenantSlug)}" class="btn btn-ghost" style="padding:0.3rem 0.6rem; font-size:0.74rem;">← Admin</a>
-    <input type="text" class="page-title-input" id="pageTitleInput" value="${escapeHtml(page.title)}" />
-  </div>
-  <div class="toolbar-right">
-    <button class="btn btn-primary" onclick="savePage()">💾 Save</button>
-    <button class="btn btn-ghost" onclick="handleLogout()" style="color:#fca5a5;">🚪 Sign Out</button>
-  </div>
-</div>
-<script>
-  async function handleLogout() {
-    localStorage.removeItem('auth_token');
-    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    window.location.href = '/login?tenant=${escapeHtml(tenantSlug)}';
-  }
-</script>
-</body>
-</html>`;
-  return c.html(html);
+  return c.html(renderEditorView({ tenantSlug: tenant.slug, page, pages, theme }));
 });
 
-// Admin Experience Dashboard API/HTML UI
 app.get('/admin', requireAuth, (c) => {
   const tenants = core.listTenants();
-  const activeTenant = c.get('tenant') as any;
+  const activeTenant = c.get('tenant' as any) as any;
   const activeView = c.req.query('view') || 'dashboard';
+  const userContext = c.get('userContext' as any) as any;
+  const isSuperadmin = userContext?.user?.type === 'PLATFORM_USER';
+  const currentUserId = userContext?.user?.userId || (isSuperadmin ? 'usr_platform_admin' : 'usr_tenant_admin');
+
+  const supportEngine = SupportAccessEngine.getInstance();
+  const supportStatus = supportEngine.hasActiveSupportAccess(activeTenant.id, currentUserId);
+  const isSupportSessionActive = isSuperadmin && supportStatus.granted;
+  const canAccessConfidentialTenantData = !isSuperadmin || isSupportSessionActive;
 
   const pages = websiteBuilder.listPages(activeTenant.id);
-  const theme = themeEngine.getThemeForTenant(activeTenant.id);
   const cmsEntries = cms.listEntries(activeTenant.id);
   const commerce = CommerceEngine.getInstance();
   const crm = CRMEngine.getInstance();
+  const erp = ERPEngine.getInstance();
   const accounting = AccountingEngine.getInstance();
   const comms = CommunicationEngine.getInstance();
   const hr = HREngine.getInstance();
-  const identityEngine = IdentityEngine.getInstance();
+  const marketplace = MarketplaceEngine.getInstance();
+  const inventory = InventoryEngine.getInstance();
 
   const products = commerce.listProducts(activeTenant.id);
   const orders = commerce.listOrders(activeTenant.id);
-  const leads = crm.listLeads(activeTenant.id);
-  const balance = accounting.getBalanceSheet(activeTenant.id);
-  const chatMsgs = comms.getMessages('chan_general');
+  const warehouses = inventory.listWarehouses(activeTenant.id);
+  const stockItems = inventory.listStock(activeTenant.id);
+  const transfers = inventory.listTransfers(activeTenant.id);
+  const leads = canAccessConfidentialTenantData ? crm.listLeads(activeTenant.id) : [];
+  const procurementOrders = canAccessConfidentialTenantData ? erp.listProcurementOrders(activeTenant.id) : [];
+  const balance = canAccessConfidentialTenantData ? accounting.getBalanceSheet(activeTenant.id) : { netBalance: 0, totalDebits: 0, totalCredits: 0 };
+  const employees = canAccessConfidentialTenantData ? hr.listEmployees(activeTenant.id) : [];
+  const chatMsgs = canAccessConfidentialTenantData ? comms.getMessages('chan_general') : [];
   const auditLogs = auditLogger.getAuditTrail(activeTenant.id);
-  const identities = (identityEngine as any).listIdentities ? (identityEngine as any).listIdentities() : Array.from((identityEngine as any).identities.values());
-
-  const telemetry = TelemetryEngine.getInstance().getTelemetry(tenants.length);
+  const identities = IdentityEngine.getInstance().listIdentities(activeTenant.id);
+  const listings = marketplace.listListings();
+  const supportGrants = supportEngine.listGrantsForTenant(activeTenant.id);
+  const analyticsSummary = AnalyticsEngine.getInstance().getSummary(activeTenant.id);
   const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>ETHENENGINE Admin Console (${escapeHtml(activeTenant.name)})</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b0f19; color: #e2e8f0; display: flex; height: 100vh; overflow: hidden; }
-    .sidebar { width: 280px; background: #111827; border-right: 1px solid #1f2937; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; overflow-y: auto; }
-    .brand { font-size: 1.2rem; font-weight: 700; color: #6366f1; display:flex; align-items:center; gap:0.5rem; }
-    .nav-item { padding: 0.65rem 0.85rem; border-radius: 6px; color: #9ca3af; text-decoration: none; font-size: 0.85rem; display:flex; align-items:center; gap:0.5rem; }
-    .nav-item.active, .nav-item:hover { background: #1f2937; color: #fff; }
-    .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
-    .card { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 1.5rem; }
-    .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #38bdf8; display:flex; justify-content:space-between; align-items:center; }
-    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-    .stat-card { background: #070a12; border: 1px solid #1f2937; border-radius: 8px; padding: 1rem; }
-    .stat-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; }
-    .stat-value { font-size: 1.4rem; font-weight: 700; color: #fff; }
-    .stat-desc { font-size: 0.8rem; color: #10b981; margin-top: 0.25rem; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
-    th, td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #1f2937; }
-    th { color: #6b7280; font-weight: 600; }
-    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #065f46; color: #34d399; }
-    .btn { background: #6366f1; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; }
-  </style>
-  <script>
-    (function() {
-      const token = localStorage.getItem('auth_token');
-      const isKeycloakSession = document.referrer.includes('8080') || window.location.search.includes('session_state') || window.location.search.includes('code');
-      if (!token && !isKeycloakSession) {
-        window.location.href = '/login?tenant=${activeTenant.slug}';
-      }
-    })();
-  </script>
-</head>
-<body>
-  <div class="sidebar">
-    <div class="brand">
-      <div style="background:#6366f1; width:28px; height:28px; border-radius:6px; display:grid; place-content:center; color:#fff; font-weight:900;">E</div>
-      ETHENENGINE ADMIN
-    </div>
-    <nav style="display:flex; flex-direction:column; gap:0.2rem;">
-      <a class="nav-item ${activeView === 'dashboard' ? 'active' : ''}" href="/admin?tenant=${activeTenant.slug}&view=dashboard">📊 Dashboard & Telemetry</a>
-      <a class="nav-item" href="/docs" target="_blank">📖 OpenAPI Specs ↗</a>
-      <button onclick="handleLogout()" class="nav-item" style="width:100%; text-align:left; border:none; cursor:pointer; background:rgba(239,68,68,0.15); color:#fca5a5; margin-top:1rem;">🚪 Sign Out / Logout</button>
-    </nav>
-  </div>
-  <div class="main-content">
-    <div class="grid-4">
-      <div class="stat-card"><div class="stat-label">🛒 Commerce Revenue</div><div class="stat-value">$${totalRevenue.toLocaleString()}</div></div>
-      <div class="stat-card"><div class="stat-label">💰 Net Balance</div><div class="stat-value">$${balance.netBalance.toLocaleString()}</div></div>
-      <div class="stat-card"><div class="stat-label">🛡️ Audit Logs</div><div class="stat-value">${auditLogs.length}</div></div>
-      <div class="stat-card"><div class="stat-label">💬 Messages</div><div class="stat-value">${chatMsgs.length}</div></div>
-    </div>
-    <div class="card">
-      <h2>Website Pages (${escapeHtml(activeTenant.name)})</h2>
-      <table>
-        <thead><tr><th>Page Title</th><th>Path Slug</th><th>Status</th></tr></thead>
-        <tbody>
-          ${pages.map((p) => `<tr><td style="font-weight:600; color:#fff;">${escapeHtml(p.title)}</td><td>/${escapeHtml(p.slug)}</td><td><span class="badge">PUBLISHED</span></td></tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <script>
-    async function handleLogout() {
-      try {
-        await fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '') } });
-      } catch (e) {}
-      localStorage.removeItem('auth_token');
-      document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      window.location.href = '/login?tenant=${activeTenant.slug}';
-    }
-  </script>
-</body>
-</html>`;
-  return c.html(html);
+  // Watchdog & Disaster Recovery Telemetry
+  const watchdog = WatchdogEngine.getInstance();
+  const dr = DisasterRecoveryEngine.getInstance();
+  const dataRecovery = DataRecoveryEngine.getInstance();
+  const loadGovernor = LoadGovernor.getInstance();
+
+  const watchdogHealth = watchdog.getHealthStatus();
+  const watchdogMetrics = watchdog.getMetrics();
+  const circuitBreakers = watchdog.getCircuitBreakers();
+  const watchdogIncidents = watchdog.listIncidents(30);
+  const drStatus = {
+    isFailoverActive: dr.isFailoverActive(),
+    failoverReason: dr.getFailoverReason(),
+    serviceProbes: dr.listServiceHealth(),
+  };
+  const snapshots = dataRecovery.listSnapshots(activeTenant.id);
+  const loadStats = loadGovernor.getStats();
+
+  return c.html(renderAdminView({
+    activeTenant,
+    activeView,
+    tenants,
+    pages,
+    canAccessConfidentialTenantData,
+    isSuperadmin,
+    isSupportSessionActive,
+    supportStatus,
+    orders,
+    totalRevenue,
+    balance,
+    leads,
+    procurementOrders,
+    auditLogs,
+    identities,
+    employees,
+    chatMsgs,
+    warehouses,
+    stockItems,
+    transfers,
+    products,
+    cmsEntries,
+    listings,
+    supportGrants,
+    analyticsSummary,
+    watchdogHealth,
+    watchdogMetrics,
+    circuitBreakers,
+    watchdogIncidents,
+    drStatus,
+    snapshots,
+    loadStats,
+  }));
 });
 
-app.put('/api/website/pages/:id/blocks', async (c) => {
-  const id = c.req.param('id');
-  const body = await c.req.json();
-  const updatedPage = websiteBuilder.updatePageBlocks(id, body.blocks);
-  return c.json({ page: updatedPage });
+app.get('/meidallm', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const tenantSlug = tenant?.slug || 'lioramedia';
+  return c.html(renderMeidaLLMView(tenantSlug));
+});
+
+app.get('/community-admin', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderCommunityAdminView(tenant));
+});
+
+app.get('/trades', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderTradesView(tenant));
+});
+
+app.get('/travel', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderTravelView(tenant));
+});
+
+app.get('/legal', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderLegalView(tenant));
+});
+
+app.get('/abode', requireAuth, (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.html(renderAbodeView(tenant));
 });
 
 app.get('/preview/:slug', (c) => {
-  const tenant = c.get('tenant') as any;
+  const tenant = c.get('tenant' as any) as any;
   const slug = c.req.param('slug');
-  const page = websiteBuilder.getPageBySlug(tenant.id, slug) || websiteBuilder.getPageBySlug('tenant_default', slug);
+  const page = websiteBuilder.getPageBySlug(tenant.id, slug);
+  if (!page) return c.text('Page not found', 404);
 
-  if (!page) return c.html('<h1>Page Not Found</h1>', 404);
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>ETHENENGINE Enterprise — ${escapeHtml(page.title)}</title>
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <div class="hero">
-    <h1>${escapeHtml(page.title)}</h1>
-  </div>
-</body>
-</html>`;
-  return c.html(html);
+  const theme = themeEngine.getThemeForTenant(tenant.id);
+  const cssVariables = themeEngine.generateCssVariables(theme.tokens);
+  const renderedContent = websiteBuilder.renderPage(page, { tenant, themeTokens: theme.tokens });
+  return c.html(renderPreviewView({ page, tenant, cssVariables, renderedContent }));
 });
 
-// Render Public Landing Page
 app.get('/', (c) => {
-  const activeTenant = c.get('tenant') as any;
+  const activeTenant = c.get('tenant' as any) as any;
   const page = websiteBuilder.getPageBySlug(activeTenant.id, 'home') || websiteBuilder.listPages(activeTenant.id)[0];
   const theme = themeEngine.getThemeForTenant(activeTenant.id);
   const cssVariables = themeEngine.generateCssVariables(theme.tokens);
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(activeTenant.name)} — Enterprise Multi-Tenant Platform</title>
-  <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/animations.css">
-  <style>
-    ${cssVariables}
-    body { background: #030712; color: #f9fafb; font-family: system-ui, -apple-system, sans-serif; margin: 0; }
-    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 2.5rem; max-width: 1200px; margin: 0 auto; }
-    .nav-logo { font-size: 1.5rem; font-weight: 800; color: #6366f1; text-decoration: none; display: flex; align-items: center; gap: 0.6rem; }
-    .nav-links { display: flex; items-center; gap: 1.5rem; }
-    .nav-link { color: #9ca3af; text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
-    .nav-link:hover { color: #ffffff; }
-    .btn-login { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; padding: 0.6rem 1.4rem; border-radius: 8px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); }
-    .hero-section { text-align: center; padding: 6rem 1.5rem 4rem; max-width: 900px; margin: 0 auto; }
-    .hero-title { font-size: 3.5rem; font-weight: 900; line-height: 1.15; background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; }
-    .hero-sub { font-size: 1.25rem; color: #94a3b8; max-width: 700px; margin: 0 auto 2.5rem; line-height: 1.6; }
-    .hero-cta { display: flex; gap: 1rem; justify-content: center; align-items: center; }
-    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 0.85rem 2rem; border-radius: 10px; font-weight: 700; font-size: 1.05rem; text-decoration: none; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
-    .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 0.85rem 2rem; border-radius: 10px; font-weight: 600; font-size: 1.05rem; text-decoration: none; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 4rem auto; padding: 0 1.5rem; }
-    .feature-card { background: rgba(17, 24, 39, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 2rem; }
-    .feature-icon { font-size: 2rem; margin-bottom: 1rem; }
-    .feature-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #f3f4f6; }
-    .feature-card p { font-size: 0.9rem; color: #9ca3af; line-height: 1.5; }
-  </style>
-</head>
-<body>
-  <nav class="navbar">
-    <a href="/" class="nav-logo">
-      <div style="background:#6366f1; width:32px; height:32px; border-radius:8px; display:grid; place-content:center; color:#fff; font-weight:900;">E</div>
-      ${escapeHtml(activeTenant.name)}
-    </a>
-    <div class="nav-links">
-      <a href="#features" class="nav-link">Platform Features</a>
-      <a href="/docs" target="_blank" class="nav-link">API Specs ↗</a>
-      <a href="/login?tenant=${escapeHtml(activeTenant.slug)}" class="btn-login">🔑 Sign In / Login</a>
-    </div>
-  </nav>
-
-  <section class="hero-section">
-    <h1 class="hero-title">${escapeHtml(page ? page.title : 'Empowering Business Operations')}</h1>
-    <p class="hero-sub">Enterprise multi-tenant platform architecture engineered for high speed, real-time analytics, commerce, and security.</p>
-    <div class="hero-cta">
-      <a href="/login?tenant=${escapeHtml(activeTenant.slug)}" class="btn-primary">Get Started / Sign In →</a>
-      <a href="/admin?tenant=${escapeHtml(activeTenant.slug)}" class="btn-secondary">Explore Admin Portal</a>
-    </div>
-  </section>
-
-  <section id="features" class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Bun & Hono Engine</h3>
-      <p>Blazing fast server response times powered natively by Bun JavaScript runtime and Hono framework.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🛡️</div>
-      <h3>Multi-Tenant Security</h3>
-      <p>Isolated data layers, JWT claim contracts, and Keycloak SSO integration for total enterprise compliance.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🛒</div>
-      <h3>Commerce & CMS</h3>
-      <p>Built-in headless CMS, product catalog management, accounting general ledger, and CRM pipeline engines.</p>
-    </div>
-  </section>
-</body>
-</html>`;
-  return c.html(html);
+  const renderedContent = page ? websiteBuilder.renderPage(page, { tenant: activeTenant, themeTokens: theme.tokens }) : '';
+  return c.html(renderPreviewView({ page, tenant: activeTenant, cssVariables, renderedContent, isRoot: true }));
 });
 
 export default {

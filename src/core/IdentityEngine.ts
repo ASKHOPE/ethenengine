@@ -279,4 +279,12 @@ export class IdentityEngine {
     }));
     return true;
   }
+
+  public listIdentities(tenantId?: string): UserIdentity[] {
+    const list = Array.from(this.identities.values());
+    if (tenantId) {
+      return list.filter((u) => u.tenantId === tenantId || u.type === 'PLATFORM_USER');
+    }
+    return list;
+  }
 }

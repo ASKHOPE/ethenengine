@@ -1,19 +1,19 @@
 /* Design System & Premium UI Stylesheet (Glassmorphism, Vibrant Gradients, Animations) */
 
 :root {
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
-  --color-secondary: #ec4899;
+  --color-primary: #0284c7;
+  --color-primary-hover: #0369a1;
+  --color-secondary: #0d9488;
   --color-accent: #38bdf8;
-  --color-bg-dark: #0b0f19;
-  --color-surface: #111827;
+  --color-bg-dark: #0f172a;
+  --color-surface: #1e293b;
   --color-surface-card: #1e293b;
-  --color-border: #334155;
-  --color-border-glow: rgba(99, 102, 241, 0.4);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-glow: rgba(2, 132, 199, 0.25);
   --color-text: #f8fafc;
   --color-text-muted: #94a3b8;
-  --border-radius-lg: 12px;
-  --border-radius-md: 8px;
+  --border-radius-lg: 10px;
+  --border-radius-md: 6px;
   --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -29,6 +29,30 @@ body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+/* Firefox & WebKit Cross-Browser Custom Scrollbar Standard */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
 }
 
 /* Glassmorphism utility */
@@ -341,4 +365,46 @@ footer {
   justify-content: space-between;
   font-size: 0.85rem;
   color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   INTERACTIVE E-COMMERCE CART DRAWER & TRIGGER
+   ========================================================================== */
+.cart-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.cart-drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 400px;
+  background: #0f172a;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cart-drawer.open {
+  transform: translateX(0);
 }

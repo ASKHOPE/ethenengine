@@ -1,65 +1,207 @@
-/* Animation & FX Library - Built-in Pure CSS Effects Framework */
+/* ==========================================================================
+   ETHENENGINE Animation & Visual FX Engine (animations.css)
+   Cross-Browser Compliant (Safari 3+, iOS Safari, Chrome, Firefox, Edge)
+   GPU-Accelerated Keyframes, Micro-Interactions, Festive Ambience & Shimmers
+   ========================================================================== */
 
-/* 1. Entrances & Keyframe Animations */
+/* 1. ENTRANCES & SCALE ANIMATIONS */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(24px);
+    -moz-transform: translateY(24px);
+    -ms-transform: translateY(24px);
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    -webkit-transform: translateX(100%);
+    -moz-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+  }
 }
 
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes scaleUpSpring {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(0.92);
+    -moz-transform: scale(0.92);
+    transform: scale(0.92);
+  }
+  70% {
+    -webkit-transform: scale(1.03);
+    -moz-transform: scale(1.03);
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    transform: scale(1);
+  }
 }
 
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+/* 2. ATMOSPHERIC AURORA & AMBIENT DRIFT */
+@keyframes auroraMeshFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-@keyframes shimmerGlow {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+@keyframes floatGentle {
+  0%, 100% {
+    -webkit-transform: translateY(0px);
+    -moz-transform: translateY(0px);
+    transform: translateY(0px);
+  }
+  50% {
+    -webkit-transform: translateY(-8px);
+    -moz-transform: translateY(-8px);
+    transform: translateY(-8px);
+  }
 }
 
-/* 2. Utility Classes */
-.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-.animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-slide-down { animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-scale-up { animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-float { animation: floatSlow 4s ease-in-out infinite; }
+/* 3. TELEMETRY PULSE & RADAR */
+@keyframes liveRadarPulse {
+  0% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    -webkit-transform: scale(1.35);
+    -moz-transform: scale(1.35);
+    transform: scale(1.35);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  100% {
+    -webkit-transform: scale(0.95);
+    -moz-transform: scale(0.95);
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
 
-/* 3. Skeleton Loading Shimmer Effect */
-.shimmer {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+/* 4. SKELETON SHIMMER EFFECT */
+@keyframes shimmerShine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 5. HOLIDAY & CELEBRATION EFFECTS */
+@keyframes gentleSnowfall {
+  0% {
+    background-position: 0px 0px, 0px 0px, 0px 0px;
+  }
+  100% {
+    background-position: 500px 1000px, 400px 400px, 300px 300px;
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px #f97316) brightness(1);
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 22px #ef4444) brightness(1.25);
+    -webkit-transform: scale(1.06);
+    transform: scale(1.06);
+  }
+}
+
+/* 6. UTILITY CLASSES */
+.animate-fade-in {
+  -webkit-animation: fadeIn 0.35s ease-out forwards;
+  -moz-animation: fadeIn 0.35s ease-out forwards;
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  -webkit-animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  -moz-animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-right {
+  -webkit-animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  -moz-animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-spring {
+  -webkit-animation: scaleUpSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  -moz-animation: scaleUpSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: scaleUpSpring 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-float {
+  -webkit-animation: floatGentle 4s ease-in-out infinite;
+  -moz-animation: floatGentle 4s ease-in-out infinite;
+  animation: floatGentle 4s ease-in-out infinite;
+}
+
+.shimmer-loading {
+  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.03) 75%);
   background-size: 200% 100%;
-  animation: shimmerGlow 1.5s infinite;
+  -webkit-animation: shimmerShine 1.8s infinite;
+  -moz-animation: shimmerShine 1.8s infinite;
+  animation: shimmerShine 1.8s infinite;
 }
 
-/* 4. Interactive Hover Micro-Effects */
-.fx-glow-hover {
-  transition: all 0.3s ease;
+/* 7. MICRO-INTERACTION BUTTON PRESSES */
+.btn-pressable {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.12s ease;
 }
 
-.fx-glow-hover:hover {
-  box-shadow: 0 0 25px rgba(99, 102, 241, 0.6);
-  border-color: rgba(99, 102, 241, 0.8);
-}
-
-.fx-card-tilt {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.fx-card-tilt:hover {
-  transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
+.btn-pressable:active {
+  -webkit-transform: scale(0.96);
+  -moz-transform: scale(0.96);
+  -ms-transform: scale(0.96);
+  transform: scale(0.96);
 }
