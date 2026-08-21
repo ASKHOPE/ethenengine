@@ -308,11 +308,22 @@ app.get('/editor', requireAuth, (c) => {
 });
 
 app.get('/admin', requireAuth, (c) => {
-  const tenants = core.listTenants();
-  const activeTenant = c.get('tenant' as any) as any;
-  const activeView = c.req.query('view') || 'dashboard';
   const userContext = c.get('userContext' as any) as any;
   const isSuperadmin = userContext?.user?.type === 'PLATFORM_USER';
+  
+  // Strict Multi-Tenant Isolation:
+  // If not a Superadmin, lock tenant context strictly to the logged-in user's assigned tenant
+  let activeTenant = c.get('tenant' as any) as any;
+  if (!isSuperadmin && userContext?.user?.tenantId) {
+    const assignedTenant = core.getTenantByDomainOrSlug(userContext.user.tenantId);
+    if (assignedTenant) {
+      activeTenant = assignedTenant;
+    }
+  }
+
+  // Tenant list visible in dropdown: Superadmins see all; Tenant Admins only see their own
+  const tenants = isSuperadmin ? core.listTenants() : [activeTenant];
+  const activeView = c.req.query('view') || 'dashboard';
   const currentUserId = userContext?.user?.userId || (isSuperadmin ? 'usr_platform_admin' : 'usr_tenant_admin');
 
   const supportEngine = SupportAccessEngine.getInstance();

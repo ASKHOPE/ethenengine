@@ -11,7 +11,9 @@ export interface PreviewViewOptions {
 export function renderPreviewView(options: PreviewViewOptions): string {
   const { page, tenant, cssVariables, renderedContent, isRoot } = options;
 
-  const cartWidgetHtml = `
+  const isCommerceEnabled = !tenant?.enabledServices || tenant.enabledServices.length === 0 || tenant.enabledServices.includes('commerce');
+
+  const cartWidgetHtml = isCommerceEnabled ? `
     <!-- FLOATING SHOPPING BAG TRIGGER -->
     <div id="cartFloatingTrigger" class="floating-cart-trigger" onclick="toggleStoreCart()" style="position:fixed; bottom:2rem; right:2rem; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--color-primary,#6366f1),var(--color-secondary,#a855f7)); display:grid; place-content:center; color:#fff; font-size:1.4rem; cursor:pointer; box-shadow:0 10px 25px rgba(0,0,0,0.5); z-index:9998;">
       🛍️
@@ -230,7 +232,7 @@ export function renderPreviewView(options: PreviewViewOptions): string {
         body: JSON.stringify({ pageSlug: ${JSON.stringify(page?.slug || 'home')}, variantId: 'A', referrer: document.referrer || '' })
       }).catch(() => {});
     </script>
-  `;
+  ` : '';
 
   if (isRoot) {
     return `<!DOCTYPE html>

@@ -3,7 +3,9 @@
 
 import { escapeHtml } from '../foundation/Sanitizer.js';
 
-export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): string {
+export function renderCommunityAdminView(tenant: any = 'lioramedia'): string {
+  const tenantSlug = typeof tenant === 'string' ? tenant : (tenant?.slug || 'lioramedia');
+  const tenantName = typeof tenant === 'string' ? tenant : (tenant?.name || tenantSlug);
   return `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -16,12 +18,30 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       --color-bg: #070a12;
       --color-panel: #0d1322;
       --color-panel-hover: #111827;
+      --color-navbar-bg: #090e1a;
+      --color-stat-bg: #111827;
       --color-border: #1f2937;
       --color-primary: #0284c7;
       --color-accent: #34d399;
+      --color-heading: #ffffff;
       --color-text-main: #f8fafc;
       --color-text-muted: #94a3b8;
     }
+
+    [data-theme="day"] {
+      --color-bg: #f8fafc;
+      --color-panel: #ffffff;
+      --color-panel-hover: #f1f5f9;
+      --color-navbar-bg: #ffffff;
+      --color-stat-bg: #f8fafc;
+      --color-border: #cbd5e1;
+      --color-primary: #0284c7;
+      --color-accent: #059669;
+      --color-heading: #0f172a;
+      --color-text-main: #1e293b;
+      --color-text-muted: #64748b;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -31,17 +51,19 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: background 0.2s, color 0.2s;
     }
 
     /* NAVIGATION BAR */
     .nav-bar {
       height: 60px;
-      background: #090e1a;
+      background: var(--color-navbar-bg);
       border-bottom: 1px solid var(--color-border);
       padding: 0 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: background 0.2s, border-color 0.2s;
     }
     .brand-group { display: flex; align-items: center; gap: 0.75rem; }
     .brand-icon {
@@ -56,9 +78,9 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       font-weight: 800;
       font-size: 1.2rem;
     }
-    .brand-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; }
+    .brand-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--color-heading); }
 
-    .nav-tabs { display: flex; gap: 0.5rem; }
+    .nav-tabs { display: flex; gap: 0.5rem; align-items: center; }
     .tab-btn {
       padding: 0.45rem 0.9rem;
       border-radius: 6px;
@@ -70,31 +92,32 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.04); }
-    .tab-btn.active { background: rgba(2, 132, 199, 0.15); color: #38bdf8; border-color: #0284c7; }
+    .tab-btn:hover { color: var(--color-heading); background: var(--color-panel-hover); }
+    .tab-btn.active { background: rgba(2, 132, 199, 0.15); color: var(--color-primary); border-color: var(--color-primary); }
 
     /* CONTENT BODY */
     .content-area { flex: 1; padding: 1.5rem; overflow-y: auto; }
-    .card { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+    .card { background: var(--color-panel); border: 1px solid var(--color-border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-    .stat-card { background: #111827; border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; }
-    .stat-label { font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .stat-val { font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 0.2rem; }
+    .stat-card { background: var(--color-stat-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; }
+    .stat-label { font-size: 0.72rem; color: var(--color-text-muted); font-weight: 700; text-transform: uppercase; }
+    .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--color-heading); margin-top: 0.2rem; }
 
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-    th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--color-border); }
-    th { color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }
+    th, td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-main); }
+    th { color: var(--color-text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }
 
-    .badge { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: #065f46; color: #34d399; }
-    .badge-amber { background: #78350f; color: #fde047; }
-    .badge-blue { background: #1e3a8a; color: #60a5fa; }
-    .badge-purple { background: #581c87; color: #c084fc; }
+    .badge { display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; font-size: 0.7rem; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+    .badge-blue { background: rgba(2, 132, 199, 0.15); color: #0284c7; }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 
     .btn { padding: 0.45rem 0.85rem; border-radius: 6px; font-weight: 700; font-size: 0.78rem; cursor: pointer; border: none; background: var(--color-primary); color: #fff; text-decoration: none; }
-    .btn-sec { background: rgba(255,255,255,0.06); border: 1px solid var(--color-border); color: #e2e8f0; }
+    .btn-sec { background: rgba(255,255,255,0.06); border: 1px solid var(--color-border); color: var(--color-text-main); }
+    .theme-btn { background: var(--color-panel); border: 1px solid var(--color-border); color: var(--color-text-main); font-weight: 700; font-size: 0.8rem; padding: 0.4rem 0.85rem; border-radius: 6px; cursor: pointer; }
 
-    #appToast { position: fixed; bottom: 20px; right: 20px; background: #0369a1; border: 1px solid #38bdf8; color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; display: none; z-index: 9999; }
+    #appToast { position: fixed; bottom: 20px; right: 20px; background: var(--color-panel); border: 1px solid var(--color-primary); color: var(--color-text-main); padding: 0.75rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 700; display: none; z-index: 9999; }
   </style>
 </head>
 <body>
@@ -105,7 +128,7 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       <div class="brand-icon">⛪</div>
       <div>
         <div class="brand-title">Community Admin</div>
-        <div style="font-size:0.7rem; color:#94a3b8;">Gospel Agenda & Roster Platform (${escapeHtml(tenantSlug.toUpperCase())})</div>
+        <div style="font-size:0.7rem; color:var(--color-text-muted);">Gospel Agenda & Roster Platform (${escapeHtml(tenantSlug.toUpperCase())})</div>
       </div>
     </div>
 
@@ -116,6 +139,7 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
       <button onclick="switchTab('attendance')" class="tab-btn" id="tab-attendance">📈 Attendance Tracker</button>
       <button onclick="switchTab('vault')" class="tab-btn" id="tab-vault">🔒 Document Vault</button>
       <button onclick="switchTab('library')" class="tab-btn" id="tab-library">📖 Sacred Library & Hymns</button>
+      <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-btn">☀️ Day Mode</button>
       <a href="/admin?tenant=${escapeHtml(tenantSlug)}&view=dashboard" class="btn btn-sec" style="margin-left:0.5rem;">← Platform Admin</a>
     </nav>
   </header>
@@ -353,10 +377,33 @@ export function renderCommunityAdminView(tenantSlug: string = 'lioramedia'): str
               <span style="font-size:0.7rem; color:#64748b;">\${l.author}</span>
             </div>
             <h4 style="color:#fff; font-size:0.9rem; font-weight:700; margin-bottom:0.4rem;">\${l.title}</h4>
-            <p style="font-size:0.75rem; color:#94a3b8; line-height:1.4; margin:0 0 0.5rem;">\${l.contentText}</p>
           </div>\`).join('');
       }
     }
+
+    function toggleTheme() {
+      const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+      const target = isDay ? 'night' : 'day';
+      if (target === 'day') {
+        document.documentElement.setAttribute('data-theme', 'day');
+        localStorage.setItem('community_theme', 'day');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('community_theme', 'night');
+      }
+      updateBtn();
+    }
+    function updateBtn() {
+      const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.textContent = isDay ? '🌙 Night Mode' : '☀️ Day Mode';
+    }
+    (function() {
+      if (localStorage.getItem('community_theme') === 'day') {
+        document.documentElement.setAttribute('data-theme', 'day');
+      }
+      updateBtn();
+    })();
   </script>
 </body>
 </html>`;

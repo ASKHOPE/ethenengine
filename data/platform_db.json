@@ -16,7 +16,12 @@
       "slug": "lioramedia",
       "domain": "lioramedia.localhost",
       "status": "active",
-      "createdAt": "2026-08-07T18:01:41.530Z"
+      "createdAt": "2026-08-07T18:01:41.530Z",
+      "enabledServices": [
+        "social",
+        "crm",
+        "commerce"
+      ]
     },
     {
       "id": "tenant_beta",
@@ -130,7 +135,7 @@
   "cms_entries": [
     {
       "tenantId": "tenant_lioramedia",
-      "contentTypeId": "ct_1787309870816",
+      "contentTypeId": "ct_1787313106069",
       "slug": "ai-commercial-pipeline",
       "data": {
         "title": "AI-Powered Personalization Pipeline for Luxury Automotive",
@@ -139,8 +144,8 @@
         "client": "Porsche Digital"
       },
       "status": "published",
-      "id": "entry_1787309870817",
-      "updatedAt": "2026-08-21T16:27:50.8171118+05:30[Asia/Kolkata]"
+      "id": "entry_1787313106069",
+      "updatedAt": "2026-08-21T17:21:46.0698652+05:30[Asia/Kolkata]"
     }
   ],
   "products": [
@@ -152,7 +157,7 @@
       "currency": "USD",
       "stock": 50,
       "description": "Up to 50 localized AI commercial variations generated monthly with dedicated render queue priority.",
-      "id": "prod_1787309870817"
+      "id": "prod_1787313106069"
     }
   ],
   "leads": [
@@ -163,8 +168,8 @@
       "company": "Red Bull Media House",
       "dealValue": 45000,
       "stage": "contacted",
-      "id": "lead_1787309870817",
-      "createdAt": "2026-08-21T10:57:50.817Z"
+      "id": "lead_1787313106070",
+      "createdAt": "2026-08-21T11:51:46.070Z"
     }
   ]
 }

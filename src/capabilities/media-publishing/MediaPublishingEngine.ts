@@ -141,8 +141,84 @@ export interface GanttMilestone {
   owner: string;
 }
 
+export interface ProjectWorkspace {
+  id: string;
+  tenantId: string;
+  name: string;
+  description: string;
+  status: 'active' | 'completed';
+  budgetLimit: number;
+  spent: number;
+  careerGroups: string[];
+  contentFormats: string[];
+  contentCategories: string[];
+  lastActive: number;
+}
+
+export interface CrmLeadDeal {
+  id: string;
+  tenantId: string;
+  projectId: string;
+  name: string;
+  company: string;
+  creatorType: 'sponsor' | 'collaborator' | 'agency' | 'talent';
+  dealStage: 'lead' | 'connected' | 'discussion' | 'active';
+  dealValue: number;
+  statusTag: 'warm' | 'hot' | 'cold';
+  notes: string;
+  updatedAt: string;
+}
+
+export interface StructuredDraft {
+  id: string;
+  tenantId: string;
+  title: string;
+  author: string;
+  audience: string;
+  keywords: string;
+  tone: string;
+  hook: string;
+  thesis: string;
+  body: string;
+  seoTitle: string;
+  seoDesc: string;
+  focusKeyword: string;
+  socialCaptionX: string;
+  socialCaptionLinkedIn: string;
+  status: 'draft' | 'in_review' | 'approved' | 'published';
+  updatedAt: string;
+}
+
+export interface ErpBudgetTransaction {
+  id: string;
+  tenantId: string;
+  projectId: string;
+  category: 'Sponsor Costs' | 'Paid Ads' | 'Tooling & APIs' | 'Contractors' | 'General';
+  description: string;
+  amount: number;
+  type: 'expense' | 'revenue';
+  date: string;
+}
+
+export interface SecurityAuditEntry {
+  id: string;
+  tenantId: string;
+  userId: string;
+  action: string;
+  resource: string;
+  details: string;
+  severity: 'info' | 'warning' | 'critical';
+  timestamp: number;
+}
+
 export class MediaPublishingEngine {
   private static instance: MediaPublishingEngine;
+
+  private projects: Map<string, ProjectWorkspace> = new Map();
+  private crmLeads: Map<string, CrmLeadDeal> = new Map();
+  private structuredDrafts: Map<string, StructuredDraft> = new Map();
+  private erpTransactions: Map<string, ErpBudgetTransaction> = new Map();
+  private auditLogs: Map<string, SecurityAuditEntry> = new Map();
 
   private channels: Map<string, PublishChannel> = new Map();
   private posts: Map<string, MediaPost> = new Map();
@@ -274,7 +350,148 @@ export class MediaPublishingEngine {
       feedback: 'Looks good! Please make sure to highlight sub-5ms latency in slide 2.',
       updatedAt: new Date().toISOString()
     };
-    this.clientReviews.set(defaultReview.id, defaultReview);
+    // 8. Seed Projects Workspace
+    const defaultProject: ProjectWorkspace = {
+      id: 'proj_1',
+      tenantId: tid,
+      name: 'LIORAMEDIA Core Studio',
+      description: 'Primary agency studio for short-form content, viral video scripts, and tech thought leadership.',
+      status: 'active',
+      budgetLimit: 50000,
+      spent: 18450,
+      careerGroups: ['Tech Influencer', 'Agency Founder', 'Media Producer'],
+      contentFormats: ['Shorts', 'Video Script', 'Carousel', 'Blog'],
+      contentCategories: ['AI Engineering', 'Web Performance', 'Cloud Edge'],
+      lastActive: Date.now()
+    };
+    this.projects.set(defaultProject.id, defaultProject);
+
+    // 9. Seed CRM Leads
+    const defaultLeads: CrmLeadDeal[] = [
+      { id: 'crm_1', tenantId: tid, projectId: 'proj_1', name: 'Acme Cloud Sponsor', company: 'Acme Corp', creatorType: 'sponsor', dealStage: 'active', dealValue: 12500, statusTag: 'hot', notes: 'Quarterly video sponsor integration.', updatedAt: new Date().toISOString() },
+      { id: 'crm_2', tenantId: tid, projectId: 'proj_1', name: 'DevOps Podcast Collab', company: 'DevOps Weekly', creatorType: 'collaborator', dealStage: 'discussion', dealValue: 4500, statusTag: 'warm', notes: 'Co-host episode on Bun runtime benchmarks.', updatedAt: new Date().toISOString() },
+      { id: 'crm_3', tenantId: tid, projectId: 'proj_1', name: 'Enterprise SaaS Talent Agency', company: 'TalentHub LLC', creatorType: 'agency', dealStage: 'connected', dealValue: 8000, statusTag: 'warm', notes: 'Representation contract discussion.', updatedAt: new Date().toISOString() }
+    ];
+    defaultLeads.forEach(l => this.crmLeads.set(l.id, l));
+
+    // 10. Seed Structured Drafts
+    const defaultDraft: StructuredDraft = {
+      id: 'draft_1',
+      tenantId: tid,
+      title: 'How to build high-performance Web Engines in 2026',
+      author: 'Lead Producer',
+      audience: 'Tech Leads & Software Architects',
+      keywords: 'TypeScript, Bun, Performance, Web Architecture',
+      tone: 'authoritative',
+      hook: 'Most web frameworks waste 70% of CPU cycles on redundant serialization overhead.',
+      thesis: 'By leveraging native edge runtimes and zero-copy JSON pipelines, you can achieve sub-5ms response times.',
+      body: 'In this technical breakdown, we look at the internal architecture of ETHENENGINE...',
+      seoTitle: 'Building High-Performance Web Engines (2026 Architectural Guide)',
+      seoDesc: 'Learn how to construct sub-5ms enterprise web applications using modern runtimes.',
+      focusKeyword: 'Web Engine Architecture',
+      socialCaptionX: '🚀 Why are modern web architectures switching to Bun? A deep dive into zero-copy pipelines.',
+      socialCaptionLinkedIn: 'Excited to publish our comprehensive architecture guide on building sub-5ms web applications.',
+      status: 'approved',
+      updatedAt: new Date().toISOString()
+    };
+    this.structuredDrafts.set(defaultDraft.id, defaultDraft);
+
+    // 11. Seed ERP Transactions
+    const defaultTxs: ErpBudgetTransaction[] = [
+      { id: 'tx_1', tenantId: tid, projectId: 'proj_1', category: 'Sponsor Costs', description: 'Acme Cloud Q3 Sponsorship Revenue', amount: 12500, type: 'revenue', date: '2026-08-01' },
+      { id: 'tx_2', tenantId: tid, projectId: 'proj_1', category: 'Paid Ads', description: 'Meta Ads & YouTube Shorts Boost', amount: 3200, type: 'expense', date: '2026-08-05' },
+      { id: 'tx_3', tenantId: tid, projectId: 'proj_1', category: 'Tooling & APIs', description: 'LLM Studio Inference & GPU Fleet', amount: 1850, type: 'expense', date: '2026-08-10' },
+      { id: 'tx_4', tenantId: tid, projectId: 'proj_1', category: 'Contractors', description: 'Video Animation & Motion Graphics', amount: 4500, type: 'expense', date: '2026-08-12' }
+    ];
+    defaultTxs.forEach(t => this.erpTransactions.set(t.id, t));
+  }
+
+  // --- PROJECTS WORKSPACE ---
+  public listProjects(tenantId: string): ProjectWorkspace[] {
+    return Array.from(this.projects.values()).filter(p => p.tenantId === tenantId || p.tenantId === 'tenant_default');
+  }
+
+  public createProject(data: Omit<ProjectWorkspace, 'id' | 'lastActive'>): ProjectWorkspace {
+    const proj: ProjectWorkspace = {
+      ...data,
+      id: `proj_${Date.now()}`,
+      lastActive: Date.now()
+    };
+    this.projects.set(proj.id, proj);
+    return proj;
+  }
+
+  // --- CRM LEADS & PIPELINE ---
+  public listCrmLeads(tenantId: string): CrmLeadDeal[] {
+    return Array.from(this.crmLeads.values()).filter(l => l.tenantId === tenantId || l.tenantId === 'tenant_default');
+  }
+
+  public createCrmLead(data: Omit<CrmLeadDeal, 'id' | 'updatedAt'>): CrmLeadDeal {
+    const lead: CrmLeadDeal = {
+      ...data,
+      id: `crm_${Date.now()}`,
+      updatedAt: new Date().toISOString()
+    };
+    this.crmLeads.set(lead.id, lead);
+    return lead;
+  }
+
+  public updateCrmDealStage(id: string, stage: CrmLeadDeal['dealStage']): CrmLeadDeal | null {
+    const lead = this.crmLeads.get(id);
+    if (!lead) return null;
+    lead.dealStage = stage;
+    lead.updatedAt = new Date().toISOString();
+    this.crmLeads.set(id, lead);
+    return lead;
+  }
+
+  // --- STRUCTURED DRAFTS ---
+  public listDrafts(tenantId: string): StructuredDraft[] {
+    return Array.from(this.structuredDrafts.values()).filter(d => d.tenantId === tenantId || d.tenantId === 'tenant_default');
+  }
+
+  public createDraft(data: Omit<StructuredDraft, 'id' | 'updatedAt'>): StructuredDraft {
+    const draft: StructuredDraft = {
+      ...data,
+      id: `draft_${Date.now()}`,
+      updatedAt: new Date().toISOString()
+    };
+    this.structuredDrafts.set(draft.id, draft);
+    return draft;
+  }
+
+  // --- ERP BUDGET & FINANCE ---
+  public listErpTransactions(tenantId: string): ErpBudgetTransaction[] {
+    return Array.from(this.erpTransactions.values()).filter(t => t.tenantId === tenantId || t.tenantId === 'tenant_default');
+  }
+
+  public addErpTransaction(data: Omit<ErpBudgetTransaction, 'id'>): ErpBudgetTransaction {
+    const tx: ErpBudgetTransaction = {
+      ...data,
+      id: `tx_${Date.now()}`
+    };
+    this.erpTransactions.set(tx.id, tx);
+    return tx;
+  }
+
+  // --- SECURITY AUDIT & TELEMETRY ---
+  public recordAudit(tenantId: string, userId: string, action: string, resource: string, details: string, severity: 'info' | 'warning' | 'critical' = 'info'): SecurityAuditEntry {
+    const entry: SecurityAuditEntry = {
+      id: `aud_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      tenantId,
+      userId,
+      action,
+      resource,
+      details,
+      severity,
+      timestamp: Date.now()
+    };
+    this.auditLogs.set(entry.id, entry);
+    return entry;
+  }
+
+  public listAuditLogs(tenantId: string): SecurityAuditEntry[] {
+    return Array.from(this.auditLogs.values()).filter(a => a.tenantId === tenantId || a.tenantId === 'tenant_default');
   }
 
   // --- CHANNEL MANAGEMENT ---
@@ -509,7 +726,7 @@ export class MediaPublishingEngine {
       id: `sitrep_${Date.now()}`,
       tenantId,
       title: 'Executive Situation Report (SITREP)',
-      summary: `Operations running optimally. ${summary.publishedCount} post(s) published, ${summary.scheduledCount} queued. Reached ${summary.totalImpressions.toLocaleString()} impressions with ${summary.avgEngagementRate}% avg engagement across ${summary.connectedChannels} connected platforms.`,
+      summary: `Operations running optimally. ${summary.publishedCount} post(s) published, ${summary.scheduledCount} queued. Reached ${summary.totalImpressions.toLocaleString()} impressions with ${summary.avgEngagementRate}% avg engagement across ${summary.connectedChannels} connected platforms. CAC: $150 · MRR: $${summary.mrr.toLocaleString()} · LTV: $48,000.`,
       keyMetrics: {
         totalImpressions: summary.totalImpressions,
         engagementRate: summary.avgEngagementRate,
@@ -547,6 +764,13 @@ export class MediaPublishingEngine {
     const timeLogs = this.listTimeLogs(tenantId);
     const totalBillableMinutes = timeLogs.filter((t) => t.billable).reduce((sum, t) => sum + t.durationMinutes, 0);
 
+    const leads = this.listCrmLeads(tenantId);
+    const totalPipelineValue = leads.reduce((sum, l) => sum + l.dealValue, 0);
+
+    const txs = this.listErpTransactions(tenantId);
+    const totalSpent = txs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    const totalRevenue = txs.filter(t => t.type === 'revenue').reduce((sum, t) => sum + t.amount, 0);
+
     return {
       totalPosts: tenantPosts.length,
       publishedCount: published.length,
@@ -559,7 +783,13 @@ export class MediaPublishingEngine {
       totalBillableHours: Number((totalBillableMinutes / 60).toFixed(1)),
       kanbanTaskCount: this.listKanbanTasks(tenantId).length,
       ideaBankCount: this.listIdeas(tenantId).length,
-      activeAutomationRules: this.listAutomationRules(tenantId).filter((r) => r.enabled).length
+      activeAutomationRules: this.listAutomationRules(tenantId).filter((r) => r.enabled).length,
+      totalPipelineValue,
+      totalSpent,
+      totalRevenue,
+      cac: 150,
+      mrr: totalRevenue > 0 ? totalRevenue : 12500,
+      ltv: 48000
     };
   }
 }

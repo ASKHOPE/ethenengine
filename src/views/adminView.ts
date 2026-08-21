@@ -221,12 +221,29 @@ export function renderAdminView(options: AdminViewOptions): string {
     </div>
 
     <!-- TENANT CONTEXT SWITCHER -->
-    <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.75rem 0.85rem; border-radius: 10px; font-size: 0.78rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
-      <label style="color:var(--admin-text-muted); font-weight:800; display:block; margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.05em;">Active Tenant</label>
-      <select onchange="switchTenant(this.value)" style="width: 100%; background: var(--admin-card-bg); border: 1px solid var(--admin-border); color: var(--admin-heading); padding: 0.45rem 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight:600;">
-        ${tenants.map((t) => `<option value="${escapeHtml(t.slug)}" ${t.id === activeTenant.id ? 'selected' : ''}>${escapeHtml(t.name)} (${escapeHtml(t.slug)})</option>`).join('')}
-      </select>
-    </div>
+    ${
+      isSuperadmin
+        ? `
+      <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.75rem 0.85rem; border-radius: 10px; font-size: 0.78rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+          <label style="color:var(--admin-text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.05em;">Active Tenant</label>
+          <span class="badge badge-purple" style="font-size:0.6rem;">PLATFORM</span>
+        </div>
+        <select onchange="switchTenant(this.value)" style="width: 100%; background: var(--admin-card-bg); border: 1px solid var(--admin-border); color: var(--admin-heading); padding: 0.45rem 0.6rem; border-radius: 6px; font-size: 0.85rem; font-weight:600;">
+          ${tenants.map((t) => `<option value="${escapeHtml(t.slug)}" ${t.id === activeTenant.id ? 'selected' : ''}>${escapeHtml(t.name)} (${escapeHtml(t.slug)})</option>`).join('')}
+        </select>
+      </div>
+    `
+        : `
+      <div style="background: var(--admin-stat-bg); border: 1px solid var(--admin-border); padding: 0.75rem 0.85rem; border-radius: 10px; font-size: 0.78rem; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+        <label style="color:var(--admin-text-muted); font-weight:800; display:block; margin-bottom:0.25rem; text-transform:uppercase; letter-spacing:0.05em;">Isolated Tenant Domain</label>
+        <div style="font-weight:800; font-size:0.9rem; color:var(--admin-heading); display:flex; align-items:center; gap:0.4rem;">
+          🏢 ${escapeHtml(activeTenant.name)}
+        </div>
+        <div style="font-size:0.75rem; color:var(--admin-accent); margin-top:0.2rem; font-family:monospace;">${escapeHtml(activeTenant.domain || activeTenant.slug + '.localhost')}</div>
+      </div>
+    `
+    }
 
     <!-- CATEGORY BUTTONS NAV -->
     <div style="display:flex; flex-direction:column; gap:0.35rem; margin-top:0.5rem; flex:1;">
@@ -332,9 +349,9 @@ export function renderAdminView(options: AdminViewOptions): string {
       <!-- 1. EXECUTIVE DASHBOARD OVERVIEW -->
       <div class="grid-4">
         <div class="stat-card">
-          <div class="stat-label">👥 Active Tenant Orgs</div>
-          <div class="stat-value">${tenants.length} Orgs</div>
-          <div class="stat-desc">Provisioned Subdomains</div>
+          <div class="stat-label">${isSuperadmin ? '👥 Active Tenant Orgs' : '🏢 Tenant Workspace'}</div>
+          <div class="stat-value">${isSuperadmin ? `${tenants.length} Orgs` : escapeHtml(activeTenant.name)}</div>
+          <div class="stat-desc">${isSuperadmin ? 'Provisioned Subdomains' : `${escapeHtml(activeTenant.slug)}.localhost`}</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">⚡ Services Running</div>
@@ -374,24 +391,34 @@ export function renderAdminView(options: AdminViewOptions): string {
             </tr>
           </thead>
           <tbody>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📦 Multi-Warehouse Inventory Engine</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🛒 Commerce Catalog & Cart Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💼 CRM Sales Leads & Pipeline Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🏭 ERP Procurement & Supply Chain</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💰 Financial Ledger & Accounting</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">👔 HR Staff & Payroll Management</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💬 Communications & Chat Engine</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.09 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🚚 Logistics & Shipping Rate Engine</td><td>Operations</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">💳 Payments & Billing Gateway Engine</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📈 Affiliate Tracking & Commissions</td><td>Commerce</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.08 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">👥 Social & Real-Time Collaboration</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">📢 MeidaLLM Social Publishing SaaS</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">⛪ Community Admin & Sabbath Agenda</td><td>Engagement</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.11 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🛠️ Trades & Craftsmen Portfolio Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.14 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">✈️ Travel, Mobility & Fleet Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.15 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">⚖️ Legal House & Practice Engine</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.13 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🏢 Abode Property & Rental Management</td><td>Vertical Engine</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.12 ms</td><td>24.5 MB</td></tr>
-            <tr><td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">🌐 Public API Integration Gateway Suite</td><td>Gateway</td><td><span class="badge">🟢 HEALTHY</span></td><td>0.10 ms</td><td>24.5 MB</td></tr>
+            ${[
+              { id: 'inventory', name: '📦 Multi-Warehouse Inventory Engine', cat: 'Operations', lat: '0.12 ms', mem: '24.5 MB' },
+              { id: 'commerce', name: '🛒 Commerce Catalog & Cart Engine', cat: 'Commerce', lat: '0.15 ms', mem: '24.5 MB' },
+              { id: 'crm', name: '💼 CRM Sales Leads & Pipeline Engine', cat: 'Commerce', lat: '0.10 ms', mem: '24.5 MB' },
+              { id: 'erp', name: '🏭 ERP Procurement & Supply Chain', cat: 'Operations', lat: '0.14 ms', mem: '24.5 MB' },
+              { id: 'accounting', name: '💰 Financial Ledger & Accounting', cat: 'Operations', lat: '0.11 ms', mem: '24.5 MB' },
+              { id: 'hr', name: '👔 HR Staff & Payroll Management', cat: 'Operations', lat: '0.13 ms', mem: '24.5 MB' },
+              { id: 'comms', name: '💬 Communications & Chat Engine', cat: 'Engagement', lat: '0.09 ms', mem: '24.5 MB' },
+              { id: 'logistics', name: '🚚 Logistics & Shipping Rate Engine', cat: 'Operations', lat: '0.10 ms', mem: '24.5 MB' },
+              { id: 'payments', name: '💳 Payments & Billing Gateway Engine', cat: 'Commerce', lat: '0.11 ms', mem: '24.5 MB' },
+              { id: 'affiliates', name: '📈 Affiliate Tracking & Commissions', cat: 'Commerce', lat: '0.08 ms', mem: '24.5 MB' },
+              { id: 'social', name: '📢 MeidaLLM Social Publishing SaaS', cat: 'Engagement', lat: '0.12 ms', mem: '24.5 MB' },
+              { id: 'community', name: '⛪ Community Admin & Sabbath Agenda', cat: 'Engagement', lat: '0.11 ms', mem: '24.5 MB' },
+              { id: 'trades', name: '🛠️ Trades & Craftsmen Portfolio Engine', cat: 'Vertical Engine', lat: '0.14 ms', mem: '24.5 MB' },
+              { id: 'travel', name: '✈️ Travel, Mobility & Fleet Engine', cat: 'Vertical Engine', lat: '0.15 ms', mem: '24.5 MB' },
+              { id: 'legal', name: '⚖️ Legal House & Practice Engine', cat: 'Vertical Engine', lat: '0.13 ms', mem: '24.5 MB' },
+              { id: 'abode', name: '🏢 Abode Property & Rental Management', cat: 'Vertical Engine', lat: '0.12 ms', mem: '24.5 MB' },
+            ]
+              .filter(s => !activeTenant.enabledServices || activeTenant.enabledServices.length === 0 || activeTenant.enabledServices.includes(s.id))
+              .map(s => `
+                <tr>
+                  <td style="padding:0.65rem; font-weight:600; color:var(--admin-heading);">${s.name}</td>
+                  <td>${s.cat}</td>
+                  <td><span class="badge">🟢 HEALTHY</span></td>
+                  <td>${s.lat}</td>
+                  <td>${s.mem}</td>
+                </tr>
+              `).join('')}
           </tbody>
         </table>
       </div>
@@ -421,154 +448,63 @@ export function renderAdminView(options: AdminViewOptions): string {
         ? `
       <div class="card">
         <h2>
-          <span style="display:flex; align-items:center; gap:0.5rem; color:#fff;">⚡ Enterprise Subsystem Engines (${escapeHtml(activeTenant.name)})</span>
-          <span class="badge" style="background:#065f46; color:#34d399;">16 ENGINES ACTIVE</span>
+          <span style="display:flex; align-items:center; gap:0.5rem;">⚡ Enterprise Subsystem Engines (${escapeHtml(activeTenant.name)})</span>
+          <span class="badge" style="background:#065f46; color:#34d399;">
+            ${[
+              { id: 'inventory', icon: '📦', name: 'Multi-Warehouse Inventory', desc: 'Bin allocation, SKU stock tracking & 7 fulfillment hubs.', view: 'inventory', appUrl: null },
+              { id: 'commerce', icon: '🛒', name: 'Commerce & Orders', desc: `${orders.length} order(s) processed · Cart & checkout gateway.`, view: 'commerce', appUrl: null },
+              { id: 'crm', icon: '💼', name: 'CRM & Sales Leads', desc: `${leads.length} active lead(s) · Deal pipeline tracking.`, view: 'crm', appUrl: null },
+              { id: 'erp', icon: '🏭', name: 'ERP & Procurement', desc: `${procurementOrders.length} supply chain purchase order(s).`, view: 'erp', appUrl: null },
+              { id: 'accounting', icon: '💰', name: 'Accounting & Ledger', desc: 'Double-entry general ledger & balance sheet integrity.', view: 'accounting', appUrl: null },
+              { id: 'hr', icon: '👔', name: 'HR & Staff Roster', desc: 'Employee roster & salary compensation records.', view: 'hr', appUrl: null },
+              { id: 'comms', icon: '💬', name: 'Team Comms & Chat', desc: `${chatMsgs.length} message(s) · Live team workspace channels.`, view: 'comms', appUrl: null },
+              { id: 'logistics', icon: '🚛', name: 'Logistics & Carrier Shipping', desc: 'FedEx, UPS, DHL & Postal live rate calculator and label generation.', view: 'logistics', appUrl: null },
+              { id: 'payments', icon: '💳', name: 'Payments & Subscriptions', desc: 'Stripe, PayPal, recurring MRR invoices & tax compliance engine.', view: 'payments', appUrl: null },
+              { id: 'affiliates', icon: '📈', name: 'Sales Commissions & Affiliates', desc: 'Affiliate referral tracking, links & tier payout calculator.', view: 'affiliates', appUrl: null },
+              { id: 'social', icon: '📢', name: 'Media & Social LLM Publisher', desc: 'MeidaLLM multi-channel social posting, AI prompt wizard & publishing queue.', view: 'social', appUrl: null, highlight: '#10b981' },
+              { id: 'community', icon: '⛪', name: 'Community Admin & Sabbath Agendas', desc: 'Gospel Agenda platform, Sabbath service architect, callings pipeline & sacred library.', view: 'community', appUrl: null, highlight: '#0284c7' },
+              { id: 'trades', icon: '🛠️', name: 'Trades & Craftsmen Portfolio', desc: 'Project showcases for handymen, plumbers, carpenters, & builders with live estimates & work orders.', view: null, appUrl: `/trades?tenant=${activeTenant.slug}` },
+              { id: 'travel', icon: '✈️', name: 'Travel, Mobility & Corporate Fleet', desc: 'Corporate holiday trip bundles, company-sponsored retreats, chauffeur deals & self-drive rentals.', view: null, appUrl: `/travel?tenant=${activeTenant.slug}` },
+              { id: 'legal', icon: '⚖️', name: 'Legal House & Practice', desc: 'Court motion timelines, legal statute document library, billable hours logger & audit storage.', view: null, appUrl: `/legal?tenant=${activeTenant.slug}` },
+              { id: 'abode', icon: '🏢', name: 'Abode Property & Rental Management', desc: 'Multi-property unit listings, tenant lease agreements, rent roll invoicing, maintenance dispatch & owner payouts.', view: null, appUrl: `/abode?tenant=${activeTenant.slug}` },
+            ].filter(e => !activeTenant.enabledServices || activeTenant.enabledServices.length === 0 || activeTenant.enabledServices.includes(e.id)).length} ENGINES ACTIVE
+          </span>
         </h2>
-        <p style="color:#94a3b8; font-size:0.88rem; margin-bottom:1.5rem; line-height:1.5;">Manage multi-warehouse inventory, process commerce orders, track CRM sales leads, configure ERP procurement, audit financial ledgers, oversee HR staff, chat, calculate shipping, handle payments, track affiliate commissions, media publishing, community admin, trades craftsman portfolios, corporate travel & fleet, legal practice cases, and Abode property rental management.</p>
+        <p style="color:var(--admin-text-muted); font-size:0.88rem; margin-bottom:1.5rem; line-height:1.5;">Configured enterprise subsystem modules provisioned for <strong>${escapeHtml(activeTenant.name)}</strong>.</p>
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">📦</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Multi-Warehouse Inventory</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Bin allocation, SKU stock tracking & 7 fulfillment hubs.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=inventory" class="btn" style="text-align:center; font-size:0.82rem;">Open Inventory Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">🛒</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Commerce & Orders</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">${orders.length} order(s) processed · Cart & checkout gateway.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=commerce" class="btn" style="text-align:center; font-size:0.82rem;">Open Commerce Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">💼</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">CRM & Sales Leads</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">${leads.length} active lead(s) · Deal pipeline tracking.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=crm" class="btn" style="text-align:center; font-size:0.82rem;">Open CRM Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">🏭</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">ERP & Procurement</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">${procurementOrders.length} supply chain purchase order(s).</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=erp" class="btn" style="text-align:center; font-size:0.82rem;">Open ERP Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">💰</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Accounting & Ledger</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Double-entry general ledger & balance sheet integrity.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=accounting" class="btn" style="text-align:center; font-size:0.82rem;">Open Ledger Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">👔</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">HR & Staff Roster</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Employee roster & salary compensation records.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=hr" class="btn" style="text-align:center; font-size:0.82rem;">Open HR Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">💬</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Team Comms & Chat</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">${chatMsgs.length} message(s) · Live team workspace channels.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=comms" class="btn" style="text-align:center; font-size:0.82rem;">Open Team Chat →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">🚛</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Logistics & Carrier Shipping</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">FedEx, UPS, DHL & Postal live rate calculator and label generation.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=logistics" class="btn" style="text-align:center; font-size:0.82rem;">Open Logistics Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">💳</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Payments & Subscriptions</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Stripe, PayPal, recurring MRR invoices & tax compliance engine.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=payments" class="btn" style="text-align:center; font-size:0.82rem;">Open Payments Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">📈</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Sales Commissions & Affiliates</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Affiliate referral tracking, links & tier payout calculator.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=affiliates" class="btn" style="text-align:center; font-size:0.82rem;">Open Affiliate Engine →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">📢</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Media & Social LLM Publisher</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">MeidaLLM multi-channel social posting, AI prompt wizard & publishing queue.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=social" class="btn" style="text-align:center; font-size:0.82rem; background:linear-gradient(135deg,#10b981,#059669); font-weight:800;">Open Media Publisher →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">⛪</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Community Admin & Sabbath Agendas</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Gospel Agenda platform, Sabbath service architect, callings pipeline & sacred library.</p>
-            </div>
-            <a href="/admin?tenant=${activeTenant.slug}&view=community" class="btn" style="text-align:center; font-size:0.82rem; background:linear-gradient(135deg,#0284c7,#0369a1); font-weight:800;">Open Community Admin →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">🛠️</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Trades & Craftsmen Portfolio</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Project showcases for handymen, plumbers, carpenters, & builders with live estimates & work orders.</p>
-            </div>
-            <a href="/trades?tenant=${activeTenant.slug}" class="btn" style="text-align:center; font-size:0.82rem; background:#0284c7; font-weight:800;">Open Trades App →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">✈️</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Travel, Mobility & Corporate Fleet</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Corporate holiday trip bundles, company-sponsored retreats, chauffeur deals & self-drive rentals.</p>
-            </div>
-            <a href="/travel?tenant=${activeTenant.slug}" class="btn" style="text-align:center; font-size:0.82rem; background:#8b5cf6; font-weight:800;">Open Travel App →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">⚖️</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Legal House & Practice</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Court motion timelines, legal statute document library, billable hours logger & audit storage.</p>
-            </div>
-            <a href="/legal?tenant=${activeTenant.slug}" class="btn" style="text-align:center; font-size:0.82rem; background:#eab308; color:#0f172a; font-weight:800;">Open Legal House →</a>
-          </div>
-
-          <div style="background:#0d1322; border:1px solid #1f2937; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
-            <div>
-              <div style="font-size:1.75rem; margin-bottom:0.4rem;">🏢</div>
-              <h3 style="color:#fff; font-size:1.05rem; margin-bottom:0.35rem;">Abode Property & Rental Management</h3>
-              <p style="font-size:0.8rem; color:#94a3b8; line-height:1.4;">Multi-property unit listings, tenant lease agreements, rent roll invoicing, maintenance dispatch & owner payouts.</p>
-            </div>
-            <a href="/abode?tenant=${activeTenant.slug}" class="btn" style="text-align:center; font-size:0.82rem; background:#10b981; color:#fff; font-weight:800;">Open Abode App →</a>
-          </div>
+          ${[
+            { id: 'inventory', icon: '📦', name: 'Multi-Warehouse Inventory', desc: 'Bin allocation, SKU stock tracking & 7 fulfillment hubs.', view: 'inventory', appUrl: null },
+            { id: 'commerce', icon: '🛒', name: 'Commerce & Orders', desc: `${orders.length} order(s) processed · Cart & checkout gateway.`, view: 'commerce', appUrl: null },
+            { id: 'crm', icon: '💼', name: 'CRM & Sales Leads', desc: `${leads.length} active lead(s) · Deal pipeline tracking.`, view: 'crm', appUrl: null },
+            { id: 'erp', icon: '🏭', name: 'ERP & Procurement', desc: `${procurementOrders.length} supply chain purchase order(s).`, view: 'erp', appUrl: null },
+            { id: 'accounting', icon: '💰', name: 'Accounting & Ledger', desc: 'Double-entry general ledger & balance sheet integrity.', view: 'accounting', appUrl: null },
+            { id: 'hr', icon: '👔', name: 'HR & Staff Roster', desc: 'Employee roster & salary compensation records.', view: 'hr', appUrl: null },
+            { id: 'comms', icon: '💬', name: 'Team Comms & Chat', desc: `${chatMsgs.length} message(s) · Live team workspace channels.`, view: 'comms', appUrl: null },
+            { id: 'logistics', icon: '🚛', name: 'Logistics & Carrier Shipping', desc: 'FedEx, UPS, DHL & Postal live rate calculator and label generation.', view: 'logistics', appUrl: null },
+            { id: 'payments', icon: '💳', name: 'Payments & Subscriptions', desc: 'Stripe, PayPal, recurring MRR invoices & tax compliance engine.', view: 'payments', appUrl: null },
+            { id: 'affiliates', icon: '📈', name: 'Sales Commissions & Affiliates', desc: 'Affiliate referral tracking, links & tier payout calculator.', view: 'affiliates', appUrl: null },
+            { id: 'social', icon: '📢', name: 'Media & Social LLM Publisher', desc: 'MeidaLLM multi-channel social posting, AI prompt wizard & publishing queue.', view: 'social', appUrl: null, highlight: '#10b981' },
+            { id: 'community', icon: '⛪', name: 'Community Admin & Sabbath Agendas', desc: 'Gospel Agenda platform, Sabbath service architect, callings pipeline & sacred library.', view: 'community', appUrl: null, highlight: '#0284c7' },
+            { id: 'trades', icon: '🛠️', name: 'Trades & Craftsmen Portfolio', desc: 'Project showcases for handymen, plumbers, carpenters, & builders with live estimates & work orders.', view: null, appUrl: `/trades?tenant=${activeTenant.slug}` },
+            { id: 'travel', icon: '✈️', name: 'Travel, Mobility & Corporate Fleet', desc: 'Corporate holiday trip bundles, company-sponsored retreats, chauffeur deals & self-drive rentals.', view: null, appUrl: `/travel?tenant=${activeTenant.slug}` },
+            { id: 'legal', icon: '⚖️', name: 'Legal House & Practice', desc: 'Court motion timelines, legal statute document library, billable hours logger & audit storage.', view: null, appUrl: `/legal?tenant=${activeTenant.slug}` },
+            { id: 'abode', icon: '🏢', name: 'Abode Property & Rental Management', desc: 'Multi-property unit listings, tenant lease agreements, rent roll invoicing, maintenance dispatch & owner payouts.', view: null, appUrl: `/abode?tenant=${activeTenant.slug}` },
+          ]
+            .filter(e => !activeTenant.enabledServices || activeTenant.enabledServices.length === 0 || activeTenant.enabledServices.includes(e.id))
+            .map(e => `
+              <div style="background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                <div>
+                  <div style="font-size:1.75rem; margin-bottom:0.4rem;">${e.icon}</div>
+                  <h3 style="color:var(--admin-heading); font-size:1.05rem; margin-bottom:0.35rem;">${escapeHtml(e.name)}</h3>
+                  <p style="font-size:0.8rem; color:var(--admin-text-muted); line-height:1.4;">${e.desc}</p>
+                </div>
+                ${
+                  e.appUrl
+                    ? `<a href="${e.appUrl}" class="btn" style="text-align:center; font-size:0.82rem; ${e.highlight ? `background:${e.highlight};` : ''}">Open ${escapeHtml(e.name)} →</a>`
+                    : `<a href="/admin?tenant=${activeTenant.slug}&view=${e.view}" class="btn" style="text-align:center; font-size:0.82rem; ${e.highlight ? `background:${e.highlight};` : ''}">Open ${escapeHtml(e.name)} →</a>`
+                }
+              </div>
+            `).join('')}
         </div>
       </div>
     `
@@ -1849,6 +1785,92 @@ export function renderAdminView(options: AdminViewOptions): string {
         </div>
       </div>
     `
+        : activeView === 'tenants'
+        ? `
+      <div class="card">
+        <h2>
+          <span style="display:flex; align-items:center; gap:0.5rem;">🏢 Tenant Provisioning & Service Capability Matrix</span>
+          <div style="display:flex; gap:0.5rem;">
+            ${isSuperadmin ? `<button onclick="openNewTenantModal()" class="btn" style="padding:0.4rem 0.85rem; font-size:0.78rem;">➕ Provision New Tenant</button>` : ''}
+            <span class="badge badge-purple">${tenants.length} TENANT(S)</span>
+          </div>
+        </h2>
+        <p style="color:var(--admin-text-muted); font-size:0.85rem; margin-bottom:1.25rem;">Select exactly which enterprise subsystem engines each tenant organization has access to. Disabled engines are automatically hidden from their admin workspace and website experience.</p>
+
+        <!-- TENANT SERVICE CONFIGURATION PANEL -->
+        <div style="background:var(--admin-stat-bg); border:1px solid var(--admin-border); border-radius:12px; padding:1.25rem; margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--admin-border); padding-bottom:0.75rem;">
+            <div>
+              <h3 style="color:var(--admin-heading); font-size:1.05rem; font-weight:800; margin:0 0 0.25rem;">⚙️ Configured Engines for: <span style="color:var(--admin-accent);">${escapeHtml(activeTenant.name)}</span></h3>
+              <div style="font-size:0.75rem; color:var(--admin-text-muted);">Slug: <code>${escapeHtml(activeTenant.slug)}</code> · Domain: <code>${escapeHtml(activeTenant.domain || activeTenant.slug + '.localhost')}</code></div>
+            </div>
+            ${
+              isSuperadmin
+                ? `<button onclick="saveTenantServiceMatrix('${escapeHtml(activeTenant.id)}')" id="saveServicesBtn" class="btn" style="background:linear-gradient(135deg,#10b981,#059669); font-weight:800; padding:0.5rem 1.2rem;">💾 Save Engine Config</button>`
+                : `<span class="badge">ASSIGNED BY SUPERADMIN</span>`
+            }
+          </div>
+
+          <!-- 16 ENGINES TOGGLE CHECKLIST -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+            ${[
+              { id: 'inventory', icon: '📦', name: 'Multi-Warehouse Inventory', desc: 'SKU tracking, bin allocation & stock transfers' },
+              { id: 'commerce', icon: '🛒', name: 'Commerce & Orders', desc: 'Cart, orders & checkout engine' },
+              { id: 'crm', icon: '💼', name: 'CRM & Sales Leads', desc: 'Deal pipeline, customer leads & conversions' },
+              { id: 'erp', icon: '🏭', name: 'ERP & Procurement', desc: 'Supply chain procurement & vendor orders' },
+              { id: 'accounting', icon: '💰', name: 'Accounting & Ledger', desc: 'Double-entry balance sheet & finance ledger' },
+              { id: 'hr', icon: '👔', name: 'HR Staff & Payroll', desc: 'Employee roster & salary compensation records' },
+              { id: 'comms', icon: '💬', name: 'Team Comms & Chat', desc: 'Live workspace channels & group chat' },
+              { id: 'logistics', icon: '🚛', name: 'Logistics & Carrier Shipping', desc: 'FedEx, UPS & DHL live rates & tracking' },
+              { id: 'payments', icon: '💳', name: 'Payments & Subscriptions', desc: 'Stripe, PayPal recurring billing & taxes' },
+              { id: 'affiliates', icon: '📈', name: 'Sales Commissions & Affiliates', desc: 'Referral tracking & tiered payouts' },
+              { id: 'social', icon: '📢', name: 'Media & Social LLM Publisher', desc: 'MeidaLLM multi-channel publisher & AI drafts' },
+              { id: 'community', icon: '⛪', name: 'Community Admin & Sabbath', desc: 'Sacrament agendas & sacred library' },
+              { id: 'trades', icon: '🛠️', name: 'Trades & Craftsmen Portfolio', desc: 'Work orders & project showcases' },
+              { id: 'travel', icon: '✈️', name: 'Travel & Corporate Fleet', desc: 'Corporate retreats, chauffeur & rental fleet' },
+              { id: 'legal', icon: '⚖️', name: 'Legal House & Practice', desc: 'Court timelines, statutes & billable hours' },
+              { id: 'abode', icon: '🏢', name: 'Abode Property & Rental', desc: 'Leases, rent roll invoices & maintenance dispatch' },
+            ].map(svc => {
+              const isEnabled = !activeTenant.enabledServices || activeTenant.enabledServices.length === 0 || activeTenant.enabledServices.includes(svc.id);
+              return `
+                <label style="background:var(--admin-card-bg); border:1px solid var(--admin-border); border-radius:10px; padding:1rem; display:flex; align-items:flex-start; gap:0.85rem; cursor:${isSuperadmin ? 'pointer' : 'default'}; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+                  <input type="checkbox" name="tenant_service_toggle" value="${svc.id}" ${isEnabled ? 'checked' : ''} ${isSuperadmin ? '' : 'disabled'} style="margin-top:0.3rem; width:18px; height:18px; accent-color:#6366f1;" />
+                  <div style="flex:1;">
+                    <div style="font-weight:800; font-size:0.9rem; color:var(--admin-heading); display:flex; align-items:center; gap:0.4rem;">
+                      <span>${svc.icon}</span> ${escapeHtml(svc.name)}
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-top:0.25rem; line-height:1.35;">${escapeHtml(svc.desc)}</div>
+                  </div>
+                </label>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- PROVISIONED TENANTS TABLE -->
+        <h3 style="color:var(--admin-heading); font-size:0.95rem; font-weight:800; margin-bottom:0.75rem;">📋 All Provisioned Tenant Organizations</h3>
+        <table>
+          <thead><tr><th>Organization Name</th><th>Slug Identifier</th><th>Assigned Domain</th><th>Active Engines</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${tenants.map(t => {
+              const activeCount = t.enabledServices && t.enabledServices.length > 0 ? t.enabledServices.length : 16;
+              return `
+                <tr>
+                  <td style="font-weight:700; color:var(--admin-heading);">🏢 ${escapeHtml(t.name)}</td>
+                  <td><code>${escapeHtml(t.slug)}</code></td>
+                  <td>${escapeHtml(t.domain || t.slug + '.localhost')}</td>
+                  <td><span class="badge badge-purple">${activeCount} / 16 Active</span></td>
+                  <td><span class="badge">ACTIVE</span></td>
+                  <td>
+                    <a href="/admin?tenant=${escapeHtml(t.slug)}&view=tenants" class="btn" style="padding:0.25rem 0.65rem; font-size:0.75rem; background:#0284c7;">Configure Services ⚙️</a>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `
         : activeView === 'firewall'
         ? `
       <div class="card">
@@ -2305,6 +2327,36 @@ export function renderAdminView(options: AdminViewOptions): string {
       localStorage.removeItem('auth_token');
       document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       window.location.href = '/login?tenant=${escapeHtml(activeTenant.slug)}';
+    }
+
+    async function saveTenantServiceMatrix(tenantId) {
+      const btn = document.getElementById('saveServicesBtn');
+      const checkboxes = document.querySelectorAll('input[name="tenant_service_toggle"]:checked');
+      const enabledServices = Array.from(checkboxes).map((cb) => cb.value);
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+      }
+
+      try {
+        const res = await fetch('/api/core/tenants/' + encodeURIComponent(tenantId) + '/services', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabledServices })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAdminToast('✅ Configured ' + enabledServices.length + ' engine(s) for ' + (data.tenant?.name || 'tenant') + '!');
+          setTimeout(() => window.location.reload(), 900);
+        } else {
+          showAdminToast('⚠️ ' + (data.error || 'Failed to update services'));
+          if (btn) { btn.disabled = false; btn.textContent = '💾 Save Engine Config'; }
+        }
+      } catch (e) {
+        showAdminToast('❌ Error saving tenant services');
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Save Engine Config'; }
+      }
     }
 
     function showAdminToast(msg) {

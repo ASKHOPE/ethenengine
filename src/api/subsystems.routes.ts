@@ -616,6 +616,114 @@ mediaPublisherRouter.post('/client-reviews/respond', async (c) => {
   return c.json({ review });
 });
 
+// Projects Workspace
+mediaPublisherRouter.get('/projects', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ projects: mediaPublisher.listProjects(tenant.id) });
+});
+
+mediaPublisherRouter.post('/projects', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const body = await c.req.json();
+  const project = mediaPublisher.createProject({
+    tenantId: tenant.id,
+    name: body.name || 'New Creator Campaign',
+    description: body.description || '',
+    status: body.status || 'active',
+    budgetLimit: Number(body.budgetLimit) || 25000,
+    spent: Number(body.spent) || 0,
+    careerGroups: body.careerGroups || ['Tech Creator'],
+    contentFormats: body.contentFormats || ['Shorts', 'Video Script'],
+    contentCategories: body.contentCategories || ['Tech']
+  });
+  return c.json({ project }, 201);
+});
+
+// CRM Pipeline & Deals
+mediaPublisherRouter.get('/crm', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ leads: mediaPublisher.listCrmLeads(tenant.id) });
+});
+
+mediaPublisherRouter.post('/crm', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const body = await c.req.json();
+  const lead = mediaPublisher.createCrmLead({
+    tenantId: tenant.id,
+    projectId: body.projectId || 'proj_1',
+    name: body.name || 'New Sponsor Prospect',
+    company: body.company || 'Enterprise Brand',
+    creatorType: body.creatorType || 'sponsor',
+    dealStage: body.dealStage || 'lead',
+    dealValue: Number(body.dealValue) || 5000,
+    statusTag: body.statusTag || 'warm',
+    notes: body.notes || ''
+  });
+  return c.json({ lead }, 201);
+});
+
+mediaPublisherRouter.post('/crm/stage', async (c) => {
+  const body = await c.req.json();
+  const lead = mediaPublisher.updateCrmDealStage(body.id, body.dealStage);
+  return c.json({ lead });
+});
+
+// Structured Drafts & Scripts
+mediaPublisherRouter.get('/drafts', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ drafts: mediaPublisher.listDrafts(tenant.id) });
+});
+
+mediaPublisherRouter.post('/drafts', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const body = await c.req.json();
+  const draft = mediaPublisher.createDraft({
+    tenantId: tenant.id,
+    title: body.title || 'New Script Draft',
+    author: body.author || 'Creator',
+    audience: body.audience || 'Target Audience',
+    keywords: body.keywords || '',
+    tone: body.tone || 'authoritative',
+    hook: body.hook || '',
+    thesis: body.thesis || '',
+    body: body.body || '',
+    seoTitle: body.seoTitle || '',
+    seoDesc: body.seoDesc || '',
+    focusKeyword: body.focusKeyword || '',
+    socialCaptionX: body.socialCaptionX || '',
+    socialCaptionLinkedIn: body.socialCaptionLinkedIn || '',
+    status: body.status || 'draft'
+  });
+  return c.json({ draft }, 201);
+});
+
+// ERP Budget & Finance
+mediaPublisherRouter.get('/erp', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ transactions: mediaPublisher.listErpTransactions(tenant.id) });
+});
+
+mediaPublisherRouter.post('/erp/transaction', async (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  const body = await c.req.json();
+  const tx = mediaPublisher.addErpTransaction({
+    tenantId: tenant.id,
+    projectId: body.projectId || 'proj_1',
+    category: body.category || 'General',
+    description: body.description || 'Studio Expense',
+    amount: Number(body.amount) || 100,
+    type: body.type || 'expense',
+    date: body.date || new Date().toISOString().split('T')[0]
+  });
+  return c.json({ transaction: tx }, 201);
+});
+
+// Security Audit & Telemetry
+mediaPublisherRouter.get('/audit', (c) => {
+  const tenant = c.get('tenant' as any) as any;
+  return c.json({ auditLogs: mediaPublisher.listAuditLogs(tenant.id) });
+});
+
 // Sprint Cycles, SITREP & Gantt
 mediaPublisherRouter.get('/sprint-cycles', (c) => {
   const tenant = c.get('tenant' as any) as any;
@@ -880,6 +988,7 @@ travelFleetRouter.post('/corporate-packages', async (c) => {
   const pkg = travelFleetEngine.addCorporatePackage(tenant.id, {
     title: body.title || 'Corporate Retreat Package',
     destination: body.destination || 'Resort Island',
+    category: body.category || 'Executive Retreat',
     durationDays: Number(body.durationDays || 3),
     maxEmployees: Number(body.maxEmployees || 20),
     pricePerEmployee: Number(body.pricePerEmployee || 1500),

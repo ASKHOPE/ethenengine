@@ -25,6 +25,7 @@ export interface Tenant {
   slug: string;
   domain: string;
   status: 'active' | 'suspended';
+  enabledServices?: string[]; // Array of engine/feature keys active for this tenant
   createdAt: string;
 }
 
@@ -175,6 +176,30 @@ export class CorePlatformManager {
 
   public listTenants(): Tenant[] {
     return Array.from(this.tenants.values());
+  }
+
+  public updateTenantServices(tenantIdOrSlug: string, enabledServices: string[], actorId = 'usr_admin'): Tenant | undefined {
+    const tenant = this.getTenantByDomainOrSlug(tenantIdOrSlug);
+    if (!tenant) return undefined;
+    tenant.enabledServices = enabledServices;
+    this.tenants.set(tenant.id, tenant);
+    
+    try {
+      PersistenceDriver.getInstance().saveCollection('tenants', this.listTenants());
+    } catch (e) {
+      console.error('[CorePlatformManager] Failed to persist tenant services update:', e);
+    }
+
+    this.eventBus.publish('tenant.services.updated', { tenantId: tenant.id, enabledServices }, { tenantId: tenant.id, actorId });
+    this.auditLogger.log({
+      tenantId: tenant.id,
+      actorId,
+      action: 'tenant.updateServices',
+      resource: `Tenant:${tenant.id}`,
+      details: { enabledServices },
+    });
+
+    return tenant;
   }
 
   // Workspaces

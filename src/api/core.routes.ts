@@ -40,12 +40,16 @@ coreRouter.get('/events', (c) => {
   return c.json({ events: eventBus.getEventHistory(tenant.id) });
 });
 
-coreRouter.get('/sync-status', (c) => {
-  return c.json({
-    status: 'ok',
-    syncEngine: {
-      ...syncEngine.getStats(),
-      description: 'Dual-write engine: writes concurrently to local PostgreSQL and Aiven Cloud DB.',
-    },
-  });
+coreRouter.put('/tenants/:id/services', async (c) => {
+  const tenantId = c.req.param('id');
+  const body = await c.req.json();
+  const { enabledServices } = body;
+  const userContext = c.get('userContext' as any) as any;
+  const actorId = userContext?.user?.userId || 'usr_superadmin';
+  
+  const updatedTenant = core.updateTenantServices(tenantId, enabledServices || [], actorId);
+  if (!updatedTenant) {
+    return c.json({ error: 'Tenant not found' }, 404);
+  }
+  return c.json({ tenant: updatedTenant, message: 'Tenant active services configured successfully' });
 });

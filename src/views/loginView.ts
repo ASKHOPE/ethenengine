@@ -10,15 +10,49 @@ export function renderLoginView(tenantSlug: string): string {
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/animations.css" />
   <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(2, 6, 23, 0.6);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --input-color: #ffffff;
+      --sso-bg: rgba(255, 255, 255, 0.05);
+      --sso-border: rgba(255, 255, 255, 0.15);
+      --sso-color: #e2e8f0;
+      --toggle-bg: rgba(15, 23, 42, 0.6);
+      --toggle-border: rgba(255, 255, 255, 0.15);
+    }
+
+    [data-theme="day"] {
+      --bg-gradient: radial-gradient(circle at top left, #e0e7ff 0%, #f1f5f9 50%, #e2e8f0 100%);
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #f8fafc;
+      --input-border: #cbd5e1;
+      --input-color: #0f172a;
+      --sso-bg: #ffffff;
+      --sso-border: #cbd5e1;
+      --sso-color: #334155;
+      --toggle-bg: rgba(255, 255, 255, 0.8);
+      --toggle-border: #cbd5e1;
+    }
+
     body {
       margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(circle at top left, #1e1b4b 0%, #0f172a 50%, #020617 100%);
-      font-family: system-ui, -apple-system, sans-serif; color: #f8fafc;
+      background: var(--bg-gradient);
+      font-family: system-ui, -apple-system, sans-serif; color: var(--text-main);
+      transition: background 0.3s, color 0.3s;
+      position: relative;
     }
     .login-card {
-      width: 100%; max-width: 440px; padding: 2.5rem; background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      width: 100%; max-width: 440px; padding: 2.5rem; background: var(--card-bg);
+      backdrop-filter: blur(16px); border: 1px solid var(--card-border); border-radius: 1.25rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
     .brand-header { text-align: center; margin-bottom: 2rem; }
     .brand-logo {
@@ -28,10 +62,10 @@ export function renderLoginView(tenantSlug: string): string {
       box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
     }
     .input-group { margin-bottom: 1.25rem; }
-    .input-group label { display: block; font-size: 0.85rem; font-weight: 500; color: #94a3b8; margin-bottom: 0.5rem; }
+    .input-group label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem; }
     .input-control {
-      width: 100%; padding: 0.75rem 1rem; background: rgba(2, 6, 23, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0.5rem; color: white;
+      width: 100%; padding: 0.75rem 1rem; background: var(--input-bg);
+      border: 1px solid var(--input-border); border-radius: 0.5rem; color: var(--input-color);
       font-size: 0.95rem; box-sizing: border-box; transition: all 0.2s;
     }
     .input-control:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
@@ -41,27 +75,36 @@ export function renderLoginView(tenantSlug: string): string {
       cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: transform 0.1s, box-shadow 0.2s;
     }
     .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
-    .sso-divider { display: flex; align-items: center; margin: 1.5rem 0; color: #64748b; font-size: 0.8rem; }
-    .sso-divider::before, .sso-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1); }
+    .sso-divider { display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-muted); font-size: 0.8rem; }
+    .sso-divider::before, .sso-divider::after { content: ''; flex: 1; height: 1px; background: var(--input-border); }
     .sso-divider span { padding: 0 0.75rem; }
     .btn-keycloak {
-      width: 100%; padding: 0.85rem; background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 0.5rem; color: #e2e8f0;
+      width: 100%; padding: 0.85rem; background: var(--sso-bg);
+      border: 1px solid var(--sso-border); border-radius: 0.5rem; color: var(--sso-color);
       font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center;
       justify-content: center; gap: 0.75rem; transition: background 0.2s; text-decoration: none; box-sizing: border-box;
     }
-    .btn-keycloak:hover { background: rgba(255, 255, 255, 0.1); }
+    .btn-keycloak:hover { opacity: 0.9; }
     .alert-msg { padding: 0.75rem; border-radius: 0.5rem; font-size: 0.85rem; margin-bottom: 1.25rem; display: none; }
     .alert-error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
     .alert-success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac; }
+    .theme-corner-btn {
+      position: absolute; top: 20px; right: 20px;
+      background: var(--toggle-bg); border: 1px solid var(--toggle-border);
+      color: var(--text-main); font-weight: 700; font-size: 0.8rem;
+      padding: 0.5rem 0.9rem; border-radius: 8px; cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
   </style>
 </head>
 <body>
+  <button id="themeToggleBtn" onclick="toggleTheme()" class="theme-corner-btn">☀️ Day Mode</button>
+
   <div class="login-card animate-fade-in">
     <div class="brand-header">
       <div class="brand-logo">E</div>
-      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">ETHENENGINE</h2>
-      <p style="margin: 0.4rem 0 0; color: #94a3b8; font-size: 0.85rem;">Enterprise Multi-Tenant Platform</p>
+      <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--text-main);">ETHENENGINE</h2>
+      <p style="margin: 0.4rem 0 0; color: var(--text-muted); font-size: 0.85rem;">Enterprise Multi-Tenant Platform</p>
     </div>
 
     <div id="alertBox" class="alert-msg"></div>
@@ -74,7 +117,7 @@ export function renderLoginView(tenantSlug: string): string {
 
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="password" class="input-control" placeholder="••••••••" required value="password123" />
+        <input type="password" id="password" class="input-control" placeholder="••••••••" required value="Password123!" />
       </div>
 
       <button type="submit" class="btn-submit">Sign In to Workspace</button>
@@ -94,6 +137,30 @@ export function renderLoginView(tenantSlug: string): string {
   </div>
 
   <script>
+    function toggleTheme() {
+      const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+      const target = isDay ? 'night' : 'day';
+      if (target === 'day') {
+        document.documentElement.setAttribute('data-theme', 'day');
+        localStorage.setItem('login_theme', 'day');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('login_theme', 'night');
+      }
+      updateBtn();
+    }
+    function updateBtn() {
+      const isDay = document.documentElement.getAttribute('data-theme') === 'day';
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) btn.textContent = isDay ? '🌙 Night Mode' : '☀️ Day Mode';
+    }
+    (function() {
+      if (localStorage.getItem('login_theme') === 'day') {
+        document.documentElement.setAttribute('data-theme', 'day');
+      }
+      updateBtn();
+    })();
+
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('email').value;
