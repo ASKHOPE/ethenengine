@@ -59,6 +59,10 @@ export class BasicCMS {
     };
     this.contentTypes.set(blogPost.id, blogPost);
 
+    const now = typeof (globalThis as any).Temporal !== 'undefined'
+      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
+      : new Date().toISOString();
+
     const entry: ContentEntry = {
       id: 'entry_1',
       tenantId: 'tenant_default',
@@ -66,14 +70,25 @@ export class BasicCMS {
       slug: 'welcome-to-our-platform',
       data: {
         title: 'Welcome to the Next Generation Business Platform',
-        content: 'This modular platform architecture provides foundational capability engines for scalable web applications.',
+        content: '### Modular Engine Architecture\nThis platform leverages **Bun 1.4** native capabilities including **Bun.Image**, **Bun.markdown**, and **Event pipelines** for high-throughput performance.',
         author: 'Platform Architect',
         coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f',
       },
       status: 'published',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
     };
     this.entries.set(entry.id, entry);
+  }
+
+  /**
+   * Render entry content to HTML using native Bun.markdown
+   */
+  public renderEntryToHtml(entry: ContentEntry): string {
+    const rawContent = entry.data.content || '';
+    if (typeof Bun !== 'undefined' && typeof (Bun as any).markdown?.html === 'function') {
+      return (Bun as any).markdown.html(rawContent);
+    }
+    return rawContent.replace(/\n/g, '<br/>');
   }
 
   public createContentType(type: Omit<ContentType, 'id'>): ContentType {
@@ -92,10 +107,14 @@ export class BasicCMS {
   }
 
   public createEntry(entry: Omit<ContentEntry, 'id' | 'updatedAt'>): ContentEntry {
+    const now = typeof (globalThis as any).Temporal !== 'undefined'
+      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
+      : new Date().toISOString();
+
     const newEntry: ContentEntry = {
       ...entry,
       id: `entry_${Date.now()}`,
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
     };
     this.entries.set(newEntry.id, newEntry);
     this.eventBus.publish('cms.entry.created', newEntry, { tenantId: entry.tenantId });
@@ -112,9 +131,13 @@ export class BasicCMS {
   public publishEntry(id: string): ContentEntry {
     const entry = this.entries.get(id);
     if (!entry) throw new Error(`Entry ${id} not found`);
+    const now = typeof (globalThis as any).Temporal !== 'undefined'
+      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
+      : new Date().toISOString();
     entry.status = 'published';
-    entry.updatedAt = new Date().toISOString();
+    entry.updatedAt = now;
     this.eventBus.publish('cms.entry.published', entry, { tenantId: entry.tenantId });
     return entry;
   }
 }
+

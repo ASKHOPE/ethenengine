@@ -60,6 +60,22 @@ export class OpenAPIGenerator {
             },
           },
         },
+        '/api/media/process': {
+          post: {
+            summary: 'Native Bun.Image transformation and WebP/AVIF SIMD transcoding',
+            responses: {
+              '201': { description: 'Processed image metadata and cached reference' },
+            },
+          },
+        },
+        '/api/media/cron/status': {
+          get: {
+            summary: 'Inspect status and run history of native Bun.cron tasks',
+            responses: {
+              '200': { description: 'Active background cron jobs' },
+            },
+          },
+        },
       },
     };
   }

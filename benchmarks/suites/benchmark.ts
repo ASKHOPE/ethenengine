@@ -1,10 +1,7 @@
-// Benchmark Utility: Measures HTTP Throughput, Latency (P50/P95), and Memory Footprint
+import app from '../../src/index.js';
 
-import http from 'http';
-
-const TARGET_URL = process.env.TARGET_URL || 'http://localhost:3000/';
-const TOTAL_REQUESTS = 1000;
-const CONCURRENCY = 50;
+const TOTAL_REQUESTS = 5000;
+const CONCURRENCY = 100;
 
 interface BenchmarkResults {
   totalRequests: number;
@@ -20,20 +17,15 @@ interface BenchmarkResults {
 
 async function makeRequest(): Promise<number> {
   const start = performance.now();
-  return new Promise((resolve, reject) => {
-    const req = http.get(TARGET_URL, (res) => {
-      res.on('data', () => {});
-      res.on('end', () => {
-        resolve(performance.now() - start);
-      });
-    });
-    req.on('error', (err) => reject(err));
-  });
+  const req = new Request('http://localhost:3000/api/openapi.json');
+  const res = await app.fetch(req);
+  await res.text();
+  return performance.now() - start;
 }
 
 async function runBenchmark(): Promise<BenchmarkResults> {
   console.log(`=======================================================`);
-  console.log(` Starting Performance Benchmark against ${TARGET_URL}`);
+  console.log(` Starting Performance Benchmark against Native Bun + Hono App`);
   console.log(` Concurrency: ${CONCURRENCY} | Total Requests: ${TOTAL_REQUESTS}`);
   console.log(`=======================================================`);
 
@@ -91,6 +83,8 @@ runBenchmark().then((res) => {
   console.log(`📊 Latency P99: ${res.p99Ms.toFixed(2)} ms`);
   console.log(`💾 Memory Footprint (RSS): ${res.memoryUsageMB.toFixed(2)} MB`);
   console.log(`=======================================================`);
+  process.exit(0);
 }).catch((err) => {
   console.error('Benchmark Error:', err);
+  process.exit(1);
 });

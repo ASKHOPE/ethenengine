@@ -282,4 +282,23 @@ export class WebsiteBuilder {
     const cleanSlug = slug.replace(/^\/+/, '');
     return Array.from(this.pages.values()).find((p) => (p.tenantId === tenantId || p.tenantId === cleanId || p.tenantId === `tenant_${cleanId}`) && (p.slug === cleanSlug || p.slug === slug));
   }
+
+  /**
+   * Capture real-time page preview screenshot using native Bun 1.4 Bun.WebView
+   */
+  public async capturePageScreenshot(url: string, width = 1200, height = 800): Promise<Uint8Array | null> {
+    if (typeof Bun !== 'undefined' && typeof (Bun as any).WebView === 'function') {
+      try {
+        const view = new (Bun as any).WebView({ width, height });
+        await view.navigate(url);
+        const screenshotBlob = await view.screenshot();
+        const arrayBuffer = await screenshotBlob.arrayBuffer();
+        return new Uint8Array(arrayBuffer);
+      } catch (err) {
+        return null;
+      }
+    }
+    return null;
+  }
 }
+

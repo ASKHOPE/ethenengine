@@ -1,9 +1,6 @@
 // Aiven Cloud PostgreSQL Database Connection Engine & Schema Sync
 
 import pg from 'pg';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const { Pool } = pg;
 

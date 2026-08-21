@@ -24,12 +24,27 @@ import { runtimeInputValidator } from './foundation/RuntimeValidator.js';
 import { OpenAPIGenerator } from './foundation/OpenAPIGenerator.js';
 import { SyncEngine } from './foundation/SyncEngine.js';
 
+import { MediaEngine } from './capabilities/media/MediaEngine.js';
+import { ScheduledCronEngine } from './foundation/ScheduledCronEngine.js';
+
 type Variables = {
   tenant: any;
   userContext?: any;
 };
 
 const app = new Hono<{ Variables: Variables }>();
+
+// Boot Scheduled Cron Engine (Automated Backups & Telemetry via Bun.cron)
+const cronEngine = ScheduledCronEngine.getInstance();
+cronEngine.initializeJobs();
+
+// Listen to OS-level Memory Pressure notification (Bun 1.4 kernel event)
+if (typeof process !== 'undefined' && typeof process.on === 'function') {
+  process.on('memoryPressure' as any, (level: string) => {
+    console.warn(`[ETHENENGINE Kernel Alert] Memory pressure: ${level}. Evicting in-memory media & query caches.`);
+    MediaEngine.getInstance().clearCache();
+  });
+}
 
 // Serve Static Assets via Bun (Using Bun File API)
 app.use('/*', serveStatic({ root: './public' }));
@@ -69,6 +84,7 @@ const capabilityRegistry = CapabilityRegistry.getInstance();
 const themeEngine = ThemeEngine.getInstance();
 const cms = BasicCMS.getInstance();
 const websiteBuilder = WebsiteBuilder.getInstance();
+const mediaEngine = MediaEngine.getInstance();
 const auditLogger = AuditLogger.getInstance();
 const eventBus = EventBus.getInstance();
 
@@ -115,6 +131,16 @@ capabilityRegistry.registerCapability({
   version: '1.0.0',
   description: 'Headless structured content type and entry management engine',
   category: 'business',
+  enabled: true,
+  initialize: () => {},
+});
+
+capabilityRegistry.registerCapability({
+  id: 'capability_media_engine',
+  name: 'Native Media & Image Engine',
+  version: '1.4.0',
+  description: 'Zero-dependency Bun.Image SIMD transformer & WebP optimization pipeline',
+  category: 'experience',
   enabled: true,
   initialize: () => {},
 });
@@ -481,6 +507,45 @@ app.post('/api/cms/entries', async (c) => {
   const { contentTypeId, slug, data, status } = body;
   const entry = cms.createEntry({ tenantId: tenant.id, contentTypeId, slug, data, status: status || 'published' });
   return c.json({ entry }, 201);
+});
+
+// Native Bun.Image Processing Endpoints
+app.post('/api/media/process', async (c) => {
+  const tenant = c.get('tenant') as any;
+  const body = await c.req.parseBody();
+  const file = body['file'];
+  const width = body['width'] ? parseInt(body['width'] as string, 10) : 800;
+  const format = (body['format'] as any) || 'webp';
+  const quality = body['quality'] ? parseInt(body['quality'] as string, 10) : 85;
+
+  if (!file || !(file instanceof Blob)) {
+    // Generate an in-memory sample 1x1 PNG if no file provided
+    const samplePng = new Uint8Array([
+      0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+      0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+      0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+      0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+      0x42, 0x60, 0x82,
+    ]);
+    const meta = await mediaEngine.processAndStore(tenant.id, 'sample.png', samplePng, { width, format, quality });
+    return c.json({ status: 'ok', engine: 'Bun.Image (SIMD)', ...meta }, 201);
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  const meta = await mediaEngine.processAndStore(tenant.id, (file as any).name || 'upload.png', arrayBuffer, {
+    width,
+    format,
+    quality,
+  });
+  return c.json({ status: 'ok', engine: 'Bun.Image (SIMD)', ...meta }, 201);
+});
+
+app.get('/api/media/cron/status', (c) => {
+  return c.json({
+    status: 'ok',
+    engine: 'Bun.cron',
+    jobs: ScheduledCronEngine.getInstance().getJobStatuses(),
+  });
 });
 
 app.get('/api/theme', (c) => {

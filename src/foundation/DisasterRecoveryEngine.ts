@@ -40,24 +40,32 @@ export class DisasterRecoveryEngine {
   public async createBackup(tenantId: string): Promise<BackupMetadata> {
     const startTime = Date.now();
     const backupId = `bkp_${tenantId}_${Date.now()}`;
+    const now = typeof (globalThis as any).Temporal !== 'undefined'
+      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
+      : new Date().toISOString();
 
     // Collect snapshot data
     const snapshot = {
       tenantId,
-      timestamp: new Date().toISOString(),
+      timestamp: now,
       databaseData: this.persistenceDriver.getCollection(tenantId),
     };
 
     const filePath = path.join(this.backupDir, `${backupId}.json`);
     const jsonStr = JSON.stringify(snapshot, null, 2);
-    fs.writeFileSync(filePath, jsonStr, 'utf-8');
+
+    if (typeof Bun !== 'undefined' && typeof Bun.write === 'function') {
+      await Bun.write(filePath, jsonStr);
+    } else {
+      fs.writeFileSync(filePath, jsonStr, 'utf-8');
+    }
 
     const durationMs = Date.now() - startTime;
 
     const meta: BackupMetadata = {
       backupId,
       tenantId,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
       sizeBytes: Buffer.byteLength(jsonStr),
       rpoSeconds: 0, // Real-time snapshot
       rtoSeconds: Math.ceil(durationMs / 1000),
@@ -76,8 +84,13 @@ export class DisasterRecoveryEngine {
       throw new Error(`Backup archive ${backupId} not found`);
     }
 
-    const raw = fs.readFileSync(filePath, 'utf-8');
-    const snapshot = JSON.parse(raw);
+    let snapshot: any;
+    if (typeof Bun !== 'undefined' && typeof Bun.file === 'function') {
+      snapshot = await Bun.file(filePath).json();
+    } else {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      snapshot = JSON.parse(raw);
+    }
 
     // Restore collection to persistence store
     this.persistenceDriver.saveCollection(snapshot.tenantId, snapshot.databaseData);

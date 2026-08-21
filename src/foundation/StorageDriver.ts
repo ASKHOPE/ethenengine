@@ -23,13 +23,24 @@ export class LocalStorageDriver implements StorageDriver {
     const filePath = path.join(this.baseDir, key);
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(filePath, data);
+    
+    if (typeof Bun !== 'undefined' && Bun.write) {
+      await Bun.write(filePath, data);
+    } else {
+      fs.writeFileSync(filePath, data);
+    }
     return `/uploads/${key}`;
   }
 
   public async get(key: string): Promise<Buffer | null> {
     const filePath = path.join(this.baseDir, key);
     if (!fs.existsSync(filePath)) return null;
+    
+    if (typeof Bun !== 'undefined' && Bun.file) {
+      const file = Bun.file(filePath);
+      const arrayBuffer = await file.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    }
     return fs.readFileSync(filePath);
   }
 

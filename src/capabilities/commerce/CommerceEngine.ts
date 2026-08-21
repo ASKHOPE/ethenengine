@@ -111,6 +111,10 @@ export class CommerceEngine {
 
     const totalAmount = cart.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
+    const now = typeof (globalThis as any).Temporal !== 'undefined'
+      ? (globalThis as any).Temporal.Now.zonedDateTimeISO().toString()
+      : new Date().toISOString();
+
     const order: Order = {
       id: `ord_${Date.now()}`,
       tenantId,
@@ -118,7 +122,7 @@ export class CommerceEngine {
       items: [...cart.items],
       totalAmount,
       status: 'pending',
-      createdAt: new Date().toISOString(),
+      createdAt: now,
     };
 
     this.orders.set(order.id, order);

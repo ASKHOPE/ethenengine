@@ -162,4 +162,19 @@ export class ThemeEngine {
       }
     `.trim();
   }
+
+  /**
+   * Parse JSON5 theme definition (allowing comments, unquoted keys, trailing commas) via native Bun.JSON5
+   */
+  public importThemeFromJson5(tenantId: string, name: string, json5String: string): Theme {
+    let parsed: any;
+    if (typeof Bun !== 'undefined' && typeof (Bun as any).JSON5?.parse === 'function') {
+      parsed = (Bun as any).JSON5.parse(json5String);
+    } else {
+      parsed = JSON.parse(json5String);
+    }
+    const currentTheme = this.getThemeForTenant(tenantId);
+    return this.updateThemeTokens(currentTheme.id, parsed);
+  }
 }
+

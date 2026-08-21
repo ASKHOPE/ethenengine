@@ -1,10 +1,10 @@
 // Comprehensive Subsystem Benchmark Suite for ETHENENGINE Platform
 
-import { AuthTokenEngine } from '../src/core/AuthTokenEngine.js';
-import { SecurityCrypto } from '../src/foundation/SecurityCrypto.js';
-import { EventBus } from '../src/foundation/EventBus.js';
-import { SearchEngine } from '../src/core/SearchEngine.js';
-import { escapeHtml } from '../src/foundation/Sanitizer.js';
+import { AuthTokenEngine } from '../../src/core/AuthTokenEngine.js';
+import { SecurityCrypto } from '../../src/foundation/SecurityCrypto.js';
+import { EventBus } from '../../src/foundation/EventBus.js';
+import { SearchEngine } from '../../src/core/SearchEngine.js';
+import { escapeHtml } from '../../src/foundation/Sanitizer.js';
 
 async function benchmarkSubsystems() {
   console.log('=======================================================');

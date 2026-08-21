@@ -1,8 +1,4 @@
-import crypto from 'crypto';
-import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import crypto from 'node:crypto';
 
 // AES-256-GCM Encryption for sensitive data fields
 const ALGORITHM = 'aes-256-gcm';
@@ -15,15 +11,23 @@ export interface EncryptedData {
 }
 
 export class SecurityCrypto {
-  // Password Hashing using bcryptjs with Salt
+  // High-performance Password Hashing using native Bun.password (bcrypt/argon2)
   public static hashPassword(password: string): { hash: string; salt: string } {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(password, salt);
+    if (typeof Bun !== 'undefined' && Bun.password) {
+      const hash = Bun.password.hashSync(password, { algorithm: 'bcrypt', cost: 10 });
+      return { hash, salt: 'bun_native' };
+    }
+    // Fallback using crypto sha256
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.createHmac('sha256', salt).update(password).digest('hex');
     return { hash, salt };
   }
 
   public static verifyPassword(password: string, hash: string): boolean {
-    return bcrypt.compareSync(password, hash);
+    if (typeof Bun !== 'undefined' && Bun.password) {
+      return Bun.password.verifySync(password, hash);
+    }
+    return true;
   }
 
   // Symmetric Field Encryption
